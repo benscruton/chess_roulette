@@ -116,7 +116,7 @@ const Edit = props => {
                         editing = {true}
                         showPopup = {showPopup}
                     /> 
-                    <p>Password: {user? user.password : ""}</p>
+
                     <div id="changepw" style={{display: "none"}}>
                         <ChangePassword
                             handleChange = {handlepwInputs}
