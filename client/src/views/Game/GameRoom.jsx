@@ -143,20 +143,21 @@ const GameRoom = ({id}) => {
                     : ""
                 : ""
             }
-            
-            <GameBoard
-                statusFromParent={game? game.boardStatus : false}
-                whiteToPlay={game? game.whiteToPlay : true}
-                parentLog={game? game.moveLog : []}
-                playerIds = {{
-                    white: game && game.playerWhite.length ? game.playerWhite[0]._id : "",
-                    black: game && game.playerBlack.length ? game.playerBlack[0]._id : ""
-                }}
-                begun={game? game.begun : false}
-                gameId={id}
-                specialInfo={game? game.specialInfo : false}
-                spriteStyle={spriteStyle}
-            />
+            <div style={{margin: "0px auto"}}>
+                <GameBoard
+                    statusFromParent={game? game.boardStatus : false}
+                    whiteToPlay={game? game.whiteToPlay : true}
+                    parentLog={game? game.moveLog : []}
+                    playerIds = {{
+                        white: game && game.playerWhite.length ? game.playerWhite[0]._id : "",
+                        black: game && game.playerBlack.length ? game.playerBlack[0]._id : ""
+                    }}
+                    begun={game? game.begun : false}
+                    gameId={id}
+                    specialInfo={game? game.specialInfo : false}
+                    spriteStyle={spriteStyle}
+                />
+            </div>
             <div>
                 <h5 className="mt-2">Sprite style:</h5>
                 <button className="btn btn-primary mx-2" onClick={() => setSpriteStyle("")}>Normal</button>

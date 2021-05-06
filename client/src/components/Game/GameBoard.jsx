@@ -5,6 +5,7 @@ import styles from "./GameBoard.module.css";
 import io from "socket.io-client";
 
 import images from "./ImageSets/standardChess";
+import PawnPromotion from "../Game/PawnPromotion";
 const rules = require("./MoveLogic/StandardChess/standardChessMoves");
 
 const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, playerIds, spriteStyle}) => {
@@ -19,6 +20,7 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
     const [boardStatus, setBoardStatus] = useState(false);
     const [whiteToPlay, setWhiteToPlay] = useState(true);
     const [activeTile, setActiveTile] = useState(false);
+    const [pawnReady, setPawnReady] = useState(true);
     const [moveLog, setMoveLog] = useState([]);
     const [info, setInfo] = useState({});
     const [viewAsBlack, setViewAsBlack] = useState(false);
@@ -49,7 +51,9 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
         if(loggedIn._id === playerIds.black){
             console.log("you are playing as black");
             // console.log(playerIds.black);
-            setViewAsBlack(true);
+            if(loggedIn._id !== playerIds.white){
+                setViewAsBlack(true);
+            }
         }
         else{
             setViewAsBlack(false);
@@ -201,6 +205,17 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
     return (
         <div id="board">
             <h3>{whiteToPlay? "White" : "Black"}'s move</h3>
+
+            {pawnReady?
+                <PawnPromotion
+                    images={images}
+                    spriteStyle={spriteStyle}
+                    whiteToPlay={whiteToPlay}
+                />
+                :
+                <></>
+            }
+
             <div className={viewAsBlack? styles.boardContainerBlack : styles.boardContainer}>
                 {boardStatus?
                     boardStatus.map( (row, i) =>
