@@ -45,6 +45,9 @@ module.exports = {
                                     }
                                 })
                             }
+                            else {
+                                res.json({error: "Invalid login attempt."});
+                            }
                         })
                         .catch(err => res.json({error: "Invalid login attempt."}))
                 }
