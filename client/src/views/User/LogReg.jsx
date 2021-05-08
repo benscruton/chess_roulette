@@ -70,8 +70,43 @@ const LogReg = props => {
     }
 
     return (
-        <div className="d-flex justify-content-around p-5">
-            <form className="col-4" onSubmit={handleRegister}>
+        <div className="d-flex justify-content-around p-5 flex-wrap">
+            
+            <form className="col-lg-4 col-md-5 col-sm-10" onSubmit={handleLogin}>
+                <h2 className="text-center">Login</h2>
+
+                <div className="form-group">
+                    <label htmlFor="email">Email:</label>
+                    <input 
+                        type="email" 
+                        name="email"
+                        className="form-control"
+                        onChange={handleLogInputs}
+                        value={log.email}
+                    />
+                    <span className="text-danger">
+                        {logErrors.email ? logErrors.email.message : ""}
+                    </span>
+                </div>
+
+                <div className="form-group">
+                    <label htmlFor="password">Password:</label>
+                    <input 
+                        type="password" 
+                        name="password"
+                        className="form-control"
+                        onChange={handleLogInputs}
+                        value={log.password}
+                    />
+                    <span className="text-danger">
+                        {logErrors.password ? logErrors.password.message : ""}
+                    </span>
+                    <input type="submit" value="Login" className="btn btn-dark my-3"/>
+                </div>
+            </form>
+
+
+            <form className="col-lg-4 col-md-5 col-sm-10" onSubmit={handleRegister}>
                 <h2 className="text-center">Register</h2>
                 <div className="form-group">
                     <label htmlFor="firstName">First Name:</label>
@@ -158,42 +193,6 @@ const LogReg = props => {
                 </div>
 
                 <input type="submit" value="Register" className="btn btn-dark my-3"/>
-
-            </form>
-
-
-
-            <form className="col-4" onSubmit={handleLogin}>
-                <h2 className="text-center">Login</h2>
-
-                <div className="form-group">
-                    <label htmlFor="email">Email:</label>
-                    <input 
-                        type="email" 
-                        name="email"
-                        className="form-control"
-                        onChange={handleLogInputs}
-                        value={log.email}
-                    />
-                    <span className="text-danger">
-                        {logErrors.email ? logErrors.email.message : ""}
-                    </span>
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="password">Password:</label>
-                    <input 
-                        type="password" 
-                        name="password"
-                        className="form-control"
-                        onChange={handleLogInputs}
-                        value={log.password}
-                    />
-                    <span className="text-danger">
-                        {logErrors.password ? logErrors.password.message : ""}
-                    </span>
-                    <input type="submit" value="Login" className="btn btn-dark my-3"/>
-                </div>
 
             </form>
         </div>

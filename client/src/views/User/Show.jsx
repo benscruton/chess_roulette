@@ -19,7 +19,7 @@ const Show = props => {
                 <h2 className="card-title">{user.firstName}</h2>
                 <p className="card-text">{user.lastName}</p>
             </div>
-            <button className="btn btn-warning" onClick={() => navigate(`/users/edit/${props.id}`)}>Edit</button>
+            <button className="btn btn-warning mb-2" onClick={() => navigate(`/users/${props.id}/edit`)}>Edit</button>
         </div>
     )
 }
