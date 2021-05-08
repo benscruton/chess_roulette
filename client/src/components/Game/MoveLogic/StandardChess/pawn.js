@@ -9,6 +9,9 @@ const checkMoves =  (tile, boardStatus, specialInfo) => {
     const piece = tile.occupied;
 
     const moves = [];
+
+    // prevent crashing if a pawn is clicked on while awaiting promotion
+    if(tile.rank == 1 || tile.rank == 8) return moves;
     
     // White pawns: normal moves
     if(piece.color === "white"){

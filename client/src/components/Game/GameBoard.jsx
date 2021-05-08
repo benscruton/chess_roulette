@@ -20,7 +20,6 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
     const [boardStatus, setBoardStatus] = useState(false);
     const [whiteToPlay, setWhiteToPlay] = useState(true);
     const [activeTile, setActiveTile] = useState(false);
-    const [pawnReady, setPawnReady] = useState(true);
     const [moveLog, setMoveLog] = useState([]);
     const [info, setInfo] = useState({});
     const [viewAsBlack, setViewAsBlack] = useState(false);
@@ -83,7 +82,8 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
     }, [socket]);
 
     const clickTile = (tile) => {
-        if(movesToHere(tile)){
+        if(movesToHere(tile) && !info.pawnReady){
+            let pawnReadyNow = info.pawnReady;
             // Make sure 1) game has begun, 2) it is their turn, and 3) it's the right player
             if(begun
                 && (activeTile.occupied.color === "white") - (whiteToPlay) === 0
@@ -151,11 +151,17 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
                         castlingLegalAfterThisMove[`E${activeTile.rank}`] = false;
                         castlingLegalAfterThisMove[`H${activeTile.rank}`] = false;
                     }
-                
+
+                // Special case: pawn promotion
+                    if(tile.occupied.type === "pawn" && (tile.rank === 1 || tile.rank === 8)){
+                        pawnReadyNow = tile;
+                    }
+
                 // Update special info on the front end:
                     setInfo({...info,
                         castlingLegal: castlingLegalAfterThisMove,
-                        enPassantAvailable: enPassant
+                        enPassantAvailable: enPassant,
+                        pawnReady: pawnReadyNow,
                     });
                     
 
@@ -169,11 +175,15 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
                 setMoveLog(moveLogTemp);
                 
                 // send move to database:
-                Axios.put(`http://localhost:8000/api/games/${gameId}`, {boardStatus, whiteToPlay: !whiteToPlay, moveLog: moveLogTemp, $set: {"specialInfo.enPassantAvailable": enPassant, "specialInfo.castlingLegal": castlingLegalAfterThisMove}})
-                    // .then(setWhiteToPlay(!whiteToPlay))
+                Axios.put(`http://localhost:8000/api/games/${gameId}`, {boardStatus, whiteToPlay: (pawnReadyNow? whiteToPlay : !whiteToPlay), moveLog: moveLogTemp, $set: {"specialInfo.enPassantAvailable": enPassant, "specialInfo.castlingLegal": castlingLegalAfterThisMove, "specialInfo.pawnReady": pawnReadyNow}})
+                    // .then(() => {
+                    //     if(!pawnReadyNow) setWhiteToPlay(!whiteToPlay);
+                    //     setThisUserMoves(thisUserMoves + 1);   
+                    // })
                     .catch(err => console.error({errors: err}))
                 
-                setWhiteToPlay(!whiteToPlay);
+                // These lines might eventually get moved into the "then" statement, but for now I'll leave them outside so that front-end-only play will still work.
+                if(!pawnReadyNow) setWhiteToPlay(!whiteToPlay);
                 setThisUserMoves(thisUserMoves + 1);
             }
 
@@ -202,15 +212,48 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
         return false;
     }
 
+    const promotePawn = (tileCopy, choice) => {
+        if(playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id){
+            let boardRow = (tileCopy.rank === 8? 0 : 7);
+            let boardStatusTemp = boardStatus;
+            for(let i=0; i<boardStatusTemp[boardRow].length; i++){
+                if(boardStatusTemp[boardRow][i].file === tileCopy.file){
+                    boardStatusTemp[boardRow][i].occupied.type = choice;
+                    console.log(boardStatusTemp[boardRow][i]);
+                }
+            }
+            setBoardStatus(boardStatusTemp);
+            let moveLogTemp = [...moveLog];
+            moveLogTemp[moveLogTemp.length - 1][whiteToPlay? 0 : 1] += (choice === "knight"? "N" : choice.substring(0, 1).toUpperCase());
+            setMoveLog(moveLogTemp);
+            setInfo({...info,
+                pawnReady: false
+            });
+            
+            Axios.put(`http://localhost:8000/api/games/${gameId}`, {boardStatus: boardStatusTemp, whiteToPlay: !whiteToPlay, moveLog: moveLogTemp, $set: {"specialInfo.pawnReady": false}})
+                // .then(() => {
+                //     setWhiteToPlay(!whiteToPlay);
+                //     setThisUserMoves(thisUserMoves + 1);
+                // })
+                .catch(err => console.error({errors: err}))
+            
+            // See above note -- these lines may eventually get moved into a "then" call but for now I will leave them out of it so front-end-only play works
+            setWhiteToPlay(!whiteToPlay);
+            setThisUserMoves(thisUserMoves + 1);
+        }
+    }
+
     return (
         <div id="board">
             <h3>{whiteToPlay? "White" : "Black"}'s move</h3>
 
-            {pawnReady?
+            {info.pawnReady && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id?
                 <PawnPromotion
                     images={images}
                     spriteStyle={spriteStyle}
                     whiteToPlay={whiteToPlay}
+                    tile={info.pawnReady}
+                    promotePawn={promotePawn}
                 />
                 :
                 <></>

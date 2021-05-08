@@ -22,6 +22,8 @@ function addSpecialInfo(){
         H8: true
     }
 
+    specialInfo.pawnReady = false;
+
     return specialInfo;
 }
 
