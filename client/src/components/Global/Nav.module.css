@@ -1,0 +1,37 @@
+.bar{
+    color: navajowhite;
+    background-color: #773388;
+    width: 100%;
+    /* font-weight: bold; */
+}
+
+.barIcon{
+    color: navajowhite;
+}
+
+.logo{
+    font-family: Girassol, cursive;
+    /* color: blue; */
+}
+
+.innerlink, .innerlogout{
+    color: burlywood;
+    border-top: 2px solid #773388;
+    border-bottom: 2px solid #773388;
+    /* font-family: Raleway; */
+}
+
+.innerlink:hover{
+    color: navajowhite;
+    border-top: 2px solid navajowhite;
+    border-bottom: 2px solid navajowhite;
+    border-radius: 5px;
+}
+
+.innerlogout:hover{
+    color: navajowhite;
+    border-top: 2px solid red;
+    border-bottom: 2px solid red;
+    border-radius: 5px;
+}
+

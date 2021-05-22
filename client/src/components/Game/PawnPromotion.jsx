@@ -14,6 +14,7 @@ const PawnPromotion = ({images, spriteStyle, whiteToPlay, tile, promotePawn}) =>
                 >
                     <img
                         src={images[`${whiteToPlay? "white" : "black"}knight${spriteStyle}`]}
+                        alt="N"
                     />
                 </div>
 
@@ -23,6 +24,7 @@ const PawnPromotion = ({images, spriteStyle, whiteToPlay, tile, promotePawn}) =>
                 >
                     <img
                         src={images[`${whiteToPlay? "white" : "black"}bishop${spriteStyle}`]}
+                        alt="B"
                     />
                 </div>
 
@@ -32,6 +34,7 @@ const PawnPromotion = ({images, spriteStyle, whiteToPlay, tile, promotePawn}) =>
                 >
                     <img
                         src={images[`${whiteToPlay? "white" : "black"}rook${spriteStyle}`]}
+                        alt="R"
                     />
                 </div>
 
@@ -41,6 +44,7 @@ const PawnPromotion = ({images, spriteStyle, whiteToPlay, tile, promotePawn}) =>
                 >
                     <img
                         src={images[`${whiteToPlay? "white" : "black"}queen${spriteStyle}`]}
+                        alt="Q"
                     />
                 </div>
             </div>
