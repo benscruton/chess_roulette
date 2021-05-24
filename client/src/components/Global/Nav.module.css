@@ -14,24 +14,30 @@
     /* color: blue; */
 }
 
-.innerlink, .innerlogout{
+.navlink, .loginlink, .logoutlink{
     color: burlywood;
     border-top: 2px solid #773388;
     border-bottom: 2px solid #773388;
     /* font-family: Raleway; */
 }
 
-.innerlink:hover{
+.navlink:hover{
     color: navajowhite;
     border-top: 2px solid navajowhite;
     border-bottom: 2px solid navajowhite;
     border-radius: 5px;
 }
 
-.innerlogout:hover{
-    color: navajowhite;
+.loginlink:hover{
+    color: mediumseagreen;
+    border-top: 2px solid mediumseagreen;
+    border-bottom: 2px solid mediumseagreen;
+    border-radius: 5px;
+}
+
+.logoutlink:hover{
+    color: red;
     border-top: 2px solid red;
     border-bottom: 2px solid red;
     border-radius: 5px;
 }
-

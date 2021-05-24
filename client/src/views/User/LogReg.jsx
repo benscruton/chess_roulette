@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Axios from 'axios';
 
 
-const LogReg = props => {
+const LogReg = ({setLoggedIn}) => {
     const initialReg = {
         firstName : "",
         lastName : "",
@@ -23,24 +23,30 @@ const LogReg = props => {
         })
     }
 
+    const logUserIn = u => {
+        localStorage.setItem("user", JSON.stringify(u));
+        setLoggedIn(u);
+        navigate(`/users/${u._id}`);
+    };
+
     const handleRegister = (e) => {
         e.preventDefault();
         Axios.post('http://localhost:8000/api/register', reg, {withCredentials:true})
             .then(res => {
                 console.log(res.data)
                 if (res.data.msg) {
-                    localStorage.setItem("user", JSON.stringify(res.data.userLogged))
-                    navigate('/dashboard')
+                    logUserIn(res.data.userLogged);
+                    // navigate('/dashboard')
                 } else {
                     setRegErrors(res.data);
                 }
             })
-    }
+    };
     
     const initialLog = {
         email : "",
         password : "",
-    }
+    };
     
     const [log, setLog] = useState(initialLog);
     const [logErrors, setLogErrors] = useState(initialLog);
@@ -58,8 +64,8 @@ const LogReg = props => {
         .then(res => {
             console.log(res.data)
             if (res.data.msg) {
-                localStorage.setItem("user", JSON.stringify(res.data.userLogged))
-                navigate('/dashboard')
+                logUserIn(res.data.userLogged);
+                // navigate('/dashboard')
             } else {
                 setLogErrors({
                     email: {message: res.data.error},

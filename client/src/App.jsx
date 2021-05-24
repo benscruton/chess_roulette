@@ -17,15 +17,18 @@ import './App.css';
 
 const App = () => {
 
-  const [loggedIn] = useState(
-    JSON.parse(localStorage.getItem("user")) || {
-      firstName: "No One",
-      lastName: "LoggedIn",
-    }
+  const noUser = {
+    firstName: "No One",
+    lastName: "Logged In",
+  };
+
+  const [loggedIn, setLoggedIn] = useState(
+    JSON.parse(localStorage.getItem("user")) || noUser
   );
 
   const logout = e => {
     e.preventDefault();
+    setLoggedIn(noUser);
     blarg.get(`http://localhost:8000/api/logout`, { withCredentials: true })
       .then( () => {
         localStorage.clear();
@@ -62,10 +65,12 @@ const App = () => {
         logout={logout}
         className="col-12"
       />
-
+      <div className="col-12">
+        <button onClick={() => console.log(loggedIn)} className="btn btn-info">Log user</button>
+      </div>
       <div className="col-lg-8 col-md-10 col-sm-12">
         <Router>
-          <LogReg path="/" />
+          <LogReg path="/" setLoggedIn={setLoggedIn}/>
           <Main path="/dashboard" />
           {/* <Create path="/users/new" /> */}
           <Edit path="/users/:id/edit" />

@@ -56,22 +56,31 @@ const Nav = ({loggedIn, logout}) => {
         <div id="collapsingmenu">
           <ul className="navbar-nav ml-auto">
 
+            {loggedIn.email ?
+              <li className="nav-item mx-lg-3 mx-md-1">
+                <Link className={`nav-link ${styles.navlink}`} to={`/users/${loggedIn._id}`}>Profile</Link>
+              </li>
+              :
+              <></>
+            }
+
             <li className="nav-item mx-lg-3 mx-md-1">
-              <Link className={`nav-link ${styles.innerlink}`} to={`/users/${loggedIn._id}`}>Profile</Link>
+              <Link className={`nav-link ${styles.navlink}`} to="/games">All Games</Link>
             </li>
 
             <li className="nav-item mx-lg-3 mx-md-1">
-              <Link className={`nav-link ${styles.innerlink}`} to="/games">All Games</Link>
+              <Link className={`nav-link ${styles.navlink}`} to="/games/new">New Game</Link>
             </li>
 
-            <li className="nav-item mx-lg-3 mx-md-1">
-              <Link className={`nav-link ${styles.innerlink}`} to="/games/new">New Game</Link>
-            </li>
-
-            <li className="nav-item mx-lg-3 mx-md-1">
-              <a className={`nav-link ${styles.innerlogout}`} href="/logout" onClick={logout}>Log Out</a>
-            </li>
-
+            {loggedIn.email ?
+              <li className="nav-item mx-lg-3 mx-md-1">
+                <a className={`nav-link ${styles.logoutlink}`} href="/logout" onClick={logout}>Log Out</a>
+              </li>
+              :
+              <li className="nav-item mx-lg-3 mx-md-1">
+                <Link className={`nav-link ${styles.loginlink}`} to="/">Log In</Link>
+              </li>
+            }
           </ul>
         </div>
       </div>
