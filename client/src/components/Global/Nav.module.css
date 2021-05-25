@@ -15,7 +15,7 @@
 }
 
 .navlink, .loginlink, .logoutlink{
-    color: burlywood;
+    color: #e6b276;
     border-top: 2px solid #773388;
     border-bottom: 2px solid #773388;
     /* font-family: Raleway; */
@@ -23,7 +23,7 @@
 
 .navlink:hover{
     color: navajowhite;
-    border-top: 2px solid navajowhite;
+    border-top: 2px solid #ffdead;
     border-bottom: 2px solid navajowhite;
     border-radius: 5px;
 }

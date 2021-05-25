@@ -65,21 +65,18 @@ const App = () => {
         logout={logout}
         className="col-12"
       />
-      <div className="col-12">
-        <button onClick={() => console.log(loggedIn)} className="btn btn-info">Log user</button>
-      </div>
       <div className="col-lg-8 col-md-10 col-sm-12">
         <Router>
           <LogReg path="/" setLoggedIn={setLoggedIn}/>
-          <Main path="/dashboard" />
+          {/* <Main path="/dashboard" /> */}
           {/* <Create path="/users/new" /> */}
           <Edit path="/users/:id/edit" />
-          <Show path="/users/:id" />
+          <Show path="/users/:id" loggedIn={loggedIn}/>
 
           {/* <GameRoom path="/games" /> */}
           <NewGame path="/games/new" />
           <GameLobby path="/games" />
-          <GameRoom path="/games/:id" />
+          <GameRoom path="/games/:id" loggedIn={loggedIn}/>
         </Router>
       </div>
     </div>

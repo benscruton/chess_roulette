@@ -3,10 +3,10 @@ const {User} = require('../models/user.model'),
     bcrypt = require('bcrypt');
 
 module.exports = {
-    register: (req,res) => {
+    register: (req,rsp) => {
         User.create(req.body)
             .then(data => {
-                res.cookie("usertoken",jwt.sign({id:data._id}, process.env.JWT_KEY), {
+                rsp.cookie("usertoken",jwt.sign({id:data._id}, process.env.JWT_KEY), {
                     httpOnly:true,
                     expires: new Date(Date.now() + 90000000000)
                 }).json({
@@ -20,18 +20,18 @@ module.exports = {
                     }
                 })
             })
-            .catch( err => res.json(err.errors))
+            .catch( err => rsp.json(err.errors))
     },
-    login: (req,res) => {
+    login: (req,rsp) => {
         User.findOne({email:req.body.email})
             .then(data => {
                 if (data === null) {
-                    res.json({error: "Invalid login attempt."})
+                    rsp.json({error: "Invalid login attempt."})
                 } else {
                     bcrypt.compare(req.body.password,data.password)
                         .then(isValid => {
                             if (isValid === true) {
-                                res.cookie("usertoken",jwt.sign({id:data._id}, process.env.JWT_KEY), {
+                                rsp.cookie("usertoken",jwt.sign({id:data._id}, process.env.JWT_KEY), {
                                     httpOnly:true,
                                     expires: new Date(Date.now() + 90000000000)
                                 }).json({
@@ -46,25 +46,25 @@ module.exports = {
                                 })
                             }
                             else {
-                                res.json({error: "Invalid login attempt."});
+                                rsp.json({error: "Invalid login attempt."});
                             }
                         })
-                        .catch(err => res.json({error: "Invalid login attempt."}))
+                        .catch(err => rsp.json({error: "Invalid login attempt."}))
                 }
             })
-            .catch(err => res.json({error: "Invalid login attempt."}))
+            .catch(err => rsp.json({error: "Invalid login attempt."}))
     },
-    logout: (req,res) => {
-        res.clearCookie("usertoken");
-        res.json({msg:"logged out"});
+    logout: (req,rsp) => {
+        rsp.clearCookie("usertoken");
+        rsp.json({msg:"logged out"});
     },
 
 
-    checkPasswordBeforeChange : (req, res) => {
+    checkPasswordBeforeChange : (req, rsp) => {
         User.findOne({email:req.body.email})
             .then(data => {
                 if (data === null) {
-                    res.json({error: "Invalid user."})
+                    rsp.json({error: "Invalid user."})
                 } else {
                     bcrypt.compare(req.body.password,data.password)
                         .then(isValid => {
@@ -74,11 +74,11 @@ module.exports = {
                                     bcrypt.hash(req.body.newPassword,10)
                                         .then(hash => {
                                             User.updateOne({_id:data._id}, {password: hash}, {runValidators:true, new:true})
-                                                .catch(err => res.status(400).json({errors: err.errors}))
+                                                .catch(err => rsp.status(400).json({errors: err.errors}))
                                         })
                                         .catch(err => console.error({errors: err}));
 
-                                    res.cookie("usertoken",jwt.sign({id:data._id}, process.env.JWT_KEY), {
+                                    rsp.cookie("usertoken",jwt.sign({id:data._id}, process.env.JWT_KEY), {
                                         httpOnly:true,
                                         expires: new Date(Date.now() + 90000000000)
                                     }).json({msg:"Password updated!"})
@@ -86,19 +86,19 @@ module.exports = {
                                 else{
                                     // respond with errors about how passwords don't match.
                                     console.log("This is an error.");
-                                    res.json({error: "Passwords don't match."});
+                                    rsp.json({error: "Passwords don't match."});
                                     return;
                                 }
 
                                 
                             }
                             else{
-                                res.json({error: "Invalid password."});
+                                rsp.json({error: "Invalid password."});
                             }
                         })
-                        .catch(err => res.json({error: "Invalid login attempt."}))
+                        .catch(err => rsp.json({error: "Invalid login attempt."}))
                 }
             })
-            .catch(err => res.json({error: "Invalid login attempt."}))
+            .catch(err => rsp.json({error: "Invalid login attempt."}))
     }
 }

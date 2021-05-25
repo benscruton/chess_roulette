@@ -3,12 +3,8 @@ import axios from "axios";
 import React, {useState, useEffect} from "react";
 import GameBoard from "../../components/Game/GameBoard";
 
-const GameRoom = ({id}) => {
+const GameRoom = ({id, loggedIn}) => {
 
-    const [loggedIn, setLoggedIn] = useState(JSON.parse(localStorage.getItem("user")) || {
-        firstName:"No One",
-        lastName: "LoggedIn"
-    })
     const [spriteStyle, setSpriteStyle] = useState("");
     const [game, setGame] = useState(false);
     
@@ -21,7 +17,7 @@ const GameRoom = ({id}) => {
 
     const deleteGame = e => {
         axios.delete(`http://localhost:8000/api/games/${id}`)
-            .then(() => navigate("/dashboard"))
+            .then(() => navigate("/games"))
             .catch(err => console.error({errors: err}));
     }
 

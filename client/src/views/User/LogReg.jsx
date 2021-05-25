@@ -79,7 +79,7 @@ const LogReg = ({setLoggedIn}) => {
         <div className="d-flex justify-content-around p-5 flex-wrap">
             
             <form className="col-lg-4 col-md-5 col-sm-10" onSubmit={handleLogin}>
-                <h2 className="text-center">Login</h2>
+                <h2 className="text-center">Log In</h2>
 
                 <div className="form-group">
                     <label htmlFor="email">Email:</label>
