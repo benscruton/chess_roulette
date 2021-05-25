@@ -2,11 +2,10 @@ import {useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Router, navigate} from '@reach/router';
 import blarg from "axios";
-// import Create from './views/User/Create';
 import Nav from "./components/Global/Nav";
 import Edit from './views/User/Edit';
 import Show from './views/User/Show';
-import Main from './views/Main';
+// import Main from './views/Main';
 import GameRoom from './views/Game/GameRoom';
 import LogReg from './views/User/LogReg';
 import NewGame from './views/Game/NewGame';
@@ -69,11 +68,9 @@ const App = () => {
         <Router>
           <LogReg path="/" setLoggedIn={setLoggedIn}/>
           {/* <Main path="/dashboard" /> */}
-          {/* <Create path="/users/new" /> */}
           <Edit path="/users/:id/edit" />
           <Show path="/users/:id" loggedIn={loggedIn}/>
 
-          {/* <GameRoom path="/games" /> */}
           <NewGame path="/games/new" />
           <GameLobby path="/games" />
           <GameRoom path="/games/:id" loggedIn={loggedIn}/>

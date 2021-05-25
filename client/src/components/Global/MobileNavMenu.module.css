@@ -1,0 +1,51 @@
+.bar{
+    color: navajowhite;
+    background-color: #773388;
+    width: 100%;
+    /* font-weight: bold; */
+}
+
+.barIcon{
+    color: navajowhite;
+}
+
+.logo{
+    font-family: Girassol, cursive;
+    /* color: blue; */
+}
+
+.navlink, .loginlink, .logoutlink{
+    color: #e6b276;
+    border-right: 2px solid #773388;
+    border-left: 2px solid #773388;
+    padding-left: 9px;
+    padding-right: 9px;
+    /* font-family: Raleway; */
+}
+
+.navlink:hover{
+    color: navajowhite;
+    border-right: 2px solid #ffdead;
+    border-left: 2px solid navajowhite;
+    border-radius: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.loginlink:hover{
+    color: mediumseagreen;
+    border-right: 2px solid mediumseagreen;
+    border-left: 2px solid mediumseagreen;
+    border-radius: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.logoutlink:hover{
+    color: red;
+    border-right: 2px solid red;
+    border-left: 2px solid red;
+    border-radius: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+}

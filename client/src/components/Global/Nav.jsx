@@ -2,42 +2,25 @@ import React, {useEffect, useState} from "react";
 import {Link} from "@reach/router";
 import styles from "./Nav.module.css";
 import {List} from "react-bootstrap-icons";
+import MobileNavMenu from "./MobileNavMenu";
 
 
 const Nav = ({loggedIn, logout}) => {
-
-  const [prevScreenWidth, setPrevScreenWidth] = useState(window.innerWidth);
+  const [viewMobileMenu, setViewMobileMenu] = useState(false);
 
   const chooseMenuBasedOnSize = () => {
-    
-    console.log(window);
-    console.log(window.innerWidth);
-    setPrevScreenWidth(window.innerWidth);
-
-
-    // if(window.innerWidth < 768 && !isMobileSize){
-    //   document.getElementById("collapsingmenu").classList = ["collapse"];
-    //   setIsMobileSize(true);
-    // }
-
-    // else if(window.innerWidth >= 768 && isMobileSize){
-    //   document.getElementById("collapsingmenu").classList = [];
-    //   setIsMobileSize(false);
-    // }
+    if(window.innerWidth >= 768){
+      setViewMobileMenu(false);
+      document.getElementById("collapsingmenu").classList = [];
+    }
+    else {
+      document.getElementById("collapsingmenu").classList = ["collapse"];
+    }
   };
 
   useEffect( () => {
     window.addEventListener("resize", chooseMenuBasedOnSize);
   }, []);
-
-  const toggleMenu = (e) => {
-    let menu = document.getElementById("collapsingmenu");
-    if(menu.classList.contains("collapse")){
-      menu.classList = [];
-    } else {
-      menu.classList = ["collapse"];
-    }
-  }
 
   return (
     <nav className={`navbar navbar-expand-md col-12 mb-1 d-flex ${styles.bar}`}>
@@ -47,7 +30,7 @@ const Nav = ({loggedIn, logout}) => {
         <div className="col-md-12 col-sm-0">
           <button
             className={`navbar-toggler ${styles.barIcon}`}
-            onClick={toggleMenu}
+            onClick={() => setViewMobileMenu(!viewMobileMenu)}
           >
             <List />
           </button>
@@ -82,7 +65,13 @@ const Nav = ({loggedIn, logout}) => {
               </li>
             }
           </ul>
+          
         </div>
+        {viewMobileMenu ? 
+            <MobileNavMenu loggedIn={loggedIn} logout={logout} />
+            :
+            <></>
+          }
       </div>
     </nav>
 

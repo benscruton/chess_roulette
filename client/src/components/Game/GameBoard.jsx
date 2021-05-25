@@ -45,14 +45,8 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
     }, [specialInfo]);
 
     useEffect( () => {
-        console.log(loggedIn._id);
-        console.log(playerIds);
         if(loggedIn._id === playerIds.black){
-            console.log("you are playing as black");
-            // console.log(playerIds.black);
-            if(loggedIn._id !== playerIds.white){
-                setViewAsBlack(true);
-            }
+            setViewAsBlack(loggedIn._id !== playerIds.white);
         }
         else{
             setViewAsBlack(false);
