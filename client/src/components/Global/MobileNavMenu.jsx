@@ -16,12 +16,12 @@ const MobileNavMenu = ({loggedIn, logout, toggleMenu}) => {
       <div className={styles.shadow} onClick={toggleMenu}></div>
       <ul className={`navbar-nav ${styles.block}`}>
 
-        <button
+        {/* <button
           className={`navbar-toggler ${styles.menuIcon}`}
           onClick={toggleMenu}
         >
           <List />
-        </button>
+        </button> */}
 
         {loggedIn.email ?
           <li>
