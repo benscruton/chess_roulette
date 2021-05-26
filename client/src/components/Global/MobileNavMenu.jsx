@@ -9,7 +9,6 @@ const MobileNavMenu = ({loggedIn, logout, toggleMenu}) => {
     e.preventDefault();
     logout(e);
     toggleMenu();
-    // navigate("/");
   }
 
   return (
@@ -77,7 +76,6 @@ const MobileNavMenu = ({loggedIn, logout, toggleMenu}) => {
             >Log In</Link>
           </li>
         }
-        <li><button onClick={() => console.log(loggedIn)}>log usr</button></li>
       </ul>
     </>
   );

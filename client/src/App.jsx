@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Router, navigate} from '@reach/router';
-import axios from "axios";
+import {Router} from '@reach/router';
 import Nav from "./components/Global/Nav";
 import Edit from './views/User/Edit';
 import Show from './views/User/Show';
@@ -25,11 +24,7 @@ const App = () => {
     JSON.parse(localStorage.getItem("user")) || noUser
   );
 
-// const [loggedIn, setLoggedIn] = useState(JSON.parse(localStorage.getItem("user")) || 
-//   {
-//     firstName:"No One",
-//     lastName: "LoggedIn"
-//   })
+
 // const [socket] = useState(() => io(":8000"))
 // const [input, setInput] = useState("");
 // const [messages, setMessages] = useState([])
