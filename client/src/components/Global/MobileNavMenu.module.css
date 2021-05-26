@@ -1,11 +1,25 @@
-.bar{
+.shadow{
+    position: fixed;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background-color: #0007;
+    z-index: 8;
+}
+
+.block{
     color: navajowhite;
-    background-color: #773388;
-    width: 100%;
+    background-color: #738;
+    margin-top: -10px;
+    padding: 20px 30px;
+    position: absolute;
+    right: 0;
+    z-index: 9;
     /* font-weight: bold; */
 }
 
-.barIcon{
+.menuIcon{
     color: navajowhite;
 }
 
@@ -16,10 +30,10 @@
 
 .navlink, .loginlink, .logoutlink{
     color: #e6b276;
-    border-right: 2px solid #773388;
-    border-left: 2px solid #773388;
-    padding-left: 9px;
-    padding-right: 9px;
+    border-right: 2px solid #738;
+    border-left: 2px solid #738;
+    border-radius: 5px;
+    padding: 8px 10px !important;
     /* font-family: Raleway; */
 }
 
@@ -28,8 +42,8 @@
     border-right: 2px solid #ffdead;
     border-left: 2px solid navajowhite;
     border-radius: 5px;
-    padding-left: 5px;
-    padding-right: 5px;
+    /* padding-left: 5px;
+    padding-right: 5px; */
 }
 
 .loginlink:hover{
@@ -37,8 +51,8 @@
     border-right: 2px solid mediumseagreen;
     border-left: 2px solid mediumseagreen;
     border-radius: 5px;
-    padding-left: 5px;
-    padding-right: 5px;
+    /* padding-left: 5px;
+    padding-right: 5px; */
 }
 
 .logoutlink:hover{

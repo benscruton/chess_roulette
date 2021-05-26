@@ -1,39 +1,86 @@
 import React from "react";
-import {Link} from "@reach/router";
+import {Link, navigate} from "@reach/router";
 import styles from "./MobileNavMenu.module.css";
+import {List} from "react-bootstrap-icons";
 
-const MobileNavMenu = ({loggedIn, logout}) => {
+const MobileNavMenu = ({loggedIn, logout, toggleMenu}) => {
 
-    return (
-        <ul className="navbar-nav ml-auto">
+  const logoutAndToggleMenu = e => {
+    e.preventDefault();
+    logout(e);
+    toggleMenu();
+    // navigate("/");
+  }
 
-            {loggedIn.email ?
-              <li className="nav-item mx-lg-3 mx-md-1">
-                <Link className={`nav-link ${styles.navlink}`} to={`/users/${loggedIn._id}`}>Profile</Link>
-              </li>
-              :
-              <></>
-            }
+  return (
+    <>
+      <div className={styles.shadow} onClick={toggleMenu}></div>
+      <ul className={`navbar-nav ${styles.block}`}>
 
-            <li className="nav-item mx-lg-3 mx-md-1">
-              <Link className={`nav-link ${styles.navlink}`} to="/games">All Games</Link>
-            </li>
+        <button
+          className={`navbar-toggler ${styles.menuIcon}`}
+          onClick={toggleMenu}
+        >
+          <List />
+        </button>
 
-            <li className="nav-item mx-lg-3 mx-md-1">
-              <Link className={`nav-link ${styles.navlink}`} to="/games/new">New Game</Link>
-            </li>
+        {loggedIn.email ?
+          <li>
+            <Link
+              className={`nav-link ${styles.navlink}`}
+              to={`/users/${loggedIn._id}`}
+              onClick={toggleMenu}
+            >
+              Profile
+            </Link>
+          </li>
+          :
+          <></>
+        }
 
-            {loggedIn.email ?
-              <li className="nav-item mx-lg-3 mx-md-1">
-                <a className={`nav-link ${styles.logoutlink}`} href="/logout" onClick={logout}>Log Out</a>
-              </li>
-              :
-              <li className="nav-item mx-lg-3 mx-md-1">
-                <Link className={`nav-link ${styles.loginlink}`} to="/">Log In</Link>
-              </li>
-            }
-          </ul>
-    );
+        <li>
+          <Link
+            className={`nav-link ${styles.navlink}`}
+            to="/games"
+            onClick={toggleMenu}
+          >
+            All Games
+          </Link>
+        </li>
+
+        <li>
+          <Link
+            className={`nav-link ${styles.navlink}`}
+            to="/games/new"
+            onClick={toggleMenu}
+          >
+            New Game
+          </Link>
+        </li>
+
+        {loggedIn.email ?
+          <li>
+            <Link
+              className={`nav-link ${styles.logoutlink}`}
+              to="/"
+              onClick={logoutAndToggleMenu}
+            >
+              Log Out
+            </Link>
+          </li>
+          :
+          <li>
+            <Link
+              className={`nav-link ${styles.loginlink}`}
+              to="/"
+              onClick={toggleMenu}
+            >Log In</Link>
+          </li>
+        }
+        <li><button onClick={() => console.log(loggedIn)}>log usr</button></li>
+      </ul>
+    </>
+  );
 };
 
 export default MobileNavMenu;

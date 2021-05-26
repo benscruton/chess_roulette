@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {Router, navigate} from '@reach/router';
-import blarg from "axios";
+import axios from "axios";
 import Nav from "./components/Global/Nav";
 import Edit from './views/User/Edit';
 import Show from './views/User/Show';
@@ -24,17 +24,6 @@ const App = () => {
   const [loggedIn, setLoggedIn] = useState(
     JSON.parse(localStorage.getItem("user")) || noUser
   );
-
-  const logout = e => {
-    e.preventDefault();
-    setLoggedIn(noUser);
-    blarg.get(`http://localhost:8000/api/logout`, { withCredentials: true })
-      .then( () => {
-        localStorage.clear();
-        navigate("/");
-      })
-      .catch(err => console.log(err));
-  };
 
 // const [loggedIn, setLoggedIn] = useState(JSON.parse(localStorage.getItem("user")) || 
 //   {
@@ -61,7 +50,8 @@ const App = () => {
     <div className="App d-flex flex-wrap justify-content-center">
       <Nav
         loggedIn={loggedIn}
-        logout={logout}
+        setLoggedIn={setLoggedIn}
+        noUser={noUser}
         className="col-12"
       />
       <div className="col-lg-8 col-md-10 col-sm-12">
