@@ -8,13 +8,12 @@
 .boardContainerWhite{
     display: flex;
     flex-wrap: wrap;
-    max-width: 950px;
+    flex-direction: column;
 }
 
 .boardContainerBlack{
     display: flex;
     flex-wrap: wrap;
-    max-width: 950px;
     flex-direction: column-reverse;
 }
 

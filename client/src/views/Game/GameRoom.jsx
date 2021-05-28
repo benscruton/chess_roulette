@@ -141,6 +141,7 @@ const GameRoom = ({id, loggedIn}) => {
             }
             <div style={{margin: "0px auto"}}>
                 <GameBoard
+                    loggedIn={loggedIn}
                     statusFromParent={game? game.boardStatus : false}
                     whiteToPlay={game? game.whiteToPlay : true}
                     parentLog={game? game.moveLog : []}

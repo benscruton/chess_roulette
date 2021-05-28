@@ -8,13 +8,9 @@ import images from "./ImageSets/standardChess";
 import PawnPromotion from "../Game/PawnPromotion";
 const rules = require("./MoveLogic/StandardChess/standardChessMoves");
 
-const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, playerIds, spriteStyle}) => {
+const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, playerIds, spriteStyle, loggedIn}) => {
 
     const [socket] = useState( () => io(":8000"));
-    const [loggedIn] = useState(JSON.parse(localStorage.getItem("user")) || {
-        firstName:"No One",
-        lastName: "LoggedIn"
-    });
     const [availableMoves, setAvailableMoves] = useState(false);
     const [thisUserMoves, setThisUserMoves] = useState(0);
     const [boardStatus, setBoardStatus] = useState(false);
@@ -253,7 +249,7 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
                 <></>
             }
 
-            <div className={viewAsBlack? styles.boardContainerBlack : styles.boardContainer}>
+            <div className={viewAsBlack? styles.boardContainerBlack : styles.boardContainerWhite}>
                 {boardStatus?
                     boardStatus.map( (row, i) =>
                         <div className={viewAsBlack? styles.tileRowBlack : styles.tileRowWhite} key={i}>
@@ -289,7 +285,10 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
                     <p>Loading...</p>
                 }
             </div>
-            <button className="btn btn-warning my-2" onClick = {() => setViewAsBlack(!viewAsBlack)}>Flip board</button>
+
+            <button className="btn btn-warning my-2" onClick = {() => setViewAsBlack(!viewAsBlack)}>
+                Flip board
+            </button>
 
             <h3>Moves:</h3>
             <table className="table-bordered table-striped w-100">
