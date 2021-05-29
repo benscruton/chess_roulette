@@ -5,7 +5,8 @@ import styles from "./GameBoard.module.css";
 import io from "socket.io-client";
 
 import images from "./ImageSets/standardChess";
-import PawnPromotion from "../Game/PawnPromotion";
+import PawnPromotion from "./PawnPromotion";
+import MoveLog from "./MoveLog";
 const rules = require("./MoveLogic/StandardChess/standardChessMoves");
 
 const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, playerIds, spriteStyle, loggedIn}) => {
@@ -286,29 +287,13 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
                 }
             </div>
 
-            <button className="btn btn-warning my-2" onClick = {() => setViewAsBlack(!viewAsBlack)}>
+            <button className="btn btn-warning my-2"
+            // onClick = {() => setViewAsBlack(!viewAsBlack)}>
+                onClick={() => console.log(moveLog)}>
                 Flip board
             </button>
 
-            <h3>Moves:</h3>
-            <table className="table-bordered table-striped w-100">
-                <thead>
-                    <tr>
-                        <th>White:</th>
-                        <th>Black:</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {moveLog.map( (movePair, i) =>
-                        <tr key={i}>
-                            {movePair.map( (move, j) =>
-                                <td key={j}>{move}</td>
-                            )}
-                        </tr>
-                    )}
-                </tbody>
-            </table>
-
+            <MoveLog moves={moveLog} />
         </div>
     );
 }
