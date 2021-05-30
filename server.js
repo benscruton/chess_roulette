@@ -48,7 +48,7 @@ io.on("connection", socket => {
 
         io.emit("newMoveCameIn", data);
     });
-})
+});
 
 
 require('./server/config/database.config');
