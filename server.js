@@ -46,7 +46,11 @@ io.on("connection", socket => {
         console.log("Received a new move!");
         // console.log(data);
 
-        io.emit("newMoveCameIn", data);
+        io.to(data.gameId).emit("newMoveCameIn", data);
+    });
+
+    socket.on("joinRoom", gameId => {
+        socket.join(gameId);
     });
 });
 

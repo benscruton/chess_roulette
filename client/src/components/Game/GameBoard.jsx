@@ -51,8 +51,13 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
     }, [playerIds]);
 
     // --------------- SOCKET FUNCTIONS: ----------------
+    // join room (room name will be the gameId)
+    useEffect( () => {
+        socket.emit("joinRoom", gameId);
+    }, [gameId]);
+
     // every time we make a move, send to socket
-    useEffect(() => {
+    useEffect( () => {
         if(boardStatus !== false){
             socket.emit("madeAMove", {gameId, boardStatus, whiteToPlay, info, moveLog});
         }
@@ -61,15 +66,13 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
     // when a new move comes in, update the board status
     useEffect( () => {
         socket.on("newMoveCameIn", data => {
-            console.log("received a thing");         
-            if(data.gameId === gameId){
-                setBoardStatus(data.boardStatus);
-                setInfo(data.info);
-                setWhiteToPlay(data.whiteToPlay);
-                setMoveLog(data.moveLog);
-                setActiveTile(false);
-                setAvailableMoves(false);
-            }
+            console.log("received a thing");
+            setBoardStatus(data.boardStatus);
+            setInfo(data.info);
+            setWhiteToPlay(data.whiteToPlay);
+            setMoveLog(data.moveLog);
+            setActiveTile(false);
+            setAvailableMoves(false);
         });
         return () => socket.disconnect(true);
     }, [socket]);
