@@ -13,9 +13,9 @@ const express = require('express'),
     });
 
     
-app.use(cookieParser(),cors({credentials:true, origin: 'http://localhost:3000'}),express.json(),express.urlencoded({"extended":true}));
+app.use(cookieParser(), cors({credentials: true, origin: 'http://localhost:3000'}), express.json(), express.urlencoded({"extended": true}));
 
-const chats = [];
+// const chats = [];
     
 
 io.on("connection", socket => {
@@ -36,11 +36,11 @@ io.on("connection", socket => {
         console.log("A User disconnected.");
     })
 
-    socket.on("addToChat", data =>{
-        chats.push(data);
-        //io.emit sends to all clients connected
-        io.emit("updatingMessages", chats)
-    })
+    // socket.on("addToChat", data =>{
+    //     chats.push(data);
+    //     //io.emit sends to all clients connected
+    //     io.emit("updatingMessages", chats)
+    // })
 
     socket.on("madeAMove", data => {
         console.log("Received a new move!");

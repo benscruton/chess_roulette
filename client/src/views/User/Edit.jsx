@@ -49,7 +49,7 @@ const Edit = props => {
         e.preventDefault();
         
         Axios.put(`http://localhost:8000/api/users/${props.id}`, user, {withCredentials:true})
-        .then(res => navigate(`/users/show/${props.id}`))
+        .then(res => navigate(`/users/${props.id}`))
         .catch(err => {
             console.log(err.response.data.errors);
             setErrors(err.response.data.errors)
@@ -131,7 +131,7 @@ const Edit = props => {
                     <UserForm 
                         inputs = {user}
                         title = "Edit User"
-                        submitValue = "Edit"
+                        submitValue = "Update"
                         handleInputChange = {handleChange}
                         handleSubmit = {handleSubmit}
                         errors = {errors}
