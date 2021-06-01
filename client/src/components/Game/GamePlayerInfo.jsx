@@ -19,13 +19,11 @@ const GamePlayerInfo = ({loggedIn, players, joinGame, leaveGame, beginGame, begu
                     <h5>{players[color][0].userName}</h5> :
                     <button
                       className={`mb-2 mx-1 btn border ${color === "white" ? "btn-light border-dark" : "btn-dark"}`}
-                      onClick={e => {joinGame(e); console.log("blarg");}}
+                      onClick={joinGame}
                       value={color[0].toUpperCase() + color.substring(1)}
                     >
                       Join as {color}
                     </button>
-                  // :
-                  // <>Loading...</>
                 }
               </td>
             )}

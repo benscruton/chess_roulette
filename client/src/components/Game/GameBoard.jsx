@@ -2,16 +2,16 @@ import {useState, useEffect} from "react";
 import Axios from "axios";
 
 import styles from "./GameBoard.module.css";
-import io from "socket.io-client";
+// import io from "socket.io-client";
 
 import images from "./ImageSets/standardChess";
 import PawnPromotion from "./PawnPromotion";
 import MoveLog from "./MoveLog";
 const rules = require("./MoveLogic/StandardChess/standardChessMoves");
 
-const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, playerIds, spriteStyle, loggedIn}) => {
+const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, playerIds, spriteStyle, loggedIn, socket}) => {
 
-    const [socket] = useState( () => io(":8000"));
+    // const [socket] = useState( () => io(":8000"));
     const [availableMoves, setAvailableMoves] = useState(false);
     const [thisUserMoves, setThisUserMoves] = useState(0);
     const [boardStatus, setBoardStatus] = useState(false);
@@ -52,9 +52,9 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
 
     // --------------- SOCKET FUNCTIONS: ----------------
     // join room (room name will be the gameId)
-    useEffect( () => {
-        socket.emit("joinRoom", gameId);
-    }, [gameId]);
+    // useEffect( () => {
+    //     socket.emit("joinRoom", gameId);
+    // }, [gameId]);
 
     // every time we make a move, send to socket
     useEffect( () => {
@@ -113,7 +113,6 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
                     if((tile.occupied.type === "pawn") && ((Math.abs(activeTile.rank - tile.rank)) === 2)){
                         enPassant = [tile.file, (tile.rank + activeTile.rank)/2];
                     }
-                    // setInfo({...info, enPassantAvailable: enPassant});
                 
                 // Special Case: Castling
                     // facilitate rooks also moving
@@ -183,7 +182,7 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
                 setThisUserMoves(thisUserMoves + 1);
             }
 
-            // if it's not this player's turn
+            // if it's not this player's turn / piece
             else{
                 setActiveTile(false);
                 setAvailableMoves(false);
@@ -242,6 +241,7 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
     return (
         <div id="board">
             <h3>{whiteToPlay? "White" : "Black"}'s move</h3>
+            <button onClick={() => console.log(playerIds)} className="btn btn-info">Log player IDs</button>
 
             {info.pawnReady && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id?
                 <PawnPromotion
@@ -293,8 +293,8 @@ const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, pla
             </div>
 
             <button className="btn btn-warning my-2"
-            // onClick = {() => setViewAsBlack(!viewAsBlack)}>
-                onClick={() => console.log(moveLog)}>
+                onClick = {() => setViewAsBlack(!viewAsBlack)}
+            >
                 Flip board
             </button>
 

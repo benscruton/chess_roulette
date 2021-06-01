@@ -1,11 +1,13 @@
 import { navigate } from "@reach/router";
 import axios from "axios";
 import React, {useState, useEffect} from "react";
+import io from "socket.io-client";
 import GameBoard from "../../components/Game/GameBoard";
 import GamePlayerInfo from "../../components/Game/GamePlayerInfo";
 
 const GameRoom = ({id, loggedIn}) => {
 
+  const [socket] = useState( () => io(":8000"));
   const [spriteStyle, setSpriteStyle] = useState("");
   const [game, setGame] = useState(false);
   
@@ -14,6 +16,10 @@ const GameRoom = ({id, loggedIn}) => {
       .then(res => {
         setGame(res.data.results);
       }).catch(err => console.error(err.errors));
+  }, [id]);
+
+  useEffect( () => {
+    socket.emit("joinRoom", id);
   }, [id]);
 
   const deleteGame = e => {
@@ -70,6 +76,7 @@ const GameRoom = ({id, loggedIn}) => {
 
       <div className="mx-auto">
         <GameBoard
+          socket={socket}
           loggedIn={loggedIn}
           statusFromParent={game? game.boardStatus : false}
           whiteToPlay={game? game.whiteToPlay : true}
