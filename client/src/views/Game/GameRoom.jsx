@@ -74,20 +74,20 @@ const GameRoom = ({id, loggedIn}) => {
   //   socket.emit("newPlayer", socketInfo);
   // }
 
-  useEffect( () => {
-    console.log("lookin' for somethin'?");
+  // useEffect( () => {
+  //   console.log("lookin' for somethin'?");
 
-    socket.on("playerUpdate", data => {
-      console.log(data);
-      if(game){
-        setGame({...game,
-          [`player${data.color}`]: data.player
-        });
-      }
-    });
+  //   socket.on("playerUpdate", data => {
+  //     console.log(data);
+  //     if(game){
+  //       setGame({...game,
+  //         [`player${data.color}`]: data.player
+  //       });
+  //     }
+  //   });
 
-    // return (() => socket.disconnect(true));
-  }, []);
+  //   // return (() => socket.disconnect(true));
+  // }, []);
 
   const beginGame = () => {
     axios.put(`http://localhost:8000/api/games/${id}`, {begun: true})

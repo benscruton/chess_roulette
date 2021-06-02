@@ -14,13 +14,13 @@ const GamePlayerInfo = (props) => {
     begun
   } = props;
 
-  const [players, setPlayers] = useState({
-    white: [],
-    black: []
-  });
+  const [playerWhite, setPlayerWhite] = useState([]);
+  const [playerBlack, setPlayerBlack] = useState([]);
+  const players = {white: playerWhite, black: playerBlack};
 
   useState( () => {
-    setPlayers(origPlayers);
+    setPlayerWhite(origPlayers.white);
+    setPlayerBlack(origPlayers.black);
   }, [origPlayers]);
 
   const joinGame = e => {
@@ -37,9 +37,11 @@ const GamePlayerInfo = (props) => {
       color: e.target.value
     };
     socket.emit("newPlayer", socketInfo);
-    setPlayers({...players,
-      [e.target.value.toLowerCase()]: player
-    });
+    if(e.target.value === "White"){
+      setPlayerWhite(player);
+    } else if(e.target.value === "Black") {
+      setPlayerBlack(player);
+    }
   }
 
   const leaveGame = e => {
@@ -52,10 +54,28 @@ const GamePlayerInfo = (props) => {
       color: e.target.value
     };
     socket.emit("newPlayer", socketInfo);
-    setPlayers({...players,
-      [e.target.value.toLowerCase()]: []
-    });
+    if(e.target.value === "White"){
+      setPlayerWhite([]);
+    } else if(e.target.value === "Black") {
+      setPlayerBlack([]);
+    }
   }
+
+  useEffect( () => {
+    console.log("lookin' for somethin'?");
+
+    socket.on("playerUpdate", data => {
+      console.log(data);
+      if(data.color === "White"){
+        setPlayerWhite(data.player);
+      } else if(data.color === "Black") {
+        setPlayerBlack(data.player);
+      }
+    });
+
+    return (() => socket.disconnect(true));
+  }, []);
+
 
   const colors = ["white", "black"];
 
