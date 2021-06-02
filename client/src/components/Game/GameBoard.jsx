@@ -9,12 +9,12 @@ import PawnPromotion from "./PawnPromotion";
 import MoveLog from "./MoveLog";
 const rules = require("./MoveLogic/StandardChess/standardChessMoves");
 
-const GameBoard = ({statusFromParent, gameId, parentLog, specialInfo, begun, playerIds, spriteStyle, loggedIn, socket}) => {
+const GameBoard = ({socket, statusFromParent, gameId, parentLog, specialInfo, begun, playerIds, spriteStyle, loggedIn}) => {
 
     // const [socket] = useState( () => io(":8000"));
     const [availableMoves, setAvailableMoves] = useState(false);
     const [thisUserMoves, setThisUserMoves] = useState(0);
-    const [boardStatus, setBoardStatus] = useState(false);
+    const [boardStatus, setBoardStatus] = useState(statusFromParent);
     const [whiteToPlay, setWhiteToPlay] = useState(true);
     const [activeTile, setActiveTile] = useState(false);
     const [moveLog, setMoveLog] = useState([]);

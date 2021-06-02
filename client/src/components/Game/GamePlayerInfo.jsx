@@ -1,6 +1,61 @@
-import React from "react";
+import {useState, useEffect} from "react";
+import axios from "axios";
 
-const GamePlayerInfo = ({loggedIn, players, joinGame, leaveGame, beginGame, begun}) => {
+const GamePlayerInfo = (props) => {
+
+  const {
+    socket,
+    gameId,
+    loggedIn,
+    origPlayers,
+    // joinGame,
+    // leaveGame,
+    beginGame,
+    begun
+  } = props;
+
+  const [players, setPlayers] = useState({
+    white: [],
+    black: []
+  });
+
+  useState( () => {
+    setPlayers(origPlayers);
+  }, [origPlayers]);
+
+  const joinGame = e => {
+    axios.put(`http://localhost:8000/api/games/${gameId}/addPlayer${e.target.value}/${loggedIn._id}`)
+      .catch(err => console.error({errors: err}));
+
+    let player = [{
+      _id: loggedIn._id,
+      userName: loggedIn.userName
+    }];
+    let socketInfo = {
+      gameId,
+      player,
+      color: e.target.value
+    };
+    socket.emit("newPlayer", socketInfo);
+    setPlayers({...players,
+      [e.target.value.toLowerCase()]: player
+    });
+  }
+
+  const leaveGame = e => {
+    axios.put(`http://localhost:8000/api/games/${gameId}/removePlayer${e.target.value}/${loggedIn._id}`)
+      .catch(err => console.error({errors: err}));
+
+    let socketInfo = {
+      gameId,
+      player: [],
+      color: e.target.value
+    };
+    socket.emit("newPlayer", socketInfo);
+    setPlayers({...players,
+      [e.target.value.toLowerCase()]: []
+    });
+  }
 
   const colors = ["white", "black"];
 
@@ -50,7 +105,7 @@ const GamePlayerInfo = ({loggedIn, players, joinGame, leaveGame, beginGame, begu
         </tbody>
       </table>
 
-      {!begun && players.black.length + players.white.length === 2?
+      {!begun && players.black.length && players.white.length ?
         <button
           className="btn btn-success mt-2"
           onClick={beginGame}

@@ -20,6 +20,7 @@ const GameRoom = ({id, loggedIn}) => {
 
   useEffect( () => {
     socket.emit("joinRoom", id);
+    console.log("get a room!");
   }, [id]);
 
   const deleteGame = e => {
@@ -28,26 +29,65 @@ const GameRoom = ({id, loggedIn}) => {
       .catch(err => console.error({errors: err}));
   }
 
-  const joinGame = e => {
-    axios.put(`http://localhost:8000/api/games/${id}/addPlayer${e.target.value}/${loggedIn._id}`)
-      .then( () => {
-        setGame({...game,
-          [`player${e.target.value}`]: [{_id: loggedIn._id, userName: loggedIn.userName}]
-        });
-      })
-      .catch(err => console.error({errors: err}));
-  }
+  // const joinGame = e => {
+  //   axios.put(`http://localhost:8000/api/games/${id}/addPlayer${e.target.value}/${loggedIn._id}`)
+  //     .then( () => {
+  //       let player = [{
+  //         _id: loggedIn._id,
+  //         userName: loggedIn.userName
+  //       }];
+  //       let socketInfo = {
+  //         gameId: id,
+  //         player,
+  //         color: e.target.value
+  //       };
+  //       socket.emit("newPlayer", socketInfo);
+  //       setGame({...game,
+  //         [`player${e.target.value}`]: player
+  //       });
+  //     })
+  //     .catch(err => console.error({errors: err}));
+  // }
 
-  const leaveGame = e => {
-    axios.put(`http://localhost:8000/api/games/${id}/removePlayer${e.target.value}/${loggedIn._id}`)
-      .then( () => {
-        console.log(`You are no longer joined as ${e.target.value}.`);
+  // const leaveGame = e => {
+  //   axios.put(`http://localhost:8000/api/games/${id}/removePlayer${e.target.value}/${loggedIn._id}`)
+  //     // .then( () => {
+  //     //   setGame({...game,
+  //     //     [`player${e.target.value}`]: []
+  //     //   });
+  //     //   let socketInfo = {
+  //     //     gameId: id,
+  //     //     player: [],
+  //     //     color: e.target.value
+  //     //   };
+  //     //   socket.emit("newPlayer", socketInfo);
+  //     // })
+  //     .catch(err => console.error({errors: err}));
+  //   setGame({...game,
+  //     [`player${e.target.value}`]: []
+  //   });
+  //   let socketInfo = {
+  //     gameId: id,
+  //     player: [],
+  //     color: e.target.value
+  //   };
+  //   socket.emit("newPlayer", socketInfo);
+  // }
+
+  useEffect( () => {
+    console.log("lookin' for somethin'?");
+
+    socket.on("playerUpdate", data => {
+      console.log(data);
+      if(game){
         setGame({...game,
-          [`player${e.target.value}`]: []
+          [`player${data.color}`]: data.player
         });
-      })
-      .catch(err => console.error({errors: err}));
-  }
+      }
+    });
+
+    // return (() => socket.disconnect(true));
+  }, []);
 
   const beginGame = () => {
     axios.put(`http://localhost:8000/api/games/${id}`, {begun: true})
@@ -63,10 +103,12 @@ const GameRoom = ({id, loggedIn}) => {
     <>
       {game? 
         <GamePlayerInfo
+          socket={socket}
+          gameId={id}
           loggedIn={loggedIn}
-          players={{white: game.playerWhite, black: game.playerBlack}}
-          joinGame={joinGame}
-          leaveGame={leaveGame}
+          origPlayers={{white: game.playerWhite, black: game.playerBlack}}
+          // joinGame={joinGame}
+          // leaveGame={leaveGame}
           beginGame={beginGame}
           begun={game.begun}
         />
