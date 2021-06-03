@@ -1,24 +1,13 @@
 import {useState, useEffect} from "react";
 import axios from "axios";
 
-const GamePlayerInfo = (props) => {
-
-  const {
-    socket,
-    gameId,
-    loggedIn,
-    origPlayers,
-    // joinGame,
-    // leaveGame,
-    beginGame,
-    begun
-  } = props;
+const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun}) => {
 
   const [playerWhite, setPlayerWhite] = useState([]);
   const [playerBlack, setPlayerBlack] = useState([]);
   const players = {white: playerWhite, black: playerBlack};
 
-  useState( () => {
+  useEffect( () => {
     setPlayerWhite(origPlayers.white);
     setPlayerBlack(origPlayers.black);
   }, [origPlayers]);
@@ -73,7 +62,7 @@ const GamePlayerInfo = (props) => {
       }
     });
 
-    return (() => socket.disconnect(true));
+    return () => socket.disconnect(true);
   }, []);
 
 
@@ -125,7 +114,7 @@ const GamePlayerInfo = (props) => {
         </tbody>
       </table>
 
-      {!begun && players.black.length && players.white.length ?
+      {!begun && players.black.length && players.white.length && (players.black[0]._id === loggedIn._id || players.white[0]._id === loggedIn._id)?
         <button
           className="btn btn-success mt-2"
           onClick={beginGame}

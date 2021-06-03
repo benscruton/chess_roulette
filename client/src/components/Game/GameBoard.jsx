@@ -241,7 +241,6 @@ const GameBoard = ({socket, statusFromParent, gameId, parentLog, specialInfo, be
     return (
         <div id="board">
             <h3>{whiteToPlay? "White" : "Black"}'s move</h3>
-            <button onClick={() => console.log(playerIds)} className="btn btn-info">Log player IDs</button>
 
             {info.pawnReady && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id?
                 <PawnPromotion

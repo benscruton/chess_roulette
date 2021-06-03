@@ -42,19 +42,23 @@ io.on("connection", socket => {
     //     io.emit("updatingMessages", chats)
     // })
 
+    socket.on("joinRoom", gameId => {
+        socket.join(gameId);
+    });
+
     socket.on("madeAMove", data => {
         console.log("Received a new move!");
-        io.to(data.gameId).emit("newMoveCameIn", data);
+        socket.to(data.gameId).emit("newMoveCameIn", data);
     });
 
     socket.on("newPlayer", data => {
-        io.to(data.gameId).emit("playerUpdate", data);
+        socket.to(data.gameId).emit("playerUpdate", data);
         console.log(data);
         // io.emit("playerUpdate", data);
     });
 
-    socket.on("joinRoom", gameId => {
-        socket.join(gameId);
+    socket.on("startGame", data => {
+        socket.to(data.gameId).emit("gameBegun", data.game);
     });
 });
 
