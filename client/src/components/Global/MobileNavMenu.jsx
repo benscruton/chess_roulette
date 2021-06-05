@@ -1,34 +1,24 @@
 import React from "react";
-import {Link, navigate} from "@reach/router";
+import {Link} from "@reach/router";
 import styles from "./MobileNavMenu.module.css";
-import {List} from "react-bootstrap-icons";
 
-const MobileNavMenu = ({loggedIn, logout, toggleMenu}) => {
+const MobileNavMenu = ({loggedIn, logout, hideMenu}) => {
 
   const logoutAndToggleMenu = e => {
     e.preventDefault();
     logout(e);
-    toggleMenu();
+    hideMenu();
   }
 
   return (
     <>
-      <div className={styles.shadow} onClick={toggleMenu}></div>
       <ul className={`navbar-nav ${styles.block}`}>
-
-        {/* <button
-          className={`navbar-toggler ${styles.menuIcon}`}
-          onClick={toggleMenu}
-        >
-          <List />
-        </button> */}
-
         {loggedIn.email ?
           <li>
             <Link
               className={`nav-link ${styles.navlink}`}
               to={`/users/${loggedIn._id}`}
-              onClick={toggleMenu}
+              onClick={hideMenu}
             >
               Profile
             </Link>
@@ -41,7 +31,7 @@ const MobileNavMenu = ({loggedIn, logout, toggleMenu}) => {
           <Link
             className={`nav-link ${styles.navlink}`}
             to="/games"
-            onClick={toggleMenu}
+            onClick={hideMenu}
           >
             All Games
           </Link>
@@ -51,7 +41,7 @@ const MobileNavMenu = ({loggedIn, logout, toggleMenu}) => {
           <Link
             className={`nav-link ${styles.navlink}`}
             to="/games/new"
-            onClick={toggleMenu}
+            onClick={hideMenu}
           >
             New Game
           </Link>
@@ -72,7 +62,7 @@ const MobileNavMenu = ({loggedIn, logout, toggleMenu}) => {
             <Link
               className={`nav-link ${styles.loginlink}`}
               to="/"
-              onClick={toggleMenu}
+              onClick={hideMenu}
             >Log In</Link>
           </li>
         }

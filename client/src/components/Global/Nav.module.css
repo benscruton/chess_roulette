@@ -2,11 +2,42 @@
     color: navajowhite;
     background-color: #773388;
     width: 100%;
+    display: flex;
+    justify-content: space-between;
     z-index: 8;
+}
+
+.mobileHolder{
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background-color: #0000;
+    z-index: 7;
+}
+
+.shadow{
+    position: fixed;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background-color: #0005;
+    z-index: 6;
 }
 
 .menuIcon{
     color: navajowhite;
+    background-color: #0000;
+    margin: 15px;
+    border: 0;
+}
+
+.outerMobileMenu{
+    position: absolute;
+    right: 0;
+    z-index: 9;
 }
 
 .logo{
