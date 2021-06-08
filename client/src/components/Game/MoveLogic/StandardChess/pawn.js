@@ -27,7 +27,8 @@ const checkMoves =  (tile, boardStatus, specialInfo) => {
             && ((boardStatus[rankIdx-1][fileIdx-1].occupied
               && boardStatus[rankIdx-1][fileIdx-1].occupied.color !== piece.color)
             || (fileArray[fileIdx-1] === specialInfo.enPassantAvailable[0]
-              && tile.rank + 1 === specialInfo.enPassantAvailable[1]))
+              && tile.rank + 1 === specialInfo.enPassantAvailable[1]
+              && tile.rank === 5))
             ){
                 moves.push([fileArray[fileIdx - 1], tile.rank + 1]);
             }
@@ -35,7 +36,8 @@ const checkMoves =  (tile, boardStatus, specialInfo) => {
             && ((boardStatus[rankIdx-1][fileIdx+1].occupied
               && boardStatus[rankIdx-1][fileIdx+1].occupied.color !== piece.color)
             || (fileArray[fileIdx+1] === specialInfo.enPassantAvailable[0]
-              && tile.rank + 1 === specialInfo.enPassantAvailable[1]))
+              && tile.rank + 1 === specialInfo.enPassantAvailable[1] 
+              && tile.rank === 5))
             ){
                 moves.push([fileArray[fileIdx + 1], tile.rank + 1]);
             }
@@ -52,7 +54,8 @@ const checkMoves =  (tile, boardStatus, specialInfo) => {
             && ((boardStatus[rankIdx+1][fileIdx-1].occupied
               && boardStatus[rankIdx+1][fileIdx-1].occupied.color === "white")
             || (fileArray[fileIdx-1] === specialInfo.enPassantAvailable[0]
-              && tile.rank - 1 === specialInfo.enPassantAvailable[1]))
+              && tile.rank - 1 === specialInfo.enPassantAvailable[1]
+              && tile.rank === 4))
               
             ){
                 moves.push([fileArray[fileIdx - 1], tile.rank - 1]);
@@ -61,7 +64,8 @@ const checkMoves =  (tile, boardStatus, specialInfo) => {
             && ((boardStatus[rankIdx+1][fileIdx+1].occupied
               && boardStatus[rankIdx+1][fileIdx+1].occupied.color === "white")
             || (fileArray[fileIdx+1] === specialInfo.enPassantAvailable[0]
-              && tile.rank - 1 === specialInfo.enPassantAvailable[1]))
+              && tile.rank - 1 === specialInfo.enPassantAvailable[1]
+              && tile.rank === 4))
             ){
                 moves.push([fileArray[fileIdx + 1], tile.rank - 1]);
             }

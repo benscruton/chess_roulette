@@ -190,7 +190,7 @@ const GameBoard = ({socket, statusFromParent, gameId, parentLog, specialInfo, be
             return;
         }
 
-        if(tile.occupied){
+        if(tile.occupied && !(tile.file === activeTile.file && tile.rank === activeTile.rank)){
             setActiveTile(tile);
             setAvailableMoves(rules[tile.occupied.type](tile, boardStatus, info))
         }
@@ -265,9 +265,9 @@ const GameBoard = ({socket, statusFromParent, gameId, parentLog, specialInfo, be
                                         ${(i+j) % 2 === 0? styles.white : styles.black}
                                         ${activeTile.file === tile.file && activeTile.rank === tile.rank ? styles.active : ""}
                                         ${movesToHere(tile) ? 
-                                            tile.occupied? styles.capture : styles.available
+                                            (tile.occupied ||(tile.file === info.enPassantAvailable[0] && tile.rank === info.enPassantAvailable[1] && activeTile.occupied.type === "pawn")) ?
+                                                styles.capture : styles.available
                                             : ""}
-                                        
                                     `} 
                                     key={j}
                                     id={`${tile.file}${tile.rank}`}
