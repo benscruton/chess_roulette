@@ -42,7 +42,7 @@ const Edit = props => {
         setUser({
             ...user,
             [e.target.name] : e.target.value
-        })
+        });
     }
 
     const handleSubmit = e => {
@@ -61,6 +61,11 @@ const Edit = props => {
             ...pwInputs,
             [e.target.name]: e.target.value
         });
+        if(e.target.name === "oldpw"){
+            setPwErrors({...pwErrors,
+                oldpw: false
+            });
+        }
     }
 
     const showPopup = e => {
@@ -98,25 +103,27 @@ const Edit = props => {
                     confirmPassword: pwInputs.confirmpw
                 },
                 {withCredentials:true}
-            ).then(res => {
-                setPwInputs({
-                    oldpw: "",
-                    newpw: "",
-                    confirmpw: ""
-                });
-                setPwErrors({
-                    oldpw: false,
-                    newpw: false,
-                    confirmpw: false
-                })
-
-                // console.log(res.data);
-                if (res.data.msg) {
-                    setChangedPW(res.data.msg);
+            ).then(rsp => {
+                if (rsp.data.msg) {
+                    setChangedPW(rsp.data.msg);
+                    setPwInputs({
+                        oldpw: "",
+                        newpw: "",
+                        confirmpw: ""
+                    });
+                    setPwErrors({
+                        oldpw: false,
+                        newpw: false,
+                        confirmpw: false
+                    })
                     document.getElementById("changepw").style.display = "none";
                 }
                 else {
-                    console.log("You didn't do it :(");
+                    setPwErrors({
+                        oldpw: "Incorrect password.",
+                        newpw: false,
+                        confirmpw: false
+                    })
                 }
             })
             .catch(err => console.error({errors: err}));
@@ -149,7 +156,7 @@ const Edit = props => {
                     </div>
                 </>    
                 :
-                <h2>Not For You!</h2>
+                <p>Loading...</p>
             }   
         </>
     )
