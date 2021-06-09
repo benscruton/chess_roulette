@@ -4,13 +4,18 @@ import { navigate } from '@reach/router';
 import {useState, useEffect} from 'react';
 import Axios from 'axios';
 
-const Edit = props => {
-    const [loggedIn, setLoggedIn] = useState(JSON.parse(localStorage.getItem("user")) || {
-        firstName: "No One",
-        lastName: "LoggedIn"
-    });
+const Edit = ({loggedIn, setLoggedIn, id}) => {
+    // const [loggedIn, setLoggedIn] = useState(JSON.parse(localStorage.getItem("user")) || {
+    //     firstName: "No One",
+    //     lastName: "LoggedIn"
+    // });
 
-    const [user, setUser] = useState(false);
+    const [user, setUser] = useState({
+        firstName: loggedIn.firstName,
+        lastName: loggedIn.lastName,
+        email: loggedIn.email,
+        _id: loggedIn._id
+    });
     const [pwInputs, setPwInputs] = useState({
         oldpw: "",
         newpw: "",
@@ -23,19 +28,16 @@ const Edit = props => {
     });
     const [changedPW, setChangedPW] = useState("");
 
-    useEffect(() => {
-        Axios.get(`http://localhost:8000/api/users/${props.id}`, {withCredentials:true})
-            .then(res => setUser(res.data.results))
-            .catch(err => console.log(err))
-    }, [props])
+    // useEffect(() => {
+    //     Axios.get(`http://localhost:8000/api/users/${id}`, {withCredentials:true})
+    //         .then(res => setUser(res.data.results))
+    //         .catch(err => console.log(err))
+    // }, [id])
 
     const [errors, setErrors] = useState({
         firstName: "",
         lastName: "",
-        userName: "",
-        email: "",
-        password: "",
-        confirmPassword: ""
+        email: ""
     })
 
     const handleChange = e => {
@@ -48,8 +50,15 @@ const Edit = props => {
     const handleSubmit = e => {
         e.preventDefault();
         
-        Axios.put(`http://localhost:8000/api/users/${props.id}`, user, {withCredentials:true})
-        .then(res => navigate(`/users/${props.id}`))
+        Axios.put(`http://localhost:8000/api/users/${id}`, user, {withCredentials:true})
+        .then( () => {
+            setLoggedIn({...loggedIn,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email
+            });
+            navigate(`/users/${id}`);
+        })
         .catch(err => {
             console.log(err.response.data.errors);
             setErrors(err.response.data.errors)
@@ -157,7 +166,8 @@ const Edit = props => {
                 </>    
                 :
                 <p>Loading...</p>
-            }   
+            }
+            <button className="btn btn-info" onClick={() => console.log(loggedIn)}>Log user</button>
         </>
     )
 }

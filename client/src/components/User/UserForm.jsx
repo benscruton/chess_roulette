@@ -1,12 +1,11 @@
 import {navigate} from '@reach/router'
 
 
-const UserForm = props => {
-    const {inputs, handleInputChange, handleSubmit, title, submitValue, errors, editing, showPopup} = props;
+const UserForm = ({inputs, handleInputChange, handleSubmit, title, submitValue, errors, editing, showPopup}) => {
 
     const handleCancel = (e) => {
         e.preventDefault();
-        navigate("/dashboard");
+        navigate(`/users/${inputs._id}`);
     }
 
     return(
@@ -40,19 +39,21 @@ const UserForm = props => {
                 </span>
             </div>
             
-            <div className="form-group">
-                <label htmlFor="userName">Username:</label>
-                <input 
-                    type="text" 
-                    name="userName" 
-                    className="form-control"
-                    onChange={handleInputChange}
-                    value={inputs.userName}
-                />
-                <span className="text-danger">
-                    {errors.userName ? errors.userName.message : ""}
-                </span>
-            </div>
+            {editing? <></> :
+                <div className="form-group">
+                    <label htmlFor="userName">Username:</label>
+                    <input 
+                        type="text" 
+                        name="userName" 
+                        className="form-control"
+                        onChange={handleInputChange}
+                        value={inputs.userName}
+                    />
+                    <span className="text-danger">
+                        {errors.userName ? errors.userName.message : ""}
+                    </span>
+                </div>
+            }
             
             <div className="form-group">
                 <label htmlFor="email">Email:</label>

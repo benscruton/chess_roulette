@@ -53,8 +53,8 @@ const App = () => {
         <Router>
           <LogReg path="/" setLoggedIn={setLoggedIn}/>
           {/* <Main path="/dashboard" /> */}
-          <Edit path="/users/:id/edit" />
-          <Show path="/users/:id" loggedIn={loggedIn}/>
+          <Edit path="/users/:id/edit" loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
+          <Show path="/users/:id" loggedIn={loggedIn} />
 
           <NewGame path="/games/new" />
           <GameLobby path="/games" />
