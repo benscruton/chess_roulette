@@ -36,7 +36,6 @@ const LogReg = ({setLoggedIn}) => {
                 console.log(res.data)
                 if (res.data.msg) {
                     logUserIn(res.data.userLogged);
-                    // navigate('/dashboard')
                 } else {
                     setRegErrors(res.data);
                 }
@@ -65,7 +64,6 @@ const LogReg = ({setLoggedIn}) => {
             console.log(res.data)
             if (res.data.msg) {
                 logUserIn(res.data.userLogged);
-                // navigate('/dashboard')
             } else {
                 setLogErrors({
                     email: {message: res.data.error},
@@ -105,7 +103,7 @@ const LogReg = ({setLoggedIn}) => {
                         value={log.password}
                     />
                     <span className="text-danger">
-                        {logErrors.password ? logErrors.password.message : ""}
+                        {/* {logErrors.password ? logErrors.password.message : ""} */}
                     </span>
                     <input type="submit" value="Login" className="btn btn-dark my-3"/>
                 </div>

@@ -12,49 +12,39 @@ const express = require('express'),
         }
     });
 
-    
-app.use(cookieParser(), cors({credentials: true, origin: 'http://localhost:3000'}), express.json(), express.urlencoded({"extended": true}));
+const corsWhitelist = ["http://localhost:3000", 'http://192.168.1.64:3000'];
+const corsPrefs = {
+    credentials: true,
+    origin: (origin, callback) => {
+        console.log(origin);
+        console.log(corsWhitelist.indexOf(origin));
+        if(corsWhitelist.indexOf(origin) !== -1){
+            callback(null, true);
+        } else {
+            callback(new Error("This request was blocked by CORS policy."));
+        }
+    }
+};
 
-// const chats = [];
-    
+app.use(cookieParser(), cors(corsPrefs), express.json(), express.urlencoded({"extended": true}));    
 
 io.on("connection", socket => {
-
     console.log(socket.id);
-
-    //emit sends data only to the client that sent the event
-    // socket.emit("welcome", {msg: "from socket"});
-
-    //broadcast.emit sends data to all clients except the sender
-    // socket.broadcast.emit("joined", "another client joined the chat");
-
-    // socket.on("game", data => {
-        // 
-    // })
 
     socket.on("disconnect", data =>{
         console.log("A User disconnected.");
     })
-
-    // socket.on("addToChat", data =>{
-    //     chats.push(data);
-    //     //io.emit sends to all clients connected
-    //     io.emit("updatingMessages", chats)
-    // })
 
     socket.on("joinRoom", gameId => {
         socket.join(gameId);
     });
 
     socket.on("madeAMove", data => {
-        console.log("Received a new move!");
         socket.to(data.gameId).emit("newMoveCameIn", data);
     });
 
     socket.on("newPlayer", data => {
         socket.to(data.gameId).emit("playerUpdate", data);
-        console.log(data);
-        // io.emit("playerUpdate", data);
     });
 
     socket.on("startGame", data => {

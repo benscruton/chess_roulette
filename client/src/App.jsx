@@ -11,8 +11,6 @@ import NewGame from './views/Game/NewGame';
 import GameLobby from './views/Game/GameLobby';
 import './App.css';
 
-// import io from 'socket.io-client';
-
 const App = () => {
 
   const noUser = {
@@ -23,23 +21,6 @@ const App = () => {
   const [loggedIn, setLoggedIn] = useState(
     JSON.parse(localStorage.getItem("user")) || noUser
   );
-
-
-// const [socket] = useState(() => io(":8000"))
-// const [input, setInput] = useState("");
-// const [messages, setMessages] = useState([])
-
-// useEffect(() => {
-//   socket.on("welcome", data => console.log(data))
-//   socket.on("joined", data => console.log(data))
-//   socket.on("updatingMessages", data => setMessages(data))
-//   return () => socket.disconnect(true);
-// }, [socket])
-
-// const sendToServer = () => {
-//   socket.emit("addToChat", input);
-//   setInput("");
-// }
 
   return (
     <div className="App d-flex flex-wrap justify-content-center">
