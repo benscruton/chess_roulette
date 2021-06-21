@@ -13,7 +13,10 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
   }, [origPlayers]);
 
   const joinGame = e => {
-    axios.put(`http://localhost:8000/api/games/${gameId}/addPlayer${e.target.value}/${loggedIn._id}`)
+    if(!loggedIn.email){
+      return;
+    }
+    axios.put(`http://localhost:8000/api/games/${gameId}/addPlayer${e.target.value}/${loggedIn._id}`, null, {withCredentials: true})
       .catch(err => console.error({errors: err}));
       
     let player = [{
@@ -34,7 +37,7 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
   }
 
   const leaveGame = e => {
-    axios.put(`http://localhost:8000/api/games/${gameId}/removePlayer${e.target.value}/${loggedIn._id}`)
+    axios.put(`http://localhost:8000/api/games/${gameId}/removePlayer${e.target.value}/${loggedIn._id}`, null, {withCredentials: true})
       .catch(err => console.error({errors: err}));
 
     let socketInfo = {

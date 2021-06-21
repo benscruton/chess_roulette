@@ -16,9 +16,7 @@ const corsWhitelist = ["http://localhost:3000", 'http://192.168.1.64:3000'];
 const corsPrefs = {
     credentials: true,
     origin: (origin, callback) => {
-        console.log(origin);
-        console.log(corsWhitelist.indexOf(origin));
-        if(corsWhitelist.indexOf(origin) !== -1){
+        if(corsWhitelist.includes(origin)){
             callback(null, true);
         } else {
             callback(new Error("This request was blocked by CORS policy."));

@@ -1,6 +1,6 @@
-const LogRegController = require('../controllers/auth.controller'),
-    UserController = require('../controllers/user.controller'),
-    {authenticate} = require('../config/jwt.config');
+const LogRegController = require('../controllers/auth.controller');
+const UserController = require('../controllers/user.controller');
+const {authenticate} = require('../config/jwt.config');
 
 module.exports = (app) => {
     app.post('/api/register', LogRegController.register);

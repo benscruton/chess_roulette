@@ -170,7 +170,7 @@ const GameBoard = ({socket, statusFromParent, gameId, parentLog, specialInfo, be
                 setMoveLog(moveLogTemp);
                 
                 // send move to database:
-                Axios.put(`http://localhost:8000/api/games/${gameId}`, {boardStatus, whiteToPlay: (pawnReadyNow? whiteToPlay : !whiteToPlay), moveLog: moveLogTemp, $set: {"specialInfo.enPassantAvailable": enPassant, "specialInfo.castlingLegal": castlingLegalAfterThisMove, "specialInfo.pawnReady": pawnReadyNow}})
+                Axios.put(`http://localhost:8000/api/games/${gameId}`, {boardStatus, whiteToPlay: (pawnReadyNow? whiteToPlay : !whiteToPlay), moveLog: moveLogTemp, $set: {"specialInfo.enPassantAvailable": enPassant, "specialInfo.castlingLegal": castlingLegalAfterThisMove, "specialInfo.pawnReady": pawnReadyNow}}, {withCredentials: true})
                     // .then(() => {
                     //     if(!pawnReadyNow) setWhiteToPlay(!whiteToPlay);
                     //     setThisUserMoves(thisUserMoves + 1);   
@@ -225,7 +225,7 @@ const GameBoard = ({socket, statusFromParent, gameId, parentLog, specialInfo, be
                 pawnReady: false
             });
             
-            Axios.put(`http://localhost:8000/api/games/${gameId}`, {boardStatus: boardStatusTemp, whiteToPlay: !whiteToPlay, moveLog: moveLogTemp, $set: {"specialInfo.pawnReady": false}})
+            Axios.put(`http://localhost:8000/api/games/${gameId}`, {boardStatus: boardStatusTemp, whiteToPlay: !whiteToPlay, moveLog: moveLogTemp, $set: {"specialInfo.pawnReady": false}}, {withCredentials: true})
                 // .then(() => {
                 //     setWhiteToPlay(!whiteToPlay);
                 //     setThisUserMoves(thisUserMoves + 1);

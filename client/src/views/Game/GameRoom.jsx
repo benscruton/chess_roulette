@@ -24,13 +24,13 @@ const GameRoom = ({id, loggedIn}) => {
   }, [id]);
 
   const deleteGame = () => {
-    axios.delete(`http://localhost:8000/api/games/${id}`)
+    axios.delete(`http://localhost:8000/api/games/${id}`, {withCredentials: true})
       .then(() => navigate("/games"))
       .catch(err => console.error({errors: err}));
   }
 
   const beginGame = () => {
-    axios.put(`http://localhost:8000/api/games/${id}`, {begun: true})
+    axios.put(`http://localhost:8000/api/games/${id}`, {begun: true}, {withCredentials: true})
       .then( (rsp) => {
         let begunGame = rsp.data.results;
         setGame(begunGame);
