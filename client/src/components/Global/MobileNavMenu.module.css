@@ -15,7 +15,6 @@
     border-left: 2px solid #738;
     border-radius: 5px;
     padding: 8px 10px !important;
-    /* font-family: Raleway; */
 }
 
 .navlink:hover{
@@ -23,8 +22,6 @@
     border-right: 2px solid #ffdead;
     border-left: 2px solid navajowhite;
     border-radius: 5px;
-    /* padding-left: 5px;
-    padding-right: 5px; */
 }
 
 .loginlink:hover{
@@ -32,8 +29,6 @@
     border-right: 2px solid mediumseagreen;
     border-left: 2px solid mediumseagreen;
     border-radius: 5px;
-    /* padding-left: 5px;
-    padding-right: 5px; */
 }
 
 .logoutlink:hover{

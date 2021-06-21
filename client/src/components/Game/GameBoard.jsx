@@ -51,17 +51,16 @@ const GameBoard = ({socket, statusFromParent, gameId, parentLog, specialInfo, be
     }, [playerIds]);
 
     // --------------- SOCKET FUNCTIONS: ----------------
-    // join room (room name will be the gameId)
-    // useEffect( () => {
-    //     socket.emit("joinRoom", gameId);
-    // }, [gameId]);
-
     // every time we make a move, send to socket
     useEffect( () => {
         if(boardStatus !== false){
             socket.emit("madeAMove", {gameId, boardStatus, whiteToPlay, info, moveLog});
         }
     }, [thisUserMoves])
+
+    const sendMoveToSocket = () => {
+        socket.emit("madeAMove", {gameId, boardStatus, whiteToPlay, info, moveLog});
+    };
 
     // when a new move comes in, update the board status
     useEffect( () => {
@@ -78,6 +77,9 @@ const GameBoard = ({socket, statusFromParent, gameId, parentLog, specialInfo, be
     }, [socket]);
 
     const clickTile = (tile) => {
+        console.log(piecesAttackingThisSquare(tile.file, tile.rank, (whiteToPlay? "white" : "black")));
+        // return;
+
         if(movesToHere(tile) && !info.pawnReady){
             let pawnReadyNow = info.pawnReady;
             // Make sure 1) game has begun, 2) it is their turn, and 3) it's the right player
@@ -158,7 +160,6 @@ const GameBoard = ({socket, statusFromParent, gameId, parentLog, specialInfo, be
                         enPassantAvailable: enPassant,
                         pawnReady: pawnReadyNow,
                     });
-                    
 
                 // add the new move to the move log (which is an array of move pairs):
                 const moveLogTemp = [...moveLog];
@@ -206,6 +207,24 @@ const GameBoard = ({socket, statusFromParent, gameId, parentLog, specialInfo, be
         }
         return false;
     }
+
+    const piecesAttackingThisSquare = (file, rank, color) => {
+        for(let i=0; i<boardStatus.length; i++){
+            for(let j=0; j<boardStatus[i].length; j++){
+                let tile = boardStatus[i][j];
+                if(!tile.occupied || tile.occupied.color === color){
+                    continue;
+                }
+                let itsMoves = rules[tile.occupied.type](tile, boardStatus, info, true);
+                for(let k=0; k<itsMoves.length; k++){
+                    if(itsMoves[k][0] === file && itsMoves[k][1] === rank){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    };
 
     const promotePawn = (tileCopy, choice) => {
         if(playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id){

@@ -12,4 +12,3 @@ module.exports = (app) => {
     app.put('/api/games/:gameId/removePlayerBlack/:userId', authenticate, GameController.removePlayerBlack);
     app.delete('/api/games/:id', authenticate, GameController.destroy);
 }
-
