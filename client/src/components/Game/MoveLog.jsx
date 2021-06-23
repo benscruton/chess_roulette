@@ -14,11 +14,11 @@ const MoveLog = ({moves}) => {
         </thead>
         <tbody>
         {moves.map( (movePair, i) =>
-            <tr key={i}>
-              <td>{movePair[0]}</td>
-              <td>{movePair.length === 1 ? "" : movePair[1]}</td>
-            </tr>
-          )}
+          <tr key={i}>
+            <td>{movePair[0]}</td>
+            <td>{movePair.length === 1 ? "" : movePair[1]}</td>
+          </tr>
+        )}
         </tbody>
       </table>
     </div>

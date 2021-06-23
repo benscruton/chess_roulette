@@ -4,17 +4,20 @@ import React, {useState, useEffect} from "react";
 import io from "socket.io-client";
 import GameBoard from "../../components/Game/GameBoard";
 import GamePlayerInfo from "../../components/Game/GamePlayerInfo";
+import MoveLog from "../../components/Game/MoveLog";
 
 const GameRoom = ({id, loggedIn}) => {
 
   const [socket] = useState( () => io(":8000"));
   const [spriteStyle, setSpriteStyle] = useState("");
   const [game, setGame] = useState(false);
+  const [moveLog, setMoveLog] = useState(false);
   
   useEffect( () => {
     axios.get(`http://localhost:8000/api/games/${id}`)
       .then(res => {
         setGame(res.data.results);
+        setMoveLog(res.data.results.moveLog);
       }).catch(err => console.error(err.errors));
   }, [id]);
 
@@ -50,6 +53,7 @@ const GameRoom = ({id, loggedIn}) => {
 
   return (
     <>
+      <button onClick={() => console.log(moveLog)}>Log moves</button>
       {game? 
         <GamePlayerInfo
           socket={socket}
@@ -69,7 +73,6 @@ const GameRoom = ({id, loggedIn}) => {
           loggedIn={loggedIn}
           statusFromParent={game? game.boardStatus : false}
           whiteToPlay={game? game.whiteToPlay : true}
-          parentLog={game? game.moveLog : []}
           playerIds = {{
               white: game && game.playerWhite.length ? game.playerWhite[0]._id : "",
               black: game && game.playerBlack.length ? game.playerBlack[0]._id : ""
@@ -78,8 +81,13 @@ const GameRoom = ({id, loggedIn}) => {
           gameId={id}
           specialInfo={game? game.specialInfo : false}
           spriteStyle={spriteStyle}
+          moveLog={moveLog}
+          setMoveLog={setMoveLog}
         />
       </div>
+      
+      <MoveLog moves={moveLog? moveLog : []} />
+
       <div>
         <h5 className="mt-2">Sprite style:</h5>
         <button className="btn btn-primary mx-2" onClick={() => setSpriteStyle("")}>Normal</button>

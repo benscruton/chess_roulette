@@ -1,23 +1,17 @@
 import {useState, useEffect} from "react";
 import Axios from "axios";
-
 import styles from "./GameBoard.module.css";
-// import io from "socket.io-client";
-
 import images from "./ImageSets/standardChess";
 import PawnPromotion from "./PawnPromotion";
-import MoveLog from "./MoveLog";
 const rules = require("./MoveLogic/StandardChess/standardChessMoves");
 
-const GameBoard = ({socket, statusFromParent, gameId, parentLog, specialInfo, begun, playerIds, spriteStyle, loggedIn}) => {
+const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, playerIds, spriteStyle, loggedIn, moveLog, setMoveLog}) => {
 
-  // const [socket] = useState( () => io(":8000"));
   const [availableMoves, setAvailableMoves] = useState(false);
   const [thisUserMoves, setThisUserMoves] = useState(0);
   const [boardStatus, setBoardStatus] = useState(statusFromParent);
   const [whiteToPlay, setWhiteToPlay] = useState(true);
   const [activeTile, setActiveTile] = useState(false);
-  const [moveLog, setMoveLog] = useState([]);
   const [info, setInfo] = useState({});
   const [viewAsBlack, setViewAsBlack] = useState(false);
 
@@ -28,14 +22,9 @@ const GameBoard = ({socket, statusFromParent, gameId, parentLog, specialInfo, be
       }).catch(err => console.error(err.errors));
   }, [gameId])
   
-
   useEffect( () => {
     setBoardStatus(statusFromParent);
   }, [statusFromParent])
-
-  useEffect( () => {
-    setMoveLog(parentLog);
-  }, [parentLog]);
 
   useEffect( () => {
     setInfo({...specialInfo});
@@ -56,10 +45,6 @@ const GameBoard = ({socket, statusFromParent, gameId, parentLog, specialInfo, be
       socket.emit("madeAMove", {gameId, boardStatus, whiteToPlay, info, moveLog});
     }
   }, [thisUserMoves])
-
-  const sendMoveToSocket = () => {
-    socket.emit("madeAMove", {gameId, boardStatus, whiteToPlay, info, moveLog});
-  };
 
   // when a new move comes in, update the board status
   useEffect( () => {
@@ -337,8 +322,7 @@ const GameBoard = ({socket, statusFromParent, gameId, parentLog, specialInfo, be
       >
         Flip board
       </button>
-
-      <MoveLog moves={moveLog} />
+      
     </div>
   );
 }
