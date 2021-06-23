@@ -53,7 +53,6 @@ const GameRoom = ({id, loggedIn}) => {
 
   return (
     <>
-      <button onClick={() => console.log(moveLog)}>Log moves</button>
       {game? 
         <GamePlayerInfo
           socket={socket}

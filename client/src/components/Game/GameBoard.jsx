@@ -27,6 +27,11 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
   }, [statusFromParent])
 
   useEffect( () => {
+    setActiveTile(false);
+    setAvailableMoves(false);
+  }, [begun]);
+
+  useEffect( () => {
     setInfo({...specialInfo});
   }, [specialInfo]);
 
