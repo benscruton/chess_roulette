@@ -1,10 +1,16 @@
 import UserForm from '../../components/User/UserForm';
 import ChangePassword from "../../components/User/ChangePassword";
 import { navigate } from '@reach/router';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 import Axios from 'axios';
 
-const Edit = ({loggedIn, setLoggedIn, id}) => {
+const Edit = ({loggedIn, setLoggedIn}) => {
+  useEffect( () => {
+    if(!loggedIn.email){
+      navigate("/profile");
+    }
+  }, []);
+
   const [user, setUser] = useState({
     firstName: loggedIn.firstName,
     lastName: loggedIn.lastName,
@@ -38,14 +44,14 @@ const Edit = ({loggedIn, setLoggedIn, id}) => {
 
   const handleSubmit = e => {
     e.preventDefault();
-    Axios.put(`http://localhost:8000/api/users/${id}`, user, {withCredentials:true})
+    Axios.put(`http://localhost:8000/api/users/${loggedIn._id}`, user, {withCredentials:true})
     .then( () => {
       setLoggedIn({...loggedIn,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email
       });
-      navigate(`/users/${id}`);
+      navigate("/profile");
     })
     .catch(err => {
         console.log(err.response.data.errors);
