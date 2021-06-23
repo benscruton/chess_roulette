@@ -26,7 +26,7 @@ const LogReg = ({setLoggedIn}) => {
     const logUserIn = u => {
         localStorage.setItem("user", JSON.stringify(u));
         setLoggedIn(u);
-        navigate(`/users/${u._id}`);
+        navigate("profile");
     };
 
     const handleRegister = (e) => {

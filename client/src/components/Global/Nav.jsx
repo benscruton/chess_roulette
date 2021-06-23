@@ -51,7 +51,7 @@ const Nav = ({loggedIn, setLoggedIn, noUser}) => {
 
             {loggedIn.email ?
               <li className="nav-item mx-lg-3 mx-md-1">
-                <Link className={`nav-link ${styles.navlink}`} to={`/users/${loggedIn._id}`}>Profile</Link>
+                <Link className={`nav-link ${styles.navlink}`} to={"/profile"}>Profile</Link>
               </li>
               :
               <></>

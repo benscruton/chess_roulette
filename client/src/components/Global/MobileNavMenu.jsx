@@ -17,7 +17,7 @@ const MobileNavMenu = ({loggedIn, logout, hideMenu}) => {
           <li>
             <Link
               className={`nav-link ${styles.navlink}`}
-              to={`/users/${loggedIn._id}`}
+              to={"/profile"}
               onClick={hideMenu}
             >
               Profile
