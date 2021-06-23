@@ -76,109 +76,106 @@ const GameBoard = ({socket, statusFromParent, gameId, parentLog, specialInfo, be
   }, [socket]);
 
   const clickTile = (tile) => {
-    console.log(piecesAttackingThisSquare(tile.file, tile.rank, (whiteToPlay? "white" : "black")));
-    // return;
-
     if(isValidMove(tile) && !info.pawnReady){
-        let pawnReadyNow = info.pawnReady;
-        // Make sure 1) game has begun, 2) it is their turn, and 3) it's the right player
-        if(begun
-            && (activeTile.occupied.color === "white") - (whiteToPlay) === 0
-            && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id
-        ){
+      let pawnReadyNow = info.pawnReady;
+      // Make sure 1) game has begun, 2) it is their turn, and 3) it's the right player
+      if(begun
+          && (activeTile.occupied.color === "white") - (whiteToPlay) === 0
+          && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id
+      ){
 
-          // build the chess-notation description of the move:
-          let moveDescription = "";
-          moveDescription += activeTile.occupied.type !== "pawn" ? activeTile.occupied.abbrev :
-            tile.occupied? activeTile.file.toLowerCase() : "";
-          moveDescription += tile.occupied? "x" : "";
-          moveDescription += tile.file.toLowerCase() + tile.rank;
+        // build the chess-notation description of the move:
+        let moveDescription = "";
+        moveDescription += activeTile.occupied.type !== "pawn" ? activeTile.occupied.abbrev :
+          tile.occupied? activeTile.file.toLowerCase() : "";
+        moveDescription += tile.occupied? "x" : "";
+        moveDescription += tile.file.toLowerCase() + tile.rank;
 
-          // make move on front end:
-          tile.occupied = activeTile.occupied;
-          activeTile.occupied = false;
-          setActiveTile(false);
-          setAvailableMoves(false);
+        // make move on front end:
+        tile.occupied = activeTile.occupied;
+        activeTile.occupied = false;
+        setActiveTile(false);
+        setAvailableMoves(false);
 
-          const rankIdx = 8 - tile.rank;
-          const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
-          const fileIdx = fileArray.indexOf(tile.file);
-          // Special Case: En Passant
-            // facilitate capturing
-            if(tile.occupied.type === "pawn" && tile.file === info.enPassantAvailable[0] && tile.rank === info.enPassantAvailable[1]){
-              boardStatus[tile.occupied.color === "white" ? 3 : 4][fileIdx].occupied = false;
-              moveDescription = `${activeTile.file.toLowerCase()}x`+ moveDescription;
-            }
-            // update special info if necessary
-            let enPassant = false;
-            if((tile.occupied.type === "pawn") && ((Math.abs(activeTile.rank - tile.rank)) === 2)){
-              enPassant = [tile.file, (tile.rank + activeTile.rank)/2];
-            }
-          
-          // Special Case: Castling
-            // facilitate rooks also moving
-            if(tile.occupied.type === "king" && Math.abs(fileIdx - fileArray.indexOf(activeTile.file)) === 2){
-              if(tile.file === "G"){
-                boardStatus[rankIdx][5].occupied = {...boardStatus[rankIdx][7].occupied};
-                boardStatus[rankIdx][7].occupied = false;
-                moveDescription = "O-O";
-              }
-              if(tile.file === "C"){
-                boardStatus[rankIdx][3].occupied = {...boardStatus[rankIdx][0].occupied};
-                boardStatus[rankIdx][0].occupied = false;
-                moveDescription = "O-O-O";
-              }
-            }
-            // update special info if necessary
-            // rooks:
-            let castlingLegalAfterThisMove = {...info.castlingLegal};
-            let castleFilesRooks = ["A", "H"], castleRanks = [1, 8];
-            for(let file of castleFilesRooks){
-              for(let rank of castleRanks){
-                if((tile.file === file && tile.rank === rank) || (activeTile.file === file && activeTile.rank === rank)){
-                  castlingLegalAfterThisMove[`${file}${rank}`] = false;
-                }
-              }
-            }
-            // kings:
-            if(activeTile.file === "E" && (activeTile.rank === 1 || activeTile.rank === 8)){
-              castlingLegalAfterThisMove[`A${activeTile.rank}`] = false;
-              castlingLegalAfterThisMove[`E${activeTile.rank}`] = false;
-              castlingLegalAfterThisMove[`H${activeTile.rank}`] = false;
-            }
-
-          // Special case: pawn promotion
-              if(tile.occupied.type === "pawn" && (tile.rank === 1 || tile.rank === 8)){
-                pawnReadyNow = tile;
-              }
-
-          // Update special info on the front end:
-            setInfo({...info,
-              castlingLegal: castlingLegalAfterThisMove,
-              enPassantAvailable: enPassant,
-              pawnReady: pawnReadyNow,
-            });
-
-          // add the new move to the move log (which is an array of move pairs):
-          const moveLogTemp = [...moveLog];
-          if((moveLogTemp.length > 0) && (moveLogTemp[moveLogTemp.length-1].length === 1)){
-            moveLogTemp[moveLogTemp.length-1].push(moveDescription);
-          } else {
-            moveLogTemp.push([moveDescription])
+        const rankIdx = 8 - tile.rank;
+        const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
+        const fileIdx = fileArray.indexOf(tile.file);
+        // Special Case: En Passant
+          // facilitate capturing
+          if(tile.occupied.type === "pawn" && tile.file === info.enPassantAvailable[0] && tile.rank === info.enPassantAvailable[1]){
+            boardStatus[tile.occupied.color === "white" ? 3 : 4][fileIdx].occupied = false;
+            moveDescription = `${activeTile.file.toLowerCase()}x`+ moveDescription;
           }
-          setMoveLog(moveLogTemp);
-          
-          // send move to database:
-          Axios.put(`http://localhost:8000/api/games/${gameId}`, {boardStatus, whiteToPlay: (pawnReadyNow? whiteToPlay : !whiteToPlay), moveLog: moveLogTemp, $set: {"specialInfo.enPassantAvailable": enPassant, "specialInfo.castlingLegal": castlingLegalAfterThisMove, "specialInfo.pawnReady": pawnReadyNow}}, {withCredentials: true})
-              // .then(() => {
-              //     if(!pawnReadyNow) setWhiteToPlay(!whiteToPlay);
-              //     setThisUserMoves(thisUserMoves + 1);   
-              // })
-            .catch(err => console.error({errors: err}))
-          
-          // These lines might eventually get moved into the "then" statement, but for now I'll leave them outside so that front-end-only play will still work.
-          if(!pawnReadyNow) setWhiteToPlay(!whiteToPlay);
-          setThisUserMoves(thisUserMoves + 1);
+          // update special info if necessary
+          let enPassant = false;
+          if((tile.occupied.type === "pawn") && ((Math.abs(activeTile.rank - tile.rank)) === 2)){
+            enPassant = [tile.file, (tile.rank + activeTile.rank)/2];
+          }
+        
+        // Special Case: Castling
+          // facilitate rooks also moving
+          if(tile.occupied.type === "king" && Math.abs(fileIdx - fileArray.indexOf(activeTile.file)) === 2){
+            if(tile.file === "G"){
+              boardStatus[rankIdx][5].occupied = {...boardStatus[rankIdx][7].occupied};
+              boardStatus[rankIdx][7].occupied = false;
+              moveDescription = "O-O";
+            }
+            if(tile.file === "C"){
+              boardStatus[rankIdx][3].occupied = {...boardStatus[rankIdx][0].occupied};
+              boardStatus[rankIdx][0].occupied = false;
+              moveDescription = "O-O-O";
+            }
+          }
+          // update special info if necessary
+          // rooks:
+          let castlingLegalAfterThisMove = {...info.castlingLegal};
+          let castleFilesRooks = ["A", "H"], castleRanks = [1, 8];
+          for(let file of castleFilesRooks){
+            for(let rank of castleRanks){
+              if((tile.file === file && tile.rank === rank) || (activeTile.file === file && activeTile.rank === rank)){
+                castlingLegalAfterThisMove[`${file}${rank}`] = false;
+              }
+            }
+          }
+          // kings:
+          if(activeTile.file === "E" && (activeTile.rank === 1 || activeTile.rank === 8)){
+            castlingLegalAfterThisMove[`A${activeTile.rank}`] = false;
+            castlingLegalAfterThisMove[`E${activeTile.rank}`] = false;
+            castlingLegalAfterThisMove[`H${activeTile.rank}`] = false;
+          }
+
+        // Special case: pawn promotion
+            if(tile.occupied.type === "pawn" && (tile.rank === 1 || tile.rank === 8)){
+              pawnReadyNow = tile;
+            }
+
+        // Update special info on the front end:
+          setInfo({...info,
+            castlingLegal: castlingLegalAfterThisMove,
+            enPassantAvailable: enPassant,
+            pawnReady: pawnReadyNow,
+          });
+
+        // add the new move to the move log (which is an array of move pairs):
+        const moveLogTemp = [...moveLog];
+        if((moveLogTemp.length > 0) && (moveLogTemp[moveLogTemp.length-1].length === 1)){
+          moveLogTemp[moveLogTemp.length-1].push(moveDescription);
+        } else {
+          moveLogTemp.push([moveDescription])
+        }
+        setMoveLog(moveLogTemp);
+        
+        // send move to database:
+        Axios.put(`http://localhost:8000/api/games/${gameId}`, {boardStatus, whiteToPlay: (pawnReadyNow? whiteToPlay : !whiteToPlay), moveLog: moveLogTemp, $set: {"specialInfo.enPassantAvailable": enPassant, "specialInfo.castlingLegal": castlingLegalAfterThisMove, "specialInfo.pawnReady": pawnReadyNow}}, {withCredentials: true})
+            // .then(() => {
+            //     if(!pawnReadyNow) setWhiteToPlay(!whiteToPlay);
+            //     setThisUserMoves(thisUserMoves + 1);   
+            // })
+          .catch(err => console.error({errors: err}))
+        
+        // These lines might eventually get moved into the "then" statement, but for now I'll leave them outside so that front-end-only play will still work.
+        if(!pawnReadyNow) setWhiteToPlay(!whiteToPlay);
+        setThisUserMoves(thisUserMoves + 1);
       }
 
       // if it's not this player's turn / piece
@@ -209,14 +206,27 @@ const GameBoard = ({socket, statusFromParent, gameId, parentLog, specialInfo, be
   }
 
   const removeCheckMoves = (moves, tile) => {
+    // king moves:
     if(tile.occupied.type === "king"){
       for(let i=0; i<moves.length; i++){
+        // prevent kings from moving into check:
         if(piecesAttackingThisSquare(moves[i][0], moves[i][1], tile.occupied.color)){
           moves.splice(i, 1);
           i--;
         }
+        // prevent castling through a check:
+        else if(tile.file === "E" && (tile.rank === 1 || tile.rank === 8)){
+          if(
+            (moves[i][0] === "G" && piecesAttackingThisSquare("F", moves[i][1], tile.occupied.color))
+            || (moves[i][0] === "C" && piecesAttackingThisSquare("D", moves[i][1], tile.occupied.color))
+          ){
+            moves.splice(i, 1);
+            i--;
+          }
+        }
       }
     }
+    // non-king moves:
   };
 
   const piecesAttackingThisSquare = (file, rank, color) => {
