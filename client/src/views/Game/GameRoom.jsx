@@ -26,6 +26,14 @@ const GameRoom = ({id, loggedIn}) => {
     console.log("get a room!");
   }, [id]);
 
+  useEffect( () => {
+    console.log("connected socket in GameRoom");
+    socket.on("gameBegun", begunGame => {
+      setGame(begunGame);
+    });
+    return () => socket.disconnect(true);
+  }, []);
+
   const deleteGame = () => {
     axios.delete(`http://localhost:8000/api/games/${id}`, {withCredentials: true})
       .then(() => navigate("/games"))
@@ -42,15 +50,6 @@ const GameRoom = ({id, loggedIn}) => {
       .catch(err => console.error({errors:err}));
   }
 
-  useEffect( () => {
-    console.log("connected socket in GameRoom");
-    socket.on("gameBegun", begunGame => {
-      setGame(begunGame);
-    });
-
-    return () => socket.disconnect(true);
-  }, []);
-
   return (
     <>
       {game? 
@@ -65,8 +64,8 @@ const GameRoom = ({id, loggedIn}) => {
         :
         <>Loading...</>
       }
-
-      <div className="mx-auto">
+      
+      <div className="mx-auto col-5 d-inline">
         <GameBoard
           socket={socket}
           loggedIn={loggedIn}
@@ -84,8 +83,10 @@ const GameRoom = ({id, loggedIn}) => {
           setMoveLog={setMoveLog}
         />
       </div>
-      
-      <MoveLog moves={moveLog? moveLog : []} />
+    
+      <div className="mx-auto col-5 d-inline">
+        <MoveLog moves={moveLog? moveLog : []} />
+      </div>
 
       <div>
         <h5 className="mt-2">Sprite style:</h5>

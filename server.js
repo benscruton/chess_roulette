@@ -33,8 +33,9 @@ io.on("connection", socket => {
         console.log("A User disconnected.");
     })
 
-    socket.on("joinRoom", gameId => {
-        socket.join(gameId);
+    socket.on("joinRoom", roomName => {
+        console.log(roomName);
+        socket.join(roomName);
     });
 
     socket.on("madeAMove", data => {
@@ -42,7 +43,7 @@ io.on("connection", socket => {
     });
 
     socket.on("newPlayer", data => {
-        socket.to(data.gameId).emit("playerUpdate", data);
+        socket.to(data.gameId).to("lobby").emit("playerUpdate", data);
     });
 
     socket.on("startGame", data => {
