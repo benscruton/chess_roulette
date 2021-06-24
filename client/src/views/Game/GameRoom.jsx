@@ -31,12 +31,18 @@ const GameRoom = ({id, loggedIn}) => {
     socket.on("gameBegun", begunGame => {
       setGame(begunGame);
     });
+    socket.on("removeGame", () => {
+      navigate("/games");
+    });
     return () => socket.disconnect(true);
   }, []);
 
   const deleteGame = () => {
     axios.delete(`http://localhost:8000/api/games/${id}`, {withCredentials: true})
-      .then(() => navigate("/games"))
+      .then(() => {
+        socket.emit("gameDeleted", id);
+        navigate("/games");
+      })
       .catch(err => console.error({errors: err}));
   }
 
@@ -53,19 +59,21 @@ const GameRoom = ({id, loggedIn}) => {
   return (
     <>
       {game? 
-        <GamePlayerInfo
-          socket={socket}
-          gameId={id}
-          loggedIn={loggedIn}
-          origPlayers={{white: game.playerWhite, black: game.playerBlack}}
-          beginGame={beginGame}
-          begun={game.begun}
-        />
+        <div className="mx-auto">
+          <GamePlayerInfo
+            socket={socket}
+            gameId={id}
+            loggedIn={loggedIn}
+            origPlayers={{white: game.playerWhite, black: game.playerBlack}}
+            beginGame={beginGame}
+            begun={game.begun}
+          />
+        </div>
         :
         <>Loading...</>
       }
       
-      <div className="mx-auto col-5 d-inline">
+      <div className="mx-auto">
         <GameBoard
           socket={socket}
           loggedIn={loggedIn}
@@ -84,7 +92,7 @@ const GameRoom = ({id, loggedIn}) => {
         />
       </div>
     
-      <div className="mx-auto col-5 d-inline">
+      <div className="mx-auto">
         <MoveLog moves={moveLog? moveLog : []} />
       </div>
 

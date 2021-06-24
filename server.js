@@ -49,6 +49,10 @@ io.on("connection", socket => {
     socket.on("startGame", data => {
         socket.to(data.gameId).emit("gameBegun", data.game);
     });
+
+    socket.on("gameDeleted", gameId => {
+        socket.to(gameId).to("lobby").emit("removeGame", gameId);
+    });
 });
 
 

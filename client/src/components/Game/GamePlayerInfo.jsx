@@ -76,8 +76,8 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
       <table className="table-borderless w-100">
         <tbody>
           <tr>
-            <td>White:</td>
-            <td>Black:</td>
+            <td className="w-50">White:</td>
+            <td className="w-50">Black:</td>
           </tr>
           <tr>
             {colors.map( (color, idx) =>

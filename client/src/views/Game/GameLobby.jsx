@@ -27,10 +27,15 @@ const GameLobby = props => {
 
   useEffect( () => {
     socket.on("playerUpdate", data => {
-      console.log("hello");
       let list = JSON.parse(JSON.stringify(gameListRef.current));
       let ids = list.map(game => game._id);
       list[ids.indexOf(data.gameId)][`player${data.color}`] = data.player;
+      setGameList(list);
+    });
+    socket.on("removeGame", gameId => {
+      let list = JSON.parse(JSON.stringify(gameListRef.current));
+      let ids = list.map(game => game._id);
+      list.splice(ids.indexOf(gameId), 1);
       setGameList(list);
     });
   }, []);
