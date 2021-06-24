@@ -38,6 +38,10 @@ const GameLobby = props => {
       list.splice(ids.indexOf(gameId), 1);
       setGameList(list);
     });
+    socket.on("addGameToList", newGame => {
+      let list = [...JSON.parse(JSON.stringify(gameListRef.current)), newGame];
+      setGameList(list);
+    });
   }, []);
 
   return (

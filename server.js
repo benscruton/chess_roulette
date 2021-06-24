@@ -53,6 +53,11 @@ io.on("connection", socket => {
     socket.on("gameDeleted", gameId => {
         socket.to(gameId).to("lobby").emit("removeGame", gameId);
     });
+
+    socket.on("gameCreated", data => {
+        console.log(data);
+        socket.to("lobby").emit("addGameToList", data);
+    });
 });
 
 
