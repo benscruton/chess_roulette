@@ -14,6 +14,8 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
   const [activeTile, setActiveTile] = useState(false);
   const [info, setInfo] = useState({});
   const [viewAsBlack, setViewAsBlack] = useState(false);
+  const [tileStyle, setTileStyle] = useState(styles.tile);
+  const [pieceSize, setPieceSize] = useState(styles.piece);
 
   useEffect( () => {
     Axios.get(`http://localhost:8000/api/games/${gameId}`)
@@ -42,6 +44,24 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
       setViewAsBlack(false);
     }
   }, [playerIds]);
+
+  const adjustBoardSize = () => {
+    if(window.innerWidth > 600){
+      setTileStyle(styles.tile);
+      setPieceSize(styles.piece);
+    } else if(window.innerWidth > 400){
+      setTileStyle(styles.mediumTile);
+      setPieceSize(styles.mediumPiece);
+    } else {
+      setTileStyle(styles.smallTile);
+      setPieceSize(styles.smallPiece);
+    }
+  }
+
+  useEffect( () => {
+    adjustBoardSize();
+    window.addEventListener("resize", adjustBoardSize);
+  }, []);
 
   // --------------- SOCKET FUNCTIONS: ----------------
   // every time we make a move, send to socket
@@ -292,7 +312,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
               {row.map( (tile, j) =>
                 <div
                   className={`
-                    ${styles.tile}
+                    ${tileStyle}
                     ${(i+j) % 2 === 0? styles.white : styles.black}
                     ${activeTile.file === tile.file && activeTile.rank === tile.rank ? styles.active : ""}
                     ${isValidMove(tile) ? 
@@ -309,6 +329,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
                     <img 
                       src={images[`${tile.occupied.color}${tile.occupied.type}${spriteStyle}`]} 
                       alt={`${tile.occupied.color[0]} ${tile.occupied.abbrev}`}
+                      className={pieceSize}
                     />
                     : 
                     " "
