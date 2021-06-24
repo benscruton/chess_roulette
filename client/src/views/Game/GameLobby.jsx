@@ -1,5 +1,5 @@
 import Axios from "axios";
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useRef} from "react";
 import {Link} from "@reach/router";
 import io from "socket.io-client";
 
@@ -7,6 +7,12 @@ const GameLobby = props => {
 
   const [socket] = useState( () => io(":8000"));
   const [gameList, setGameList] = useState(false);
+
+  const gameListRef = useRef(gameList);
+
+  useEffect( () => {
+    gameListRef.current = gameList;
+  });
 
   useEffect( () => {
     Axios.get(`http://localhost:8000/api/games`)
@@ -21,22 +27,13 @@ const GameLobby = props => {
 
   useEffect( () => {
     socket.on("playerUpdate", data => {
-      console.log(data);
+      console.log("hello");
+      let list = JSON.parse(JSON.stringify(gameListRef.current));
+      let ids = list.map(game => game._id);
+      list[ids.indexOf(data.gameId)][`player${data.color}`] = data.player;
+      setGameList(list);
     });
   }, []);
-
-  // useEffect( () => {
-  //   if(gameList){
-  //     // socket.disconnect(true);
-  //     socket.on("playerUpdate", data => {
-  //       let gameIdList = gameList.map(game => game._id);
-  //       let idx = gameIdList.indexOf(data.gameId);
-  //       let gameListCopy = JSON.parse(JSON.stringify(gameList));
-  //       gameListCopy[idx][`player${data.color}`] = data.player;
-  //       setGameList(gameListCopy);
-  //     });
-  //   }
-  // }, [gameList]);
 
   return (
     <>
