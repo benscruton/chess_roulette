@@ -12,7 +12,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
   const [boardStatus, setBoardStatus] = useState(statusFromParent);
   const [whiteToPlay, setWhiteToPlay] = useState(true);
   const [activeTile, setActiveTile] = useState(false);
-  const [info, setInfo] = useState({});
+  const [info, setInfo] = useState(specialInfo);
   const [viewAsBlack, setViewAsBlack] = useState(false);
   const [tileStyle, setTileStyle] = useState(styles.tile);
   const [pieceSize, setPieceSize] = useState(styles.piece);
@@ -44,6 +44,16 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
       setViewAsBlack(false);
     }
   }, [playerIds]);
+
+  // useEffect( () => {
+  //   if(info){
+  //     let color = whiteToPlay ? "white" : "black";
+  //     let kingSpot = info.kingLocations[color];
+  //     let result = piecesAttackingThisSquare(kingSpot[0], kingSpot[1], color);
+  //     console.log(result);
+  //     setInCheck(result);
+  //   }
+  // }, [whiteToPlay]);
 
   const adjustBoardSize = () => {
     if(window.innerWidth > 600){
@@ -163,8 +173,10 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
           let newKingLocations = {...info.kingLocations};
           if(tile.occupied.type === "king"){
             newKingLocations[tile.occupied.color] = [tile.file, tile.rank];
-            console.log("king move");
           }
+
+        // Determine if the player is in check
+          let nextPlayerInCheck = !pawnReadyNow && isInCheck(whiteToPlay? "black" : "white");
 
         // Update special info on the front end:
           setInfo({...info,
@@ -172,6 +184,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
             enPassantAvailable: enPassant,
             pawnReady: pawnReadyNow,
             kingLocations: newKingLocations,
+            inCheck: nextPlayerInCheck
           });
 
         // add the new move to the move log (which is an array of move pairs):
@@ -184,7 +197,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
         setMoveLog(moveLogTemp);
         
         // send move to database:
-        Axios.put(`http://localhost:8000/api/games/${gameId}`, {boardStatus, whiteToPlay: (pawnReadyNow? whiteToPlay : !whiteToPlay), moveLog: moveLogTemp, $set: {"specialInfo.enPassantAvailable": enPassant, "specialInfo.castlingLegal": castlingLegalAfterThisMove, "specialInfo.pawnReady": pawnReadyNow, "specialInfo.kingLocations" : newKingLocations}}, {withCredentials: true})
+        Axios.put(`http://localhost:8000/api/games/${gameId}`, {boardStatus, whiteToPlay: (pawnReadyNow? whiteToPlay : !whiteToPlay), moveLog: moveLogTemp, $set: {"specialInfo.enPassantAvailable": enPassant, "specialInfo.castlingLegal": castlingLegalAfterThisMove, "specialInfo.pawnReady": pawnReadyNow, "specialInfo.kingLocations" : newKingLocations, "specialInfo.inCheck": nextPlayerInCheck}}, {withCredentials: true})
             // .then(() => {
             //     if(!pawnReadyNow) setWhiteToPlay(!whiteToPlay);
             //     setThisUserMoves(thisUserMoves + 1);   
@@ -224,7 +237,12 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
   }
 
   const isInCheck = color => {
-    console.log(info.kingLocations);
+    // let color = whiteToPlay ? "white" : "black";
+    let kingSpot = info.kingLocations[color];
+    let result = piecesAttackingThisSquare(kingSpot[0], kingSpot[1], color);
+    console.log(result);
+    return result;
+    // return piecesAttackingThisSquare(kingSpot[0], kingSpot[1], color);
   }
 
   const removeCheckMoves = (moves, tile) => {
@@ -251,6 +269,8 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
     // non-king moves:
   };
 
+  // NOTE: "color" refers to the player being attacked at this square.
+  // p(file, rank, "black") will determine if any WHITE pieces are attacking the square.
   const piecesAttackingThisSquare = (file, rank, color) => {
     for(let i=0; i<boardStatus.length; i++){
       for(let j=0; j<boardStatus[i].length; j++){
@@ -303,7 +323,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
 
   return (
     <div id="board">
-      <h3>{whiteToPlay? "White" : "Black"}'s move</h3>
+      <h3>{whiteToPlay? "White" : "Black"}{info.inCheck? " is in check" : "'s move"}</h3>
 
       {info.pawnReady && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id?
         <PawnPromotion

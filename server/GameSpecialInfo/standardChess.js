@@ -24,6 +24,8 @@ function addSpecialInfo(){
 
     specialInfo.pawnReady = false;
 
+    specialInfo.inCheck = false;
+
     return specialInfo;
 }
 
