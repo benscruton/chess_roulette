@@ -29,13 +29,21 @@ const GameLobby = props => {
     socket.on("playerUpdate", data => {
       let list = JSON.parse(JSON.stringify(gameListRef.current));
       let ids = list.map(game => game._id);
-      list[ids.indexOf(data.gameId)][`player${data.color}`] = data.player;
+      let idx = ids.indexOf(data.gameId);
+      if(idx === -1){
+        return;
+      }
+      list[idx][`player${data.color}`] = data.player;
       setGameList(list);
     });
     socket.on("removeGame", gameId => {
       let list = JSON.parse(JSON.stringify(gameListRef.current));
       let ids = list.map(game => game._id);
-      list.splice(ids.indexOf(gameId), 1);
+      let idx = ids.indexOf(gameId);
+      if(idx !== -1){
+        return;
+      }
+      list.splice(idx, 1);
       setGameList(list);
     });
     socket.on("addGameToList", newGame => {
