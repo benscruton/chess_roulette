@@ -155,15 +155,23 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
           }
 
         // Special case: pawn promotion
-            if(tile.occupied.type === "pawn" && (tile.rank === 1 || tile.rank === 8)){
-              pawnReadyNow = tile;
-            }
+          if(tile.occupied.type === "pawn" && (tile.rank === 1 || tile.rank === 8)){
+            pawnReadyNow = tile;
+          }
+        
+        // If it's a king move, update king locations
+          let newKingLocations = {...info.kingLocations};
+          if(tile.occupied.type === "king"){
+            newKingLocations[tile.occupied.color] = [tile.file, tile.rank];
+            console.log("king move");
+          }
 
         // Update special info on the front end:
           setInfo({...info,
             castlingLegal: castlingLegalAfterThisMove,
             enPassantAvailable: enPassant,
             pawnReady: pawnReadyNow,
+            kingLocations: newKingLocations,
           });
 
         // add the new move to the move log (which is an array of move pairs):
@@ -176,7 +184,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
         setMoveLog(moveLogTemp);
         
         // send move to database:
-        Axios.put(`http://localhost:8000/api/games/${gameId}`, {boardStatus, whiteToPlay: (pawnReadyNow? whiteToPlay : !whiteToPlay), moveLog: moveLogTemp, $set: {"specialInfo.enPassantAvailable": enPassant, "specialInfo.castlingLegal": castlingLegalAfterThisMove, "specialInfo.pawnReady": pawnReadyNow}}, {withCredentials: true})
+        Axios.put(`http://localhost:8000/api/games/${gameId}`, {boardStatus, whiteToPlay: (pawnReadyNow? whiteToPlay : !whiteToPlay), moveLog: moveLogTemp, $set: {"specialInfo.enPassantAvailable": enPassant, "specialInfo.castlingLegal": castlingLegalAfterThisMove, "specialInfo.pawnReady": pawnReadyNow, "specialInfo.kingLocations" : newKingLocations}}, {withCredentials: true})
             // .then(() => {
             //     if(!pawnReadyNow) setWhiteToPlay(!whiteToPlay);
             //     setThisUserMoves(thisUserMoves + 1);   
@@ -213,6 +221,10 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
       if(availableMoves[i][0] === tile.file && availableMoves[i][1] === tile.rank) return true;
     }
     return false;
+  }
+
+  const isInCheck = color => {
+    console.log(info.kingLocations);
   }
 
   const removeCheckMoves = (moves, tile) => {
@@ -343,10 +355,15 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
         }
       </div>
 
-      <button className="btn btn-warning my-2"
+      <button
+        className="btn btn-warning my-2"
         onClick = {() => setViewAsBlack(!viewAsBlack)}
       >
         Flip board
+      </button>
+
+      <button className="btn btn-info" onClick={() => isInCheck("white")}>
+        Test out check function
       </button>
       
     </div>
