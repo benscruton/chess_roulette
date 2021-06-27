@@ -118,13 +118,13 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
         const fileIdx = fileArray.indexOf(tile.file);
         // Special Case: En Passant
           // facilitate capturing
-          if(tile.occupied.type === "pawn" && tile.file === info.enPassantAvailable[0] && tile.rank === info.enPassantAvailable[1]){
+          if(activeTile.occupied.type === "pawn" && tile.file === info.enPassantAvailable[0] && tile.rank === info.enPassantAvailable[1]){
             // boardStatus[tile.occupied.color === "white" ? 3 : 4][fileIdx].occupied = false;
             moveDescription = `${activeTile.file.toLowerCase()}x`+ moveDescription;
           }
           // update special info if necessary
           let enPassant = false;
-          if((tile.occupied.type === "pawn") && ((Math.abs(activeTile.rank - tile.rank)) === 2)){
+          if((activeTile.occupied.type === "pawn") && ((Math.abs(activeTile.rank - tile.rank)) === 2)){
             enPassant = [tile.file, (tile.rank + activeTile.rank)/2];
           }
         
@@ -312,12 +312,8 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
   }
 
   const isInCheck = color => {
-    // let color = whiteToPlay ? "white" : "black";
     let kingSpot = info.kingLocations[color];
-    let result = piecesAttackingThisSquare(kingSpot[0], kingSpot[1], color);
-    console.log(result);
-    return result;
-    // return piecesAttackingThisSquare(kingSpot[0], kingSpot[1], color);
+    return piecesAttackingThisSquare(kingSpot[0], kingSpot[1], color);
   }
 
   const removeCheckMoves = (moves, tile) => {
