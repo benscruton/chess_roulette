@@ -45,16 +45,6 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
     }
   }, [playerIds]);
 
-  // useEffect( () => {
-  //   if(info){
-  //     let color = whiteToPlay ? "white" : "black";
-  //     let kingSpot = info.kingLocations[color];
-  //     let result = piecesAttackingThisSquare(kingSpot[0], kingSpot[1], color);
-  //     console.log(result);
-  //     setInCheck(result);
-  //   }
-  // }, [whiteToPlay]);
-
   const adjustBoardSize = () => {
     if(window.innerWidth > 600){
       setTileStyle(styles.tile);
@@ -100,8 +90,8 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
       let pawnReadyNow = info.pawnReady;
       // Make sure 1) game has begun, 2) it is their turn, and 3) it's the right player
       if(begun
-          && (activeTile.occupied.color === "white") - (whiteToPlay) === 0
-          && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id
+        && (activeTile.occupied.color === "white") - (whiteToPlay) === 0
+        && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id
       ){
 
         // build the chess-notation description of the move:
@@ -112,8 +102,14 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
         moveDescription += tile.file.toLowerCase() + tile.rank;
 
         // make move on front end:
-        tile.occupied = activeTile.occupied;
-        activeTile.occupied = false;
+        // tile.occupied = activeTile.occupied;
+        // activeTile.occupied = false;
+        // setActiveTile(false);
+        // setAvailableMoves(false);
+        
+        let updatedBoard = JSON.parse(JSON.stringify(boardStatus));
+        updatedBoard = executeMove(updatedBoard, activeTile, tile);
+        setBoardStatus(updatedBoard);
         setActiveTile(false);
         setAvailableMoves(false);
 
@@ -123,7 +119,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
         // Special Case: En Passant
           // facilitate capturing
           if(tile.occupied.type === "pawn" && tile.file === info.enPassantAvailable[0] && tile.rank === info.enPassantAvailable[1]){
-            boardStatus[tile.occupied.color === "white" ? 3 : 4][fileIdx].occupied = false;
+            // boardStatus[tile.occupied.color === "white" ? 3 : 4][fileIdx].occupied = false;
             moveDescription = `${activeTile.file.toLowerCase()}x`+ moveDescription;
           }
           // update special info if necessary
@@ -136,13 +132,13 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
           // facilitate rooks also moving
           if(tile.occupied.type === "king" && Math.abs(fileIdx - fileArray.indexOf(activeTile.file)) === 2){
             if(tile.file === "G"){
-              boardStatus[rankIdx][5].occupied = {...boardStatus[rankIdx][7].occupied};
-              boardStatus[rankIdx][7].occupied = false;
+              // boardStatus[rankIdx][5].occupied = {...boardStatus[rankIdx][7].occupied};
+              // boardStatus[rankIdx][7].occupied = false;
               moveDescription = "O-O";
             }
             if(tile.file === "C"){
-              boardStatus[rankIdx][3].occupied = {...boardStatus[rankIdx][0].occupied};
-              boardStatus[rankIdx][0].occupied = false;
+              // boardStatus[rankIdx][3].occupied = {...boardStatus[rankIdx][0].occupied};
+              // boardStatus[rankIdx][0].occupied = false;
               moveDescription = "O-O-O";
             }
           }
@@ -179,13 +175,15 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
           let nextPlayerInCheck = !pawnReadyNow && isInCheck(whiteToPlay? "black" : "white");
 
         // Update special info on the front end:
-          setInfo({...info,
+
+          let updatedInfo = {...info,
             castlingLegal: castlingLegalAfterThisMove,
             enPassantAvailable: enPassant,
             pawnReady: pawnReadyNow,
             kingLocations: newKingLocations,
             inCheck: nextPlayerInCheck
-          });
+          };
+          setInfo(updatedInfo);
 
         // add the new move to the move log (which is an array of move pairs):
         const moveLogTemp = [...moveLog];
@@ -206,7 +204,15 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
         
         // These lines might eventually get moved into the "then" statement, but for now I'll leave them outside so that front-end-only play will still work.
         if(!pawnReadyNow) setWhiteToPlay(!whiteToPlay);
-        setThisUserMoves(thisUserMoves + 1);
+        // setThisUserMoves(thisUserMoves + 1);
+        let socketInfo = {
+          gameId,
+          boardStatus: updatedBoard,
+          whiteToPlay: (pawnReadyNow ? whiteToPlay : !whiteToPlay),
+          info: updatedInfo,
+          moveLog: moveLogTemp
+        }
+        socket.emit("madeAMove", socketInfo);
       }
 
       // if it's not this player's turn / piece
@@ -227,6 +233,75 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
       setActiveTile(false);
       setAvailableMoves(false);
     }
+  }
+
+  const executeMove = (board, fromTile, toTile) => {
+    const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
+    const fromFileIdx = fileArray.indexOf(fromTile.file);
+    const fromRankIdx = 8 - fromTile.rank;
+    const toFileIdx = fileArray.indexOf(toTile.file);
+    const toRankIdx = 8 - toTile.rank;
+    fromTile = board[fromRankIdx][fromFileIdx];
+    toTile = board[toRankIdx][toFileIdx];
+
+    toTile.occupied = fromTile.occupied;
+    fromTile.occupied = false;
+
+    // Special Case: En Passant
+        // facilitate capturing
+        if(toTile.occupied.type === "pawn" && toTile.file === info.enPassantAvailable[0] && toTile.rank === info.enPassantAvailable[1]){
+          board[toTile.occupied.color === "white" ? 3 : 4][toFileIdx].occupied = false;
+          // moveDescription = `${activeTile.file.toLowerCase()}x`+ moveDescription;
+        }
+        // update special info if necessary
+        // let enPassant = false;
+        // if((tile.occupied.type === "pawn") && ((Math.abs(activeTile.rank - tile.rank)) === 2)){
+        //   enPassant = [tile.file, (tile.rank + activeTile.rank)/2];
+        // }
+      
+      // Special Case: Castling
+        // facilitate rooks also moving
+        if(toTile.occupied.type === "king" && Math.abs(toFileIdx - fromFileIdx) === 2){
+          if(toTile.file === "G"){
+            board[toRankIdx][5].occupied = {...board[toRankIdx][7].occupied};
+            board[toRankIdx][7].occupied = false;
+            // moveDescription = "O-O";
+          }
+          else if(toTile.file === "C"){
+            board[toRankIdx][3].occupied = {...board[toRankIdx][0].occupied};
+            board[toRankIdx][0].occupied = false;
+            // moveDescription = "O-O-O";
+          }
+        }
+        // // update special info if necessary
+        // // rooks:
+        // let castlingLegalAfterThisMove = {...info.castlingLegal};
+        // let castleFilesRooks = ["A", "H"], castleRanks = [1, 8];
+        // for(let file of castleFilesRooks){
+        //   for(let rank of castleRanks){
+        //     if((tile.file === file && tile.rank === rank) || (activeTile.file === file && activeTile.rank === rank)){
+        //       castlingLegalAfterThisMove[`${file}${rank}`] = false;
+        //     }
+        //   }
+        // }
+        // // kings:
+        // if(activeTile.file === "E" && (activeTile.rank === 1 || activeTile.rank === 8)){
+        //   castlingLegalAfterThisMove[`A${activeTile.rank}`] = false;
+        //   castlingLegalAfterThisMove[`E${activeTile.rank}`] = false;
+        //   castlingLegalAfterThisMove[`H${activeTile.rank}`] = false;
+        // }
+
+      // Special case: pawn promotion
+        // if(tile.occupied.type === "pawn" && (tile.rank === 1 || tile.rank === 8)){
+        //   pawnReadyNow = tile;
+        // }
+      
+      // If it's a king move, update king locations
+        // let newKingLocations = {...info.kingLocations};
+        // if(tile.occupied.type === "king"){
+        //   newKingLocations[tile.occupied.color] = [tile.file, tile.rank];
+        // }
+    return board;
   }
 
   const isValidMove = tile => {
