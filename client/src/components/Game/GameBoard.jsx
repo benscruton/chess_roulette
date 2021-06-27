@@ -17,6 +17,8 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
   const [tileStyle, setTileStyle] = useState(styles.tile);
   const [pieceSize, setPieceSize] = useState(styles.piece);
 
+  const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
+
   useEffect( () => {
     Axios.get(`http://localhost:8000/api/games/${gameId}`)
       .then(res => {
@@ -65,11 +67,11 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
 
   // --------------- SOCKET FUNCTIONS: ----------------
   // every time we make a move, send to socket
-  useEffect( () => {
-    if(boardStatus !== false){
-      socket.emit("madeAMove", {gameId, boardStatus, whiteToPlay, info, moveLog});
-    }
-  }, [thisUserMoves])
+  // useEffect( () => {
+  //   if(boardStatus !== false){
+  //     socket.emit("madeAMove", {gameId, boardStatus, whiteToPlay, info, moveLog});
+  //   }
+  // }, [thisUserMoves])
 
   // when a new move comes in, update the board status
   useEffect( () => {
@@ -87,130 +89,76 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
 
   const clickTile = (tile) => {
     if(isValidMove(tile) && !info.pawnReady){
-      let pawnReadyNow = info.pawnReady;
+      // let pawnReadyNow = info.pawnReady;
       // Make sure 1) game has begun, 2) it is their turn, and 3) it's the right player
       if(begun
         && (activeTile.occupied.color === "white") - (whiteToPlay) === 0
         && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id
       ){
-
-        // build the chess-notation description of the move:
-        let moveDescription = "";
-        moveDescription += activeTile.occupied.type !== "pawn" ? activeTile.occupied.abbrev :
-          tile.occupied? activeTile.file.toLowerCase() : "";
-        moveDescription += tile.occupied? "x" : "";
-        moveDescription += tile.file.toLowerCase() + tile.rank;
-
-        // make move on front end:
-        // tile.occupied = activeTile.occupied;
-        // activeTile.occupied = false;
-        // setActiveTile(false);
-        // setAvailableMoves(false);
-        
+        // Get updated information:
+        let params = establishMoveParams(activeTile, tile, info.enPassantAvailable);
         let updatedBoard = JSON.parse(JSON.stringify(boardStatus));
-        updatedBoard = executeMove(updatedBoard, activeTile, tile);
+        updatedBoard = executeMove(updatedBoard, activeTile, tile, params);
+        
+        // Special info:
+        let castlingLegalAfterThisMove = updateCastlingStatus({...info.castlingLegal}, tile, activeTile);
+
+        let pawnReadyNow = info.pawnReady;
+        if(activeTile.occupied.type === "pawn" && (tile.rank === 1 || tile.rank === 8)){
+          pawnReadyNow = tile;
+        }
+      
+        let newKingLocations = {...info.kingLocations};
+        if(activeTile.occupied.type === "king"){
+          newKingLocations[activeTile.occupied.color] = [tile.file, tile.rank];
+        }
+
+        let whoseTurnNext = (pawnReadyNow? whiteToPlay : !whiteToPlay);
+
+        let nextPlayerInCheck = !pawnReadyNow && isInCheck(updatedBoard, whoseTurnNext? "white" : "black");
+
+        let updatedSpecialInfo = {...info,
+          castlingLegal: castlingLegalAfterThisMove,
+          enPassantAvailable: params.enPassant,
+          pawnReady: pawnReadyNow,
+          kingLocations: newKingLocations,
+          inCheck: nextPlayerInCheck
+        }
+
+        // Move log with latest move added:
+        let moveDescription = buildMoveDescription(activeTile, tile, params);
+        let updatedMoveLog = JSON.parse(JSON.stringify(moveLog));
+        updatedMoveLog = addLatestMoveToLog(updatedMoveLog, moveDescription);
+
+        // Update all front-end info:
         setBoardStatus(updatedBoard);
         setActiveTile(false);
         setAvailableMoves(false);
-
-        const rankIdx = 8 - tile.rank;
-        const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
-        const fileIdx = fileArray.indexOf(tile.file);
-        // Special Case: En Passant
-          // facilitate capturing
-          if(activeTile.occupied.type === "pawn" && tile.file === info.enPassantAvailable[0] && tile.rank === info.enPassantAvailable[1]){
-            // boardStatus[tile.occupied.color === "white" ? 3 : 4][fileIdx].occupied = false;
-            moveDescription = `${activeTile.file.toLowerCase()}x`+ moveDescription;
-          }
-          // update special info if necessary
-          let enPassant = false;
-          if((activeTile.occupied.type === "pawn") && ((Math.abs(activeTile.rank - tile.rank)) === 2)){
-            enPassant = [tile.file, (tile.rank + activeTile.rank)/2];
-          }
-        
-        // Special Case: Castling
-          // facilitate rooks also moving
-          if(tile.occupied.type === "king" && Math.abs(fileIdx - fileArray.indexOf(activeTile.file)) === 2){
-            if(tile.file === "G"){
-              // boardStatus[rankIdx][5].occupied = {...boardStatus[rankIdx][7].occupied};
-              // boardStatus[rankIdx][7].occupied = false;
-              moveDescription = "O-O";
-            }
-            if(tile.file === "C"){
-              // boardStatus[rankIdx][3].occupied = {...boardStatus[rankIdx][0].occupied};
-              // boardStatus[rankIdx][0].occupied = false;
-              moveDescription = "O-O-O";
-            }
-          }
-          // update special info if necessary
-          // rooks:
-          let castlingLegalAfterThisMove = {...info.castlingLegal};
-          let castleFilesRooks = ["A", "H"], castleRanks = [1, 8];
-          for(let file of castleFilesRooks){
-            for(let rank of castleRanks){
-              if((tile.file === file && tile.rank === rank) || (activeTile.file === file && activeTile.rank === rank)){
-                castlingLegalAfterThisMove[`${file}${rank}`] = false;
-              }
-            }
-          }
-          // kings:
-          if(activeTile.file === "E" && (activeTile.rank === 1 || activeTile.rank === 8)){
-            castlingLegalAfterThisMove[`A${activeTile.rank}`] = false;
-            castlingLegalAfterThisMove[`E${activeTile.rank}`] = false;
-            castlingLegalAfterThisMove[`H${activeTile.rank}`] = false;
-          }
-
-        // Special case: pawn promotion
-          if(tile.occupied.type === "pawn" && (tile.rank === 1 || tile.rank === 8)){
-            pawnReadyNow = tile;
-          }
-        
-        // If it's a king move, update king locations
-          let newKingLocations = {...info.kingLocations};
-          if(tile.occupied.type === "king"){
-            newKingLocations[tile.occupied.color] = [tile.file, tile.rank];
-          }
-
-        // Determine if the player is in check
-          let nextPlayerInCheck = !pawnReadyNow && isInCheck(whiteToPlay? "black" : "white");
-
-        // Update special info on the front end:
-
-          let updatedInfo = {...info,
-            castlingLegal: castlingLegalAfterThisMove,
-            enPassantAvailable: enPassant,
-            pawnReady: pawnReadyNow,
-            kingLocations: newKingLocations,
-            inCheck: nextPlayerInCheck
-          };
-          setInfo(updatedInfo);
-
-        // add the new move to the move log (which is an array of move pairs):
-        const moveLogTemp = [...moveLog];
-        if((moveLogTemp.length > 0) && (moveLogTemp[moveLogTemp.length-1].length === 1)){
-          moveLogTemp[moveLogTemp.length-1].push(moveDescription);
-        } else {
-          moveLogTemp.push([moveDescription])
-        }
-        setMoveLog(moveLogTemp);
+        setMoveLog(updatedMoveLog);
+        setWhiteToPlay(whoseTurnNext);
+        setInfo(updatedSpecialInfo);
         
         // send move to database:
-        Axios.put(`http://localhost:8000/api/games/${gameId}`, {boardStatus, whiteToPlay: (pawnReadyNow? whiteToPlay : !whiteToPlay), moveLog: moveLogTemp, $set: {"specialInfo.enPassantAvailable": enPassant, "specialInfo.castlingLegal": castlingLegalAfterThisMove, "specialInfo.pawnReady": pawnReadyNow, "specialInfo.kingLocations" : newKingLocations, "specialInfo.inCheck": nextPlayerInCheck}}, {withCredentials: true})
-            // .then(() => {
-            //     if(!pawnReadyNow) setWhiteToPlay(!whiteToPlay);
-            //     setThisUserMoves(thisUserMoves + 1);   
-            // })
+        let databaseInfo = {
+          boardStatus: updatedBoard,
+          whiteToPlay: whoseTurnNext,
+          moveLog: updatedMoveLog,
+          $set: {
+            "specialInfo.castlingLegal": castlingLegalAfterThisMove,
+            "specialInfo.enPassantAvailable": params.enPassant,
+            "specialInfo.pawnReady": pawnReadyNow,
+            "specialInfo.kingLocations": newKingLocations,
+            "specialInfo.inCheck": nextPlayerInCheck
+          }
+        };
+        Axios.put(`http://localhost:8000/api/games/${gameId}`, databaseInfo, {withCredentials: true})
           .catch(err => console.error({errors: err}))
-        
-        // These lines might eventually get moved into the "then" statement, but for now I'll leave them outside so that front-end-only play will still work.
-        if(!pawnReadyNow) setWhiteToPlay(!whiteToPlay);
-        // setThisUserMoves(thisUserMoves + 1);
         let socketInfo = {
           gameId,
           boardStatus: updatedBoard,
-          whiteToPlay: (pawnReadyNow ? whiteToPlay : !whiteToPlay),
-          info: updatedInfo,
-          moveLog: moveLogTemp
+          whiteToPlay: whoseTurnNext,
+          info: updatedSpecialInfo,
+          moveLog: updatedMoveLog
         }
         socket.emit("madeAMove", socketInfo);
       }
@@ -226,7 +174,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
     if(tile.occupied && !(tile.file === activeTile.file && tile.rank === activeTile.rank)){
       setActiveTile(tile);
       let moves = rules[tile.occupied.type](tile, boardStatus, info);
-      removeCheckMoves(moves, tile);
+      removeCheckMoves(boardStatus, moves, tile);
       setAvailableMoves(moves);
     }
     else{
@@ -235,7 +183,74 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
     }
   }
 
-  const executeMove = (board, fromTile, toTile) => {
+  const updateCastlingStatus = (castlingLegalAfterThisMove, toTile, fromTile) => {
+    // rooks:
+    let castleFilesRooks = ["A", "H"], castleRanks = [1, 8];
+    for(let file of castleFilesRooks){
+      for(let rank of castleRanks){
+        if((toTile.file === file && toTile.rank === rank) || (fromTile.file === file && fromTile.rank === rank)){
+          castlingLegalAfterThisMove[`${file}${rank}`] = false;
+        }
+      }
+    }
+    // kings:
+    if(fromTile.file === "E" && castleRanks.includes(fromTile.rank)){
+      castlingLegalAfterThisMove[`A${fromTile.rank}`] = false;
+      castlingLegalAfterThisMove[`E${fromTile.rank}`] = false;
+      castlingLegalAfterThisMove[`H${fromTile.rank}`] = false;
+    }
+    return castlingLegalAfterThisMove;
+  };
+
+  const addLatestMoveToLog = (log, moveDescription) => {
+    if((log.length > 0) && (log[log.length-1].length === 1)){
+      log[log.length-1].push(moveDescription);
+    } else {
+      log.push([moveDescription])
+    }
+    return log;
+  }
+
+  const establishMoveParams = (fromTile, toTile, enPassantLocation) => {
+    let params = {enPassant: false};
+      if(toTile.occupied){
+        params.captureMove = true;
+      }
+      if(enPassantLocation
+        && fromTile.occupied.type === "pawn"
+        && toTile.file === enPassantLocation[0]
+        && toTile.rank === enPassantLocation[1]
+      ){
+        params.enPassantCapture = true;
+      }
+      if((fromTile.occupied.type === "pawn") && ((Math.abs(fromTile.rank - toTile.rank)) === 2)){
+        params.enPassant = [toTile.file, (toTile.rank + fromTile.rank)/2];
+      }
+      if(fromTile.occupied.type === "king" && Math.abs(fileArray.indexOf(toTile.file) - fileArray.indexOf(fromTile.file)) === 2){
+        if(toTile.file === "G"){
+          params.castling = "O-O";
+        }
+        else if(toTile.file === "C"){
+          params.castling = "O-O-O";
+        }
+      }
+    return params;
+  };
+
+  const buildMoveDescription = (fromTile, toTile, params) => {
+    if(params.castling){
+      return params.castling;
+    }
+    let moveDescription = (fromTile.occupied.type === "pawn" ? "" : fromTile.occupied.abbrev);
+    if(params.captureMove || params.enPassantCapture){
+      moveDescription += (fromTile.occupied.type === "pawn" ? fromTile.file.toLowerCase() : "");
+      moveDescription += "x";
+    }
+    moveDescription += toTile.file.toLowerCase() + toTile.rank;
+    return moveDescription;
+  };
+
+  const executeMove = (board, fromTile, toTile, params = {}) => {
     const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
     const fromFileIdx = fileArray.indexOf(fromTile.file);
     const fromRankIdx = 8 - fromTile.rank;
@@ -247,60 +262,20 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
     toTile.occupied = fromTile.occupied;
     fromTile.occupied = false;
 
-    // Special Case: En Passant
-        // facilitate capturing
-        if(toTile.occupied.type === "pawn" && toTile.file === info.enPassantAvailable[0] && toTile.rank === info.enPassantAvailable[1]){
-          board[toTile.occupied.color === "white" ? 3 : 4][toFileIdx].occupied = false;
-          // moveDescription = `${activeTile.file.toLowerCase()}x`+ moveDescription;
-        }
-        // update special info if necessary
-        // let enPassant = false;
-        // if((tile.occupied.type === "pawn") && ((Math.abs(activeTile.rank - tile.rank)) === 2)){
-        //   enPassant = [tile.file, (tile.rank + activeTile.rank)/2];
-        // }
-      
-      // Special Case: Castling
-        // facilitate rooks also moving
-        if(toTile.occupied.type === "king" && Math.abs(toFileIdx - fromFileIdx) === 2){
-          if(toTile.file === "G"){
-            board[toRankIdx][5].occupied = {...board[toRankIdx][7].occupied};
-            board[toRankIdx][7].occupied = false;
-            // moveDescription = "O-O";
-          }
-          else if(toTile.file === "C"){
-            board[toRankIdx][3].occupied = {...board[toRankIdx][0].occupied};
-            board[toRankIdx][0].occupied = false;
-            // moveDescription = "O-O-O";
-          }
-        }
-        // // update special info if necessary
-        // // rooks:
-        // let castlingLegalAfterThisMove = {...info.castlingLegal};
-        // let castleFilesRooks = ["A", "H"], castleRanks = [1, 8];
-        // for(let file of castleFilesRooks){
-        //   for(let rank of castleRanks){
-        //     if((tile.file === file && tile.rank === rank) || (activeTile.file === file && activeTile.rank === rank)){
-        //       castlingLegalAfterThisMove[`${file}${rank}`] = false;
-        //     }
-        //   }
-        // }
-        // // kings:
-        // if(activeTile.file === "E" && (activeTile.rank === 1 || activeTile.rank === 8)){
-        //   castlingLegalAfterThisMove[`A${activeTile.rank}`] = false;
-        //   castlingLegalAfterThisMove[`E${activeTile.rank}`] = false;
-        //   castlingLegalAfterThisMove[`H${activeTile.rank}`] = false;
-        // }
-
-      // Special case: pawn promotion
-        // if(tile.occupied.type === "pawn" && (tile.rank === 1 || tile.rank === 8)){
-        //   pawnReadyNow = tile;
-        // }
-      
-      // If it's a king move, update king locations
-        // let newKingLocations = {...info.kingLocations};
-        // if(tile.occupied.type === "king"){
-        //   newKingLocations[tile.occupied.color] = [tile.file, tile.rank];
-        // }
+    if(params.enPassantCapture){
+      console.log("this was an en passant capture");
+      board[toTile.occupied.color === "white" ? 3 : 4][toFileIdx].occupied = false;
+    }
+    if(params.castling){
+      if(params.castling === "O-O"){
+        board[toRankIdx][5].occupied = {...board[toRankIdx][7].occupied};
+        board[toRankIdx][7].occupied = false;
+      }
+      else{
+        board[toRankIdx][3].occupied = {...board[toRankIdx][0].occupied};
+        board[toRankIdx][0].occupied = false;
+      }
+    }
     return board;
   }
 
@@ -311,25 +286,25 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
     return false;
   }
 
-  const isInCheck = color => {
+  const isInCheck = (board, color) => {
     let kingSpot = info.kingLocations[color];
-    return piecesAttackingThisSquare(kingSpot[0], kingSpot[1], color);
+    return piecesAttackingThisSquare(board, kingSpot[0], kingSpot[1], color);
   }
 
-  const removeCheckMoves = (moves, tile) => {
+  const removeCheckMoves = (board, moves, tile) => {
     // king moves:
     if(tile.occupied.type === "king"){
       for(let i=0; i<moves.length; i++){
         // prevent kings from moving into check:
-        if(piecesAttackingThisSquare(moves[i][0], moves[i][1], tile.occupied.color)){
+        if(piecesAttackingThisSquare(board, moves[i][0], moves[i][1], tile.occupied.color)){
           moves.splice(i, 1);
           i--;
         }
         // prevent castling through a check:
         else if(tile.file === "E" && (tile.rank === 1 || tile.rank === 8)){
           if(
-            (moves[i][0] === "G" && piecesAttackingThisSquare("F", moves[i][1], tile.occupied.color))
-            || (moves[i][0] === "C" && piecesAttackingThisSquare("D", moves[i][1], tile.occupied.color))
+            (moves[i][0] === "G" && piecesAttackingThisSquare(board, "F", moves[i][1], tile.occupied.color))
+            || (moves[i][0] === "C" && piecesAttackingThisSquare(board, "D", moves[i][1], tile.occupied.color))
           ){
             moves.splice(i, 1);
             i--;
@@ -342,14 +317,14 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
 
   // NOTE: "color" refers to the player being attacked at this square.
   // p(file, rank, "black") will determine if any WHITE pieces are attacking the square.
-  const piecesAttackingThisSquare = (file, rank, color) => {
-    for(let i=0; i<boardStatus.length; i++){
-      for(let j=0; j<boardStatus[i].length; j++){
-        let tile = boardStatus[i][j];
+  const piecesAttackingThisSquare = (board, file, rank, color) => {
+    for(let i=0; i<board.length; i++){
+      for(let j=0; j<board[i].length; j++){
+        let tile = board[i][j];
         if(!tile.occupied || tile.occupied.color === color){
           continue;
         }
-        let itsMoves = rules[tile.occupied.type](tile, boardStatus, info, true);
+        let itsMoves = rules[tile.occupied.type](tile, board, info, true);
         for(let k=0; k<itsMoves.length; k++){
           if(itsMoves[k][0] === file && itsMoves[k][1] === rank){
             return true;
@@ -365,22 +340,34 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
       return;
     }
     let boardRow = (tileCopy.rank === 8? 0 : 7);
-    let boardStatusTemp = boardStatus;
-    for(let i=0; i<boardStatusTemp[boardRow].length; i++){
-      if(boardStatusTemp[boardRow][i].file === tileCopy.file){
-        boardStatusTemp[boardRow][i].occupied.type = choice;
-        console.log(boardStatusTemp[boardRow][i]);
+    let boardFile = fileArray.indexOf(tileCopy.file);
+    let updatedBoard = JSON.parse(JSON.stringify(boardStatus));
+    updatedBoard[boardRow][boardFile].occupied.type = choice;
+
+    let nextPlayerInCheck = isInCheck(updatedBoard, (whiteToPlay? "black" : "white"));
+
+    let updatedMoveLog = JSON.parse(JSON.stringify(moveLog));
+    updatedMoveLog[updatedMoveLog.length - 1][whiteToPlay? 0 : 1] += (choice === "knight"? "N" : choice.substring(0, 1).toUpperCase());
+
+    let updatedSpecialInfo = {...info,
+      pawnReady: false,
+      inCheck: nextPlayerInCheck
+    };
+
+    setBoardStatus(updatedBoard);
+    setMoveLog(updatedMoveLog);
+    setInfo(updatedSpecialInfo);
+
+    let databaseInfo = {
+      boardStatus: updatedBoard,
+      whiteToPlay: !whiteToPlay,
+      moveLog: updatedMoveLog,
+      $set: {
+        "specialInfo.pawnReady": false,
+        "specialInfo.inCheck": nextPlayerInCheck
       }
     }
-    setBoardStatus(boardStatusTemp);
-    let moveLogTemp = [...moveLog];
-    moveLogTemp[moveLogTemp.length - 1][whiteToPlay? 0 : 1] += (choice === "knight"? "N" : choice.substring(0, 1).toUpperCase());
-    setMoveLog(moveLogTemp);
-    setInfo({...info,
-        pawnReady: false
-    });
-    
-    Axios.put(`http://localhost:8000/api/games/${gameId}`, {boardStatus: boardStatusTemp, whiteToPlay: !whiteToPlay, moveLog: moveLogTemp, $set: {"specialInfo.pawnReady": false}}, {withCredentials: true})
+    Axios.put(`http://localhost:8000/api/games/${gameId}`, databaseInfo, {withCredentials: true})
         // .then(() => {
         //     setWhiteToPlay(!whiteToPlay);
         //     setThisUserMoves(thisUserMoves + 1);
@@ -389,7 +376,14 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
     
     // See above note -- these lines may eventually get moved into a "then" call but for now I will leave them out of it so front-end-only play works
     setWhiteToPlay(!whiteToPlay);
-    setThisUserMoves(thisUserMoves + 1);
+    let socketInfo = {
+      gameId,
+      boardStatus: updatedBoard,
+      whiteToPlay: !whiteToPlay,
+      info: updatedSpecialInfo,
+      moveLog: updatedMoveLog
+    }
+    socket.emit("madeAMove", socketInfo);
   }
 
   return (
@@ -453,8 +447,8 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
         Flip board
       </button>
 
-      <button className="btn btn-info" onClick={() => isInCheck("white")}>
-        Test out check function
+      <button className="btn btn-info" onClick={() => console.log(info.kingLocations)}>
+        Log king locations
       </button>
       
     </div>
