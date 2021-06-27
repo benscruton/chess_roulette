@@ -251,7 +251,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
   };
 
   const executeMove = (board, fromTile, toTile, params = {}) => {
-    const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
+    // const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
     const fromFileIdx = fileArray.indexOf(fromTile.file);
     const fromRankIdx = 8 - fromTile.rank;
     const toFileIdx = fileArray.indexOf(toTile.file);
@@ -263,7 +263,6 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
     fromTile.occupied = false;
 
     if(params.enPassantCapture){
-      console.log("this was an en passant capture");
       board[toTile.occupied.color === "white" ? 3 : 4][toFileIdx].occupied = false;
     }
     if(params.castling){
@@ -286,33 +285,55 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
     return false;
   }
 
-  const isInCheck = (board, color) => {
-    let kingSpot = info.kingLocations[color];
+  const isInCheck = (board, color, kingLocations = info.kingLocations) => {
+    let kingSpot = kingLocations[color];
     return piecesAttackingThisSquare(board, kingSpot[0], kingSpot[1], color);
   }
 
-  const removeCheckMoves = (board, moves, tile) => {
-    // king moves:
-    if(tile.occupied.type === "king"){
-      for(let i=0; i<moves.length; i++){
-        // prevent kings from moving into check:
-        if(piecesAttackingThisSquare(board, moves[i][0], moves[i][1], tile.occupied.color)){
-          moves.splice(i, 1);
-          i--;
-        }
-        // prevent castling through a check:
-        else if(tile.file === "E" && (tile.rank === 1 || tile.rank === 8)){
-          if(
-            (moves[i][0] === "G" && piecesAttackingThisSquare(board, "F", moves[i][1], tile.occupied.color))
-            || (moves[i][0] === "C" && piecesAttackingThisSquare(board, "D", moves[i][1], tile.occupied.color))
-          ){
-            moves.splice(i, 1);
-            i--;
-          }
-        }
+  const removeCheckMoves = (origBoard, moves, tile) => {
+    
+    for(let i=0; i<moves.length; i++){
+      let board = JSON.parse(JSON.stringify(origBoard));
+      const fromFileIdx = fileArray.indexOf(tile.file);
+      const fromRankIdx = 8 - tile.rank;
+      const toFileIdx = fileArray.indexOf(moves[i][0]);
+      const toRankIdx = 8 - moves[i][1];
+      const fromTile = board[fromRankIdx][fromFileIdx];
+      const toTile = board[toRankIdx][toFileIdx];
+      
+      let params = establishMoveParams(fromTile, toTile, info.enPassantAvailable);
+      board = executeMove(board, fromTile, toTile, params);
+      if(isInCheck(board, (whiteToPlay? "white" : "black"))){
+        moves.splice(i, 1);
+        i--;
       }
     }
-    // non-king moves:
+    
+
+
+
+    // // king moves:
+    // if(tile.occupied.type === "king"){
+    //   for(let i=0; i<moves.length; i++){
+    //     // // prevent kings from moving into check:
+    //     // if(piecesAttackingThisSquare(board, moves[i][0], moves[i][1], tile.occupied.color)){
+    //     //   moves.splice(i, 1);
+    //     //   i--;
+    //     // }
+    //     // // prevent castling through a check:
+    //     // else
+    //     if(tile.file === "E" && (tile.rank === 1 || tile.rank === 8)){
+    //       if(
+    //         (moves[i][0] === "G" && piecesAttackingThisSquare(board, "F", moves[i][1], tile.occupied.color))
+    //         || (moves[i][0] === "C" && piecesAttackingThisSquare(board, "D", moves[i][1], tile.occupied.color))
+    //       ){
+    //         moves.splice(i, 1);
+    //         i--;
+    //       }
+    //     }
+    //   }
+    // }
+    // // non-king moves:
   };
 
   // NOTE: "color" refers to the player being attacked at this square.
@@ -368,13 +389,8 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
       }
     }
     Axios.put(`http://localhost:8000/api/games/${gameId}`, databaseInfo, {withCredentials: true})
-        // .then(() => {
-        //     setWhiteToPlay(!whiteToPlay);
-        //     setThisUserMoves(thisUserMoves + 1);
-        // })
         .catch(err => console.error({errors: err}))
     
-    // See above note -- these lines may eventually get moved into a "then" call but for now I will leave them out of it so front-end-only play works
     setWhiteToPlay(!whiteToPlay);
     let socketInfo = {
       gameId,
