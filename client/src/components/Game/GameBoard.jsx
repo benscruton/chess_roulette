@@ -5,10 +5,9 @@ import images from "./ImageSets/standardChess";
 import PawnPromotion from "./PawnPromotion";
 const rules = require("./MoveLogic/StandardChess/standardChessMoves");
 
-const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, playerIds, spriteStyle, loggedIn, moveLog, setMoveLog}) => {
+const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGame, finished, playerIds, spriteStyle, loggedIn, moveLog, setMoveLog}) => {
 
   const [availableMoves, setAvailableMoves] = useState(false);
-  // const [thisUserMoves, setThisUserMoves] = useState(0);
   const [boardStatus, setBoardStatus] = useState(statusFromParent);
   const [whiteToPlay, setWhiteToPlay] = useState(true);
   const [activeTile, setActiveTile] = useState(false);
@@ -16,7 +15,6 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
   const [viewAsBlack, setViewAsBlack] = useState(false);
   const [tileStyle, setTileStyle] = useState(styles.tile);
   const [pieceSize, setPieceSize] = useState(styles.piece);
-  const [finished, setFinished] = useState(false);
 
   const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
@@ -92,21 +90,17 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
         let updatedBoard = JSON.parse(JSON.stringify(boardStatus));
         updatedBoard = executeMove(updatedBoard, activeTile, tile, params);
         
-        // Special info:
+        // Other game info:
         let castlingLegalAfterThisMove = updateCastlingStatus({...info.castlingLegal}, tile, activeTile);
-
         let pawnReadyNow = info.pawnReady;
         if(activeTile.occupied.type === "pawn" && (tile.rank === 1 || tile.rank === 8)){
           pawnReadyNow = tile;
         }
-      
         let newKingLocations = {...info.kingLocations};
         if(activeTile.occupied.type === "king"){
           newKingLocations[activeTile.occupied.color] = [tile.file, tile.rank];
         }
-
         let whoseTurnNext = (pawnReadyNow? whiteToPlay : !whiteToPlay);
-
         let nextPlayerInCheck = !pawnReadyNow && isInCheck(updatedBoard, whoseTurnNext? "white" : "black");
 
         let updatedSpecialInfo = {...info,
@@ -129,17 +123,6 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
         setMoveLog(updatedMoveLog);
         setWhiteToPlay(whoseTurnNext);
         setInfo(updatedSpecialInfo);
-
-
-        if(playerHasNoLegalMoves(updatedBoard, whoseTurnNext? "white" : "black")){
-          let message = "";
-          if(nextPlayerInCheck){
-            message += `Checkmate, ${whoseTurnNext? "Black" : "White"} wins!`;
-          } else {
-            message += "Stalemate, it's a draw!";
-          }
-          setFinished(message);
-        }
         
         // send move to database:
         let databaseInfo = {
@@ -161,9 +144,18 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
           boardStatus: updatedBoard,
           whiteToPlay: whoseTurnNext,
           info: updatedSpecialInfo,
-          moveLog: updatedMoveLog
+          moveLog: updatedMoveLog,
         }
         socket.emit("madeAMove", socketInfo);
+
+        let gameFinished = createGameFinishedStatus(updatedBoard, whoseTurnNext, nextPlayerInCheck);
+        // console.log(gameFinished);
+        if(gameFinished.length){
+          console.log("it's over!");
+          endGame(gameFinished);
+        }
+
+        
       }
 
       // if it's not this player's turn / piece
@@ -205,6 +197,17 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
       castlingLegalAfterThisMove[`H${fromTile.rank}`] = false;
     }
     return castlingLegalAfterThisMove;
+  };
+
+  const createGameFinishedStatus = (board, whoseTurnNext, nextPlayerInCheck) => {
+    if(playerHasNoLegalMoves(board, whoseTurnNext? "white" : "black")){
+      if(nextPlayerInCheck){
+        return `Checkmate, ${whoseTurnNext? "Black" : "White"} wins!`;
+      } else {
+        return "Stalemate, it's a draw!";
+      }
+    }
+    return "";
   };
 
   const addLatestMoveToLog = (log, moveDescription) => {
@@ -339,23 +342,14 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
   };
 
   const playerHasNoLegalMoves = (board, color) => {
-    console.log(color);
     for(let i=0; i<board.length; i++){
       for(let j=0; j<board[i].length; j++){
         let tile = board[i][j];        
         if(!tile.occupied || tile.occupied.color !== color){
-          // console.log(`${tile.file}${tile.rank}`);
-          // console.log(tile.occupied);
-          // console.log(tile.occupied.color, color, (tile.occupied.color === color));
           continue;
         }
-        console.log(tile.occupied.type);
         let itsMoves = rules[tile.occupied.type](tile, board, info);
-        console.log(`${tile.file}${tile.rank}`, tile.occupied.type);
-        console.log(itsMoves);
         removeCheckMoves(board, itsMoves, tile);
-        console.log("After removing check:");
-        console.log(itsMoves);
         if(itsMoves.length) return false;
       }
     }
@@ -397,21 +391,29 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
     Axios.put(`http://localhost:8000/api/games/${gameId}`, databaseInfo, {withCredentials: true})
         .catch(err => console.error({errors: err}))
     
-    setWhiteToPlay(!whiteToPlay);
+    
     let socketInfo = {
       gameId,
       boardStatus: updatedBoard,
       whiteToPlay: !whiteToPlay,
       info: updatedSpecialInfo,
-      moveLog: updatedMoveLog
+      moveLog: updatedMoveLog,
     }
     socket.emit("madeAMove", socketInfo);
+
+    let gameFinished = createGameFinishedStatus(updatedBoard, !whiteToPlay, nextPlayerInCheck);
+    console.log(gameFinished);
+    if(gameFinished.length){
+      endGame(gameFinished);
+    }
+
+    setWhiteToPlay(!whiteToPlay);
   }
 
   return (
     <div id="board">
       <h3>
-        {finished?
+        {finished.length?
           finished
           :
           `${whiteToPlay? "White" : "Black"}${info.inCheck? " is in check" : "'s move"}`}

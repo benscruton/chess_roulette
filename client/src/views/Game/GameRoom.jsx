@@ -32,6 +32,9 @@ const GameRoom = ({id, loggedIn}) => {
     socket.on("removeGame", () => {
       navigate("/games");
     });
+    socket.on("gameFinished", finishedGame => {
+      setGame(finishedGame);
+    });
     return () => socket.disconnect(true);
   }, []);
 
@@ -46,13 +49,23 @@ const GameRoom = ({id, loggedIn}) => {
 
   const beginGame = () => {
     axios.put(`http://localhost:8000/api/games/${id}`, {begun: true}, {withCredentials: true})
-      .then( (rsp) => {
+      .then(rsp => {
         let begunGame = rsp.data.results;
         setGame(begunGame);
         socket.emit("startGame", {gameId: id, game: begunGame});
       })
       .catch(err => console.error({errors:err}));
   }
+
+  const endGame = message => {
+    axios.put(`http://localhost:8000/api/games/${id}`, {finished: message}, {withCredentials: true})
+      .then(rsp => {
+        let finishedGame = rsp.data.results;
+        setGame(finishedGame);
+        socket.emit("finishGame", finishedGame);
+      })
+      .catch(err => console.error({errors:err}));
+  };
 
   return (
     <>
@@ -82,6 +95,8 @@ const GameRoom = ({id, loggedIn}) => {
               black: game && game.playerBlack.length ? game.playerBlack[0]._id : ""
           }}
           begun={game? game.begun : false}
+          endGame={endGame}
+          finished={game? game.finished : false}
           gameId={id}
           specialInfo={game? game.specialInfo : false}
           spriteStyle={spriteStyle}

@@ -50,6 +50,10 @@ io.on("connection", socket => {
     socket.to(data.gameId).emit("gameBegun", data.game);
   });
 
+  socket.on("finishGame", game => {
+    socket.to(game._id).emit("gameFinished", game);
+  });
+
   socket.on("gameDeleted", gameId => {
     socket.to(gameId).to("lobby").emit("removeGame", gameId);
   });

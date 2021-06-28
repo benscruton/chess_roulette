@@ -43,7 +43,10 @@ const GameSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-    
+    finished: {
+        type: String,
+        default: ""
+    }
 }, {timestamps:true});
 
 const Game = new mongoose.model("Game", GameSchema);
