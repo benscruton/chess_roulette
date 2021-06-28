@@ -101,14 +101,14 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
           newKingLocations[activeTile.occupied.color] = [tile.file, tile.rank];
         }
         let whoseTurnNext = (pawnReadyNow? whiteToPlay : !whiteToPlay);
-        let nextPlayerInCheck = !pawnReadyNow && isInCheck(updatedBoard, whoseTurnNext? "white" : "black");
+        params.nextPlayerInCheck = !pawnReadyNow && isInCheck(updatedBoard, whoseTurnNext? "white" : "black");
 
         let updatedSpecialInfo = {...info,
           castlingLegal: castlingLegalAfterThisMove,
           enPassantAvailable: params.enPassant,
           pawnReady: pawnReadyNow,
           kingLocations: newKingLocations,
-          inCheck: nextPlayerInCheck
+          inCheck: params.nextPlayerInCheck
         }
 
         // Move log with latest move added:
@@ -134,7 +134,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
             "specialInfo.enPassantAvailable": params.enPassant,
             "specialInfo.pawnReady": pawnReadyNow,
             "specialInfo.kingLocations": newKingLocations,
-            "specialInfo.inCheck": nextPlayerInCheck
+            "specialInfo.inCheck": params.nextPlayerInCheck
           }
         };
         Axios.put(`http://localhost:8000/api/games/${gameId}`, databaseInfo, {withCredentials: true})
@@ -148,14 +148,10 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
         }
         socket.emit("madeAMove", socketInfo);
 
-        let gameFinished = createGameFinishedStatus(updatedBoard, whoseTurnNext, nextPlayerInCheck);
-        // console.log(gameFinished);
-        if(gameFinished.length){
-          console.log("it's over!");
+        let gameFinished = createGameFinishedStatus(updatedBoard, whoseTurnNext, params.nextPlayerInCheck);
+        if(!pawnReadyNow && gameFinished.length){
           endGame(gameFinished);
         }
-
-        
       }
 
       // if it's not this player's turn / piece
@@ -255,6 +251,9 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
       moveDescription += "x";
     }
     moveDescription += toTile.file.toLowerCase() + toTile.rank;
+    if(params.nextPlayerInCheck){
+      moveDescription += "+";
+    }
     return moveDescription;
   };
 
@@ -368,7 +367,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     let nextPlayerInCheck = isInCheck(updatedBoard, (whiteToPlay? "black" : "white"));
 
     let updatedMoveLog = JSON.parse(JSON.stringify(moveLog));
-    updatedMoveLog[updatedMoveLog.length - 1][whiteToPlay? 0 : 1] += (choice === "knight"? "N" : choice.substring(0, 1).toUpperCase());
+    updatedMoveLog[updatedMoveLog.length - 1][whiteToPlay? 0 : 1] += (choice === "knight"? "N" : choice.substring(0, 1).toUpperCase() + (nextPlayerInCheck ? "+" : ""));
 
     let updatedSpecialInfo = {...info,
       pawnReady: false,
@@ -390,7 +389,6 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     }
     Axios.put(`http://localhost:8000/api/games/${gameId}`, databaseInfo, {withCredentials: true})
         .catch(err => console.error({errors: err}))
-    
     
     let socketInfo = {
       gameId,

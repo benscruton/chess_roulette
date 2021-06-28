@@ -54,10 +54,7 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
   }
 
   useEffect( () => {
-    console.log("lookin' for somethin'?");
-
     socket.on("playerUpdate", data => {
-      console.log(data);
       if(data.color === "White"){
         setPlayerWhite(data.player);
       } else if(data.color === "Black") {

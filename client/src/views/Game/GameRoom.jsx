@@ -23,6 +23,7 @@ const GameRoom = ({id, loggedIn}) => {
 
   useEffect( () => {
     socket.emit("joinRoom", id);
+    return () => socket.disconnect(true);
   }, [id]);
 
   useEffect( () => {
