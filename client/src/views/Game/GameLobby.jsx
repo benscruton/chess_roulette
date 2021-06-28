@@ -40,7 +40,7 @@ const GameLobby = props => {
       let list = JSON.parse(JSON.stringify(gameListRef.current));
       let ids = list.map(game => game._id);
       let idx = ids.indexOf(gameId);
-      if(idx !== -1){
+      if(idx === -1){
         return;
       }
       list.splice(idx, 1);

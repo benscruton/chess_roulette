@@ -300,10 +300,16 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
       const toRankIdx = 8 - moves[i][1];
       const fromTile = board[fromRankIdx][fromFileIdx];
       const toTile = board[toRankIdx][toFileIdx];
+
+      
+      const newKingLocations = JSON.parse(JSON.stringify(info.kingLocations));
+      if(tile.occupied.type === "king"){
+        newKingLocations[whiteToPlay? "white" : "black"] = [moves[i][0], moves[i][1]];
+      }
       
       let params = establishMoveParams(fromTile, toTile, info.enPassantAvailable);
       board = executeMove(board, fromTile, toTile, params);
-      if(isInCheck(board, (whiteToPlay? "white" : "black"))){
+      if(isInCheck(board, (whiteToPlay? "white" : "black"), newKingLocations)){
         moves.splice(i, 1);
         i--;
       }
