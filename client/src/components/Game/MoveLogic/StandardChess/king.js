@@ -56,7 +56,7 @@ const checkMoves =  (tile, boardStatus, specialInfo, onlyCheckingAttackingSquare
   }
 
   // Castling:
-  if(!onlyCheckingAttackingSquares && specialInfo.castlingLegal.hasOwnProperty(`${tile.file}${tile.rank}`) && specialInfo.castlingLegal[`${tile.file}${tile.rank}`]){
+  if(!onlyCheckingAttackingSquares && specialInfo.castlingLegal.hasOwnProperty(`${tile.file}${tile.rank}`) && specialInfo.castlingLegal[`${tile.file}${tile.rank}`] && !specialInfo.inCheck){
     // check king-side:
     if(specialInfo.castlingLegal[`H${tile.rank}`] 
     && !boardStatus[rankIdx][5].occupied
