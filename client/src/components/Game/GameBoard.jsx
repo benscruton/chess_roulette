@@ -81,7 +81,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
   const clickTile = (tile) => {
     if(isValidMove(tile) && !info.pawnReady){
       // Make sure 1) game has begun, 2) it is their turn, and 3) it's the right player
-      if(begun
+      if(begun && !finished.length
         && (activeTile.occupied.color === "white") - (whiteToPlay) === 0
         && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id
       ){
@@ -406,7 +406,23 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     }
 
     setWhiteToPlay(!whiteToPlay);
-  }
+  };
+
+  const resign = () => {
+    if((playerIds.white !== loggedIn._id && playerIds.black !== loggedIn._id)
+      || finished.length
+    ){
+      return;
+    }
+    let message = `${loggedIn.userName} resigned.`;
+    if(playerIds.white !== loggedIn._id){
+      message += " White wins!";
+    }
+    else if(playerIds.black !== loggedIn._id){
+      message += " Black wins!";
+    }
+    endGame(message);
+  };
 
   return (
     <div id="board">
@@ -468,11 +484,22 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
       </div>
 
       <button
-        className="btn btn-warning my-2"
+        className="btn btn-warning my-2 mx-1"
         onClick = {() => setViewAsBlack(!viewAsBlack)}
       >
         Flip board
       </button>
+
+      {!finished.length && (playerIds.white === loggedIn._id || playerIds.black === loggedIn._id)?
+        <button
+          className="btn btn-danger my-2 mx-1"
+          onClick = {resign}
+        >
+          Resign
+        </button>
+        :
+        <></>
+      }
       
     </div>
   );
