@@ -76,7 +76,6 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
   // when a new move comes in, update the board status
   useEffect( () => {
     socket.on("newMoveCameIn", data => {
-      console.log("received a thing");
       setBoardStatus(data.boardStatus);
       setInfo(data.info);
       setWhiteToPlay(data.whiteToPlay);

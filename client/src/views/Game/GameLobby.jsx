@@ -17,7 +17,7 @@ const GameLobby = props => {
   useEffect( () => {
     Axios.get(`http://localhost:8000/api/games`)
       .then(res => setGameList(res.data.results))
-      .catch(err => console.log(err))
+      .catch(err => console.error(err))
   }, [props])
 
   useEffect( () => {

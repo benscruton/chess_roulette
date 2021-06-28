@@ -23,11 +23,9 @@ const GameRoom = ({id, loggedIn}) => {
 
   useEffect( () => {
     socket.emit("joinRoom", id);
-    console.log("get a room!");
   }, [id]);
 
   useEffect( () => {
-    console.log("connected socket in GameRoom");
     socket.on("gameBegun", begunGame => {
       setGame(begunGame);
     });
