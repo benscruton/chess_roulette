@@ -468,10 +468,6 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
       >
         Flip board
       </button>
-
-      <button className="btn btn-info" onClick={() => console.log(info.kingLocations)}>
-        Log king locations
-      </button>
       
     </div>
   );
