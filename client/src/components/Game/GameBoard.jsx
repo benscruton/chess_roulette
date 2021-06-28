@@ -8,7 +8,7 @@ const rules = require("./MoveLogic/StandardChess/standardChessMoves");
 const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, playerIds, spriteStyle, loggedIn, moveLog, setMoveLog}) => {
 
   const [availableMoves, setAvailableMoves] = useState(false);
-  const [thisUserMoves, setThisUserMoves] = useState(0);
+  // const [thisUserMoves, setThisUserMoves] = useState(0);
   const [boardStatus, setBoardStatus] = useState(statusFromParent);
   const [whiteToPlay, setWhiteToPlay] = useState(true);
   const [activeTile, setActiveTile] = useState(false);
@@ -16,6 +16,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
   const [viewAsBlack, setViewAsBlack] = useState(false);
   const [tileStyle, setTileStyle] = useState(styles.tile);
   const [pieceSize, setPieceSize] = useState(styles.piece);
+  const [finished, setFinished] = useState(false);
 
   const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
@@ -66,13 +67,6 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
   }, []);
 
   // --------------- SOCKET FUNCTIONS: ----------------
-  // every time we make a move, send to socket
-  // useEffect( () => {
-  //   if(boardStatus !== false){
-  //     socket.emit("madeAMove", {gameId, boardStatus, whiteToPlay, info, moveLog});
-  //   }
-  // }, [thisUserMoves])
-
   // when a new move comes in, update the board status
   useEffect( () => {
     socket.on("newMoveCameIn", data => {
@@ -88,13 +82,12 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
 
   const clickTile = (tile) => {
     if(isValidMove(tile) && !info.pawnReady){
-      // let pawnReadyNow = info.pawnReady;
       // Make sure 1) game has begun, 2) it is their turn, and 3) it's the right player
       if(begun
         && (activeTile.occupied.color === "white") - (whiteToPlay) === 0
         && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id
       ){
-        // Get updated information:
+        // Get updated board status:
         let params = establishMoveParams(activeTile, tile, info.enPassantAvailable);
         let updatedBoard = JSON.parse(JSON.stringify(boardStatus));
         updatedBoard = executeMove(updatedBoard, activeTile, tile, params);
@@ -136,6 +129,17 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
         setMoveLog(updatedMoveLog);
         setWhiteToPlay(whoseTurnNext);
         setInfo(updatedSpecialInfo);
+
+
+        if(playerHasNoLegalMoves(updatedBoard, whoseTurnNext? "white" : "black")){
+          let message = "";
+          if(nextPlayerInCheck){
+            message += `Checkmate, ${whoseTurnNext? "Black" : "White"} wins!`;
+          } else {
+            message += "Stalemate, it's a draw!";
+          }
+          setFinished(message);
+        }
         
         // send move to database:
         let databaseInfo = {
@@ -173,7 +177,9 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
     if(tile.occupied && !(tile.file === activeTile.file && tile.rank === activeTile.rank)){
       setActiveTile(tile);
       let moves = rules[tile.occupied.type](tile, boardStatus, info);
-      removeCheckMoves(boardStatus, moves, tile);
+      if(tile.occupied.color === (whiteToPlay? "white" : "black")){
+        removeCheckMoves(boardStatus, moves, tile);
+      }
       setAvailableMoves(moves);
     }
     else{
@@ -251,11 +257,11 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
 
   const executeMove = (board, fromTile, toTile, params = {}) => {
     // const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
-    const fromFileIdx = fileArray.indexOf(fromTile.file);
-    const fromRankIdx = 8 - fromTile.rank;
+    // const fromFileIdx = fileArray.indexOf(fromTile.file);
+    // const fromRankIdx = 8 - fromTile.rank;
     const toFileIdx = fileArray.indexOf(toTile.file);
     const toRankIdx = 8 - toTile.rank;
-    fromTile = board[fromRankIdx][fromFileIdx];
+    fromTile = board[8 - fromTile.rank][fileArray.indexOf(fromTile.file)];
     toTile = board[toRankIdx][toFileIdx];
 
     toTile.occupied = fromTile.occupied;
@@ -290,58 +296,29 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
   }
 
   const removeCheckMoves = (origBoard, moves, tile) => {
-    
     for(let i=0; i<moves.length; i++){
       let board = JSON.parse(JSON.stringify(origBoard));
-      const fromFileIdx = fileArray.indexOf(tile.file);
-      const fromRankIdx = 8 - tile.rank;
-      const toFileIdx = fileArray.indexOf(moves[i][0]);
-      const toRankIdx = 8 - moves[i][1];
-      const fromTile = board[fromRankIdx][fromFileIdx];
-      const toTile = board[toRankIdx][toFileIdx];
-
-      
+      // const fromFileIdx = fileArray.indexOf(tile.file);
+      // const fromRankIdx = 8 - tile.rank;
+      // const toFileIdx = fileArray.indexOf(moves[i][0]);
+      // const toRankIdx = 8 - moves[i][1];
+      const fromTile = board[8 - tile.rank][fileArray.indexOf(tile.file)];
+      const toTile = board[8 - moves[i][1]][fileArray.indexOf(moves[i][0])];
       const newKingLocations = JSON.parse(JSON.stringify(info.kingLocations));
       if(tile.occupied.type === "king"){
-        newKingLocations[whiteToPlay? "white" : "black"] = [moves[i][0], moves[i][1]];
+        newKingLocations[tile.occupied.color] = [moves[i][0], moves[i][1]];
       }
       
       let params = establishMoveParams(fromTile, toTile, info.enPassantAvailable);
       board = executeMove(board, fromTile, toTile, params);
-      if(isInCheck(board, (whiteToPlay? "white" : "black"), newKingLocations)){
+      if(isInCheck(board, tile.occupied.color, newKingLocations)){
         moves.splice(i, 1);
         i--;
       }
     }
-    
-
-
-
-    // // king moves:
-    // if(tile.occupied.type === "king"){
-    //   for(let i=0; i<moves.length; i++){
-    //     // // prevent kings from moving into check:
-    //     // if(piecesAttackingThisSquare(board, moves[i][0], moves[i][1], tile.occupied.color)){
-    //     //   moves.splice(i, 1);
-    //     //   i--;
-    //     // }
-    //     // // prevent castling through a check:
-    //     // else
-    //     if(tile.file === "E" && (tile.rank === 1 || tile.rank === 8)){
-    //       if(
-    //         (moves[i][0] === "G" && piecesAttackingThisSquare(board, "F", moves[i][1], tile.occupied.color))
-    //         || (moves[i][0] === "C" && piecesAttackingThisSquare(board, "D", moves[i][1], tile.occupied.color))
-    //       ){
-    //         moves.splice(i, 1);
-    //         i--;
-    //       }
-    //     }
-    //   }
-    // }
-    // // non-king moves:
   };
 
-  // NOTE: "color" refers to the player being attacked at this square.
+  // NOTE: "color" refers to the player BEING ATTACKED at this square.
   // p(file, rank, "black") will determine if any WHITE pieces are attacking the square.
   const piecesAttackingThisSquare = (board, file, rank, color) => {
     for(let i=0; i<board.length; i++){
@@ -359,6 +336,30 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
       }
     }
     return false;
+  };
+
+  const playerHasNoLegalMoves = (board, color) => {
+    console.log(color);
+    for(let i=0; i<board.length; i++){
+      for(let j=0; j<board[i].length; j++){
+        let tile = board[i][j];        
+        if(!tile.occupied || tile.occupied.color !== color){
+          // console.log(`${tile.file}${tile.rank}`);
+          // console.log(tile.occupied);
+          // console.log(tile.occupied.color, color, (tile.occupied.color === color));
+          continue;
+        }
+        console.log(tile.occupied.type);
+        let itsMoves = rules[tile.occupied.type](tile, board, info);
+        console.log(`${tile.file}${tile.rank}`, tile.occupied.type);
+        console.log(itsMoves);
+        removeCheckMoves(board, itsMoves, tile);
+        console.log("After removing check:");
+        console.log(itsMoves);
+        if(itsMoves.length) return false;
+      }
+    }
+    return true;
   };
 
   const promotePawn = (tileCopy, choice) => {
@@ -409,7 +410,12 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, player
 
   return (
     <div id="board">
-      <h3>{whiteToPlay? "White" : "Black"}{info.inCheck? " is in check" : "'s move"}</h3>
+      <h3>
+        {finished?
+          finished
+          :
+          `${whiteToPlay? "White" : "Black"}${info.inCheck? " is in check" : "'s move"}`}
+      </h3>
 
       {info.pawnReady && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id?
         <PawnPromotion
