@@ -1,4 +1,5 @@
 import React from "react";
+import styles from "./DrawOffer.module.css";
 
 const DrawOffer = ({loggedIn, offeredTo, playerWhite, playerBlack, endGame, offerDraw}) => {
   let offerer, offeree;
@@ -11,8 +12,8 @@ const DrawOffer = ({loggedIn, offeredTo, playerWhite, playerBlack, endGame, offe
   }
 
   return (
-    <>
-      <p>{offerer.userName} offered a draw to {offeree.userName}</p>
+    <div className={styles.wrapper}>
+      <p className="mt-1">{offerer.userName} offered a draw to {offeree.userName}</p>
 
       {offeree._id === loggedIn._id ?
         <>
@@ -44,7 +45,7 @@ const DrawOffer = ({loggedIn, offeredTo, playerWhite, playerBlack, endGame, offe
         :
         <></>
       }
-    </>
+    </div>
   );
 }
 

@@ -1,0 +1,8 @@
+.wrapper{
+    background-color: navajowhite;
+    border: 3px solid peru;
+    border-radius: 5px;
+    width: 50%;
+    margin: 0 auto;
+    padding: 10px;
+}

@@ -112,7 +112,7 @@ const GameRoom = ({id, loggedIn}) => {
         <>Loading...</>
       }
 
-      {game && !game.finished.length && game.drawOfferedTo ?
+      {game && !game.finished && game.drawOfferedTo ?
         <DrawOffer
           loggedIn={loggedIn}
           offeredTo={game.drawOfferedTo}
