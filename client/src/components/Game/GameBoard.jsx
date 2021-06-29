@@ -3,6 +3,7 @@ import Axios from "axios";
 import styles from "./GameBoard.module.css";
 import images from "./ImageSets/standardChess";
 import PawnPromotion from "./PawnPromotion";
+import ConfirmResign from "./ConfirmResign";
 const rules = require("./MoveLogic/StandardChess/standardChessMoves");
 
 const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGame, finished, playerIds, spriteStyle, loggedIn, moveLog, setMoveLog, offerDraw, drawOfferPending}) => {
@@ -15,6 +16,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
   const [viewAsBlack, setViewAsBlack] = useState(false);
   const [tileStyle, setTileStyle] = useState(styles.tile);
   const [pieceSize, setPieceSize] = useState(styles.piece);
+  const [showResignConfirm, setShowResignConfirm] = useState(false);
 
   const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
@@ -74,6 +76,9 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
       setMoveLog(data.moveLog);
       setActiveTile(false);
       setAvailableMoves(false);
+    });
+    socket.on("gameFinished", () => {
+      setShowResignConfirm(false);
     });
     return () => socket.disconnect(true);
   }, [socket]);
@@ -422,6 +427,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
       message += " Black wins!";
     }
     endGame(message);
+    setShowResignConfirm(false);
   };
 
   return (
@@ -440,6 +446,15 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
           whiteToPlay={whiteToPlay}
           tile={info.pawnReady}
           promotePawn={promotePawn}
+        />
+        :
+        <></>
+      }
+
+      {showResignConfirm?
+        <ConfirmResign
+          resign={resign}
+          hide={() => setShowResignConfirm(false)}
         />
         :
         <></>
@@ -501,7 +516,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
           
           <button
             className="btn btn-danger my-2 mx-1"
-            onClick = {resign}
+            onClick = {() => setShowResignConfirm(true)}
           >
             Resign
           </button>
