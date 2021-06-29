@@ -46,8 +46,8 @@ io.on("connection", socket => {
     socket.to(data.gameId).to("lobby").emit("playerUpdate", data);
   });
 
-  socket.on("startGame", data => {
-    socket.to(data.gameId).emit("gameBegun", data.game);
+  socket.on("startGame", game => {
+    socket.to(game._id).emit("gameBegun", game);
   });
 
   socket.on("finishGame", game => {
@@ -58,8 +58,12 @@ io.on("connection", socket => {
     socket.to(gameId).to("lobby").emit("removeGame", gameId);
   });
 
-  socket.on("gameCreated", data => {
-    socket.to("lobby").emit("addGameToList", data);
+  socket.on("gameCreated", game => {
+    socket.to("lobby").emit("addGameToList", game);
+  });
+
+  socket.on("updateDraw", game => {
+    socket.to(game._id).emit("drawOfferUpdate", game);
   });
 });
 

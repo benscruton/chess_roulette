@@ -2,8 +2,9 @@ import { navigate } from "@reach/router";
 import axios from "axios";
 import React, {useState, useEffect} from "react";
 import io from "socket.io-client";
-import GameBoard from "../../components/Game/GameBoard";
 import GamePlayerInfo from "../../components/Game/GamePlayerInfo";
+import DrawOffer from "../../components/Game/DrawOffer";
+import GameBoard from "../../components/Game/GameBoard";
 import MoveLog from "../../components/Game/MoveLog";
 
 const GameRoom = ({id, loggedIn}) => {
@@ -27,14 +28,17 @@ const GameRoom = ({id, loggedIn}) => {
   }, [id]);
 
   useEffect( () => {
-    socket.on("gameBegun", begunGame => {
-      setGame(begunGame);
+    socket.on("gameBegun", game => {
+      setGame(game);
     });
     socket.on("removeGame", () => {
       navigate("/games");
     });
-    socket.on("gameFinished", finishedGame => {
-      setGame(finishedGame);
+    socket.on("gameFinished", game => {
+      setGame(game);
+    });
+    socket.on("drawOfferUpdate", game => {
+      setGame(game);
     });
     return () => socket.disconnect(true);
   }, []);
@@ -53,7 +57,7 @@ const GameRoom = ({id, loggedIn}) => {
       .then(rsp => {
         let begunGame = rsp.data.results;
         setGame(begunGame);
-        socket.emit("startGame", {gameId: id, game: begunGame});
+        socket.emit("startGame", begunGame);
       })
       .catch(err => console.error({errors:err}));
   }
@@ -64,6 +68,29 @@ const GameRoom = ({id, loggedIn}) => {
         let finishedGame = rsp.data.results;
         setGame(finishedGame);
         socket.emit("finishGame", finishedGame);
+      })
+      .catch(err => console.error({errors:err}));
+  };
+
+  const offerDraw = (e, reject = false) => {
+    if(!game || !loggedIn._id){
+      return;
+    }
+    let drawOfferedTo = false;
+    if(reject){
+      console.log(reject);
+      drawOfferedTo = "";
+    } else if(game.playerWhite[0]._id === loggedIn._id){
+      drawOfferedTo = game.playerBlack[0]._id;
+    } else {
+      drawOfferedTo = game.playerWhite[0]._id;
+    }
+    console.log(drawOfferedTo);
+    axios.put(`http://localhost:8000/api/games/${id}`, {drawOfferedTo}, {withCredentials: true})
+      .then(rsp => {
+        let gameWithDrawOffer = rsp.data.results;
+        setGame(gameWithDrawOffer);
+        socket.emit("updateDraw", gameWithDrawOffer);
       })
       .catch(err => console.error({errors:err}));
   };
@@ -84,6 +111,19 @@ const GameRoom = ({id, loggedIn}) => {
         :
         <>Loading...</>
       }
+
+      {game && !game.finished.length && game.drawOfferedTo ?
+        <DrawOffer
+          loggedIn={loggedIn}
+          offeredTo={game.drawOfferedTo}
+          playerWhite={game.playerWhite[0]}
+          playerBlack={game.playerBlack[0]}
+          endGame={endGame}
+          offerDraw={offerDraw}
+        />
+        :
+        <></>
+      }
       
       <div className="mx-auto">
         <GameBoard
@@ -103,6 +143,8 @@ const GameRoom = ({id, loggedIn}) => {
           spriteStyle={spriteStyle}
           moveLog={moveLog}
           setMoveLog={setMoveLog}
+          offerDraw={offerDraw}
+          drawOfferPending={game? game.drawOfferedTo.length > 0 : false}
         />
       </div>
     

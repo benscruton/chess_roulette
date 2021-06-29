@@ -5,7 +5,7 @@ import images from "./ImageSets/standardChess";
 import PawnPromotion from "./PawnPromotion";
 const rules = require("./MoveLogic/StandardChess/standardChessMoves");
 
-const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGame, finished, playerIds, spriteStyle, loggedIn, moveLog, setMoveLog}) => {
+const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGame, finished, playerIds, spriteStyle, loggedIn, moveLog, setMoveLog, offerDraw, drawOfferPending}) => {
 
   const [availableMoves, setAvailableMoves] = useState(false);
   const [boardStatus, setBoardStatus] = useState(statusFromParent);
@@ -81,7 +81,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
   const clickTile = (tile) => {
     if(isValidMove(tile) && !info.pawnReady){
       // Make sure 1) game has begun, 2) it is their turn, and 3) it's the right player
-      if(begun && !finished.length
+      if(begun && !finished.length && !drawOfferPending
         && (activeTile.occupied.color === "white") - (whiteToPlay) === 0
         && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id
       ){
@@ -484,19 +484,28 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
       </div>
 
       <button
-        className="btn btn-warning my-2 mx-1"
+        className="btn btn-info my-2 mx-1"
         onClick = {() => setViewAsBlack(!viewAsBlack)}
       >
         Flip board
       </button>
 
       {!finished.length && (playerIds.white === loggedIn._id || playerIds.black === loggedIn._id)?
-        <button
-          className="btn btn-danger my-2 mx-1"
-          onClick = {resign}
-        >
-          Resign
-        </button>
+        <>
+          <button
+            className="btn btn-warning my-2 mx-1"
+            onClick={offerDraw}
+          >
+            Offer draw
+          </button>
+          
+          <button
+            className="btn btn-danger my-2 mx-1"
+            onClick = {resign}
+          >
+            Resign
+          </button>
+        </>
         :
         <></>
       }

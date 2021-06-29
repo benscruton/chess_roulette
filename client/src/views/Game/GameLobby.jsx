@@ -18,7 +18,7 @@ const GameLobby = props => {
     Axios.get(`http://localhost:8000/api/games`)
       .then(res => setGameList(res.data.results))
       .catch(err => console.error(err))
-  }, [props])
+  }, [props]);
 
   useEffect( () => {
     socket.emit("joinRoom", "lobby");

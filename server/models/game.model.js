@@ -46,6 +46,10 @@ const GameSchema = new mongoose.Schema({
     finished: {
         type: String,
         default: ""
+    },
+    drawOfferedTo: {
+        type: String, // will be a user ID
+        default: ""
     }
 }, {timestamps:true});
 
