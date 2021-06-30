@@ -46,7 +46,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     }else{
       setViewAsBlack(false);
     }
-  }, [playerIds]);
+  }, [begun]);
 
   const adjustBoardSize = () => {
     if(window.innerWidth > 600){

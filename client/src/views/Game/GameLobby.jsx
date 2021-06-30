@@ -8,8 +8,8 @@ const GameLobby = ({loggedIn}) => {
   const [socket] = useState( () => io(":8000"));
   const [gameList, setGameList] = useState(false);
   const [filteredGameList, setFilteredGameList] = useState(false);
-  const [filter, setFilter] = useState("ongoing");
-  const [myGamesToggle, setMyGamesToggle] = useState(true);
+  const [filter, setFilter] = useState("all");
+  const [myGamesToggle, setMyGamesToggle] = useState(false);
 
   const gameListRef = useRef(gameList);
 
@@ -112,24 +112,35 @@ const GameLobby = ({loggedIn}) => {
           )}
         </select> Games:
       </h3>
-      <div className="custom-control custom-switch">
-        <p>
-          <input
-            type="checkbox"
-            checked={myGamesToggle}
-            onChange={handleToggle}
-            className="custom-control-input"
-            id="customSwitches"
-          />
-        <label className="custom-control-label" htmlFor="customSwitches">
-          {myGamesToggle ? "My" : "All"} games
-        </label>
-        </p>
-      </div>
+      <table className="table table-borderless p-0">
+        <tbody>
+          <tr>
+            <td className="text-right p-0">All Games</td>
+            <td className="p-0">
+              <div className="custom-control custom-switch">
+                <p>
+                  <input
+                    type="checkbox"
+                    checked={myGamesToggle}
+                    onChange={handleToggle}
+                    className="custom-control-input"
+                    id="customSwitches"
+                  />
+                <label className="custom-control-label" htmlFor="customSwitches">
+                  &nbsp;
+                </label>
+                </p>
+              </div>
+            </td>
+            <td className="text-left p-0">My Games</td>
+          </tr>
+        </tbody>
+      </table>
+
       {filteredGameList? 
         filteredGameList.map( (game, i) =>
           <p key={i}>
-            Game {i+1}: &nbsp;
+            Game {gameList.indexOf(game) + 1}: &nbsp;
             <Link to={`/games/${game._id}`}>
             {game.type}, between {game.playerWhite.length?
               game.playerWhite[0].userName :
