@@ -3,12 +3,17 @@ import React, {useState, useEffect, useRef} from "react";
 import {Link} from "@reach/router";
 import io from "socket.io-client";
 
-const GameLobby = props => {
+const GameLobby = ({loggedIn}) => {
 
   const [socket] = useState( () => io(":8000"));
   const [gameList, setGameList] = useState(false);
+  const [filteredGameList, setFilteredGameList] = useState(false);
+  const [filter, setFilter] = useState("ongoing");
+  const [myGamesToggle, setMyGamesToggle] = useState(true);
 
   const gameListRef = useRef(gameList);
+
+  const filterOptions = ["all", "unstarted", "ongoing", "finished", "joinable"];
 
   useEffect( () => {
     gameListRef.current = gameList;
@@ -16,9 +21,12 @@ const GameLobby = props => {
 
   useEffect( () => {
     Axios.get(`http://localhost:8000/api/games`)
-      .then(res => setGameList(res.data.results))
+      .then(res => {
+        setGameList(res.data.results);
+        setFilteredGameList(res.data.results);
+      })
       .catch(err => console.error(err))
-  }, [props]);
+  }, []);
 
   useEffect( () => {
     socket.emit("joinRoom", "lobby");
@@ -52,11 +60,74 @@ const GameLobby = props => {
     });
   }, []);
 
+  useEffect( () => {
+    filterList(filter);
+  }, [filter, myGamesToggle, gameList]);
+
+  const handleChange = e => {
+    setFilter(e.target.value);
+  };
+
+  const handleToggle = e => {
+    setMyGamesToggle(!myGamesToggle);
+  };
+
+  const filterList = filter => {
+    // "all", "my", "unstarted", "ongoing", "finished", "joinable"
+    if(!gameList){
+      return;
+    }
+    let updatedList = gameList;
+    if(filter === "my"){
+      updatedList = updatedList.filter(game => (game.playerWhite[0]?._id === loggedIn._id || game.playerBlack[0]?._id === loggedIn._id));
+    }
+    else if(filter === "ongoing"){
+      updatedList = updatedList.filter(game => game.begun && !game.finished);
+    }
+    else if(filter === "unstarted"){
+      updatedList = updatedList.filter(game => !game.begun);
+    }
+    else if(filter === "finished"){
+      updatedList = updatedList.filter(game => game.finished);
+    }
+    else if(filter === "joinable"){
+      updatedList = updatedList.filter(game => game.playerWhite.length + game.playerBlack.length < 2);
+    }
+    if(myGamesToggle){
+      updatedList = updatedList.filter(game =>
+        game.playerWhite[0]?._id === loggedIn._id || game.playerBlack[0]?._id === loggedIn._id
+      );
+    }
+    setFilteredGameList(updatedList);
+  };
+
   return (
     <>
-      <h2>Ongoing games:</h2>
-      {gameList? 
-        gameList.map( (game, i) =>
+      <h3>
+        <select value={filter} onChange={handleChange} style={{border: "1px solid peru", backgroundColor: "white"}}>
+          {filterOptions.map( (opt, idx) =>
+            <option key={idx} value={opt}>
+              {opt[0].toUpperCase() + opt.substring(1)}
+            </option>
+          )}
+        </select> Games:
+      </h3>
+      <div className="custom-control custom-switch">
+        <p>
+          <input
+            type="checkbox"
+            checked={myGamesToggle}
+            onChange={handleToggle}
+            className="custom-control-input"
+            id="customSwitches"
+          />
+        <label className="custom-control-label" htmlFor="customSwitches">
+          {myGamesToggle ? "My" : "All"} games
+        </label>
+        </p>
+      </div>
+      {filteredGameList? 
+        filteredGameList.map( (game, i) =>
           <p key={i}>
             Game {i+1}: &nbsp;
             <Link to={`/games/${game._id}`}>

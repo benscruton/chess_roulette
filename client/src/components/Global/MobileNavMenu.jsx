@@ -33,7 +33,7 @@ const MobileNavMenu = ({loggedIn, logout, hideMenu}) => {
             to="/games"
             onClick={hideMenu}
           >
-            All Games
+            Games
           </Link>
         </li>
 

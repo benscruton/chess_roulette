@@ -32,14 +32,14 @@ const App = () => {
       />
       <div className="col-lg-8 col-md-10 col-sm-12">
         <Router>
-          <LogReg path="/" setLoggedIn={setLoggedIn}/>
+          <LogReg path="/" setLoggedIn={setLoggedIn} />
           {/* <Main path="/dashboard" /> */}
           <Edit path="/profile/edit" loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
           <Show path="/profile" loggedIn={loggedIn} />
 
           <NewGame path="/games/new" />
-          <GameLobby path="/games" />
-          <GameRoom path="/games/:id" loggedIn={loggedIn}/>
+          <GameLobby path="/games" loggedIn={loggedIn} />
+          <GameRoom path="/games/:id" loggedIn={loggedIn} />
         </Router>
       </div>
     </div>

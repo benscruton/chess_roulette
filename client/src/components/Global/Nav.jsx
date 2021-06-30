@@ -58,7 +58,7 @@ const Nav = ({loggedIn, setLoggedIn, noUser}) => {
             }
 
             <li className="nav-item mx-lg-3 mx-md-1">
-              <Link className={`nav-link ${styles.navlink}`} to="/games">All Games</Link>
+              <Link className={`nav-link ${styles.navlink}`} to="/games">Games</Link>
             </li>
 
             <li className="nav-item mx-lg-3 mx-md-1">
