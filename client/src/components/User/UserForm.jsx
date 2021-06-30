@@ -5,7 +5,7 @@ const UserForm = ({inputs, handleInputChange, handleSubmit, title, submitValue, 
 
     const handleCancel = (e) => {
         e.preventDefault();
-        navigate(`/users/${inputs._id}`);
+        navigate("/profile");
     }
 
     return(

@@ -58,7 +58,6 @@ module.exports = {
     rsp.json({msg:"logged out"});
   },
 
-
   checkPasswordBeforeChange : (req, rsp) => {
     User.findOne({email:req.body.email})
       .then(data => {
@@ -91,5 +90,30 @@ module.exports = {
           .catch(err => rsp.json({error: "Invalid login attempt."}))
       })
       .catch(err => rsp.json({error: "Invalid login attempt."}))
+  },
+
+  demoLogin : (req, rsp) => {
+    let email = req.body.demoEmail;
+    if(email !== "pol.treidum@death.star" && email !== "osleo.prennert@yavin.iv"){
+      rsp.json({error: "Demo email not recognized."});
+    }
+    User.findOne({email})
+      .then(data => {
+        rsp.cookie("usertoken",jwt.sign({id:data._id}, process.env.JWT_KEY), {
+          httpOnly:true,
+          expires: new Date(Date.now() + 90000000000)
+        }).json({
+          msg:"success", 
+          userLogged: {
+            firstName: data.firstName, 
+            lastName:data.lastName,
+            userName: data.userName,
+            email: data.email,
+            _id: data._id
+          }
+        });
+      })
+      .catch(err => rsp.json({error: err}))
+    
   }
 }

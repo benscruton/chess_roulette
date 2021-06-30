@@ -505,7 +505,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
         Flip board
       </button>
 
-      {!finished.length && (playerIds.white === loggedIn._id || playerIds.black === loggedIn._id)?
+      {begun && !finished && (playerIds.white === loggedIn._id || playerIds.black === loggedIn._id)?
         <>
           <button
             className="btn btn-warning my-2 mx-1"
