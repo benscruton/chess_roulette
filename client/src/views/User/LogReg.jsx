@@ -73,7 +73,7 @@ const LogReg = ({setLoggedIn}) => {
 
   const demoLogin = e => {
     e.preventDefault();
-    Axios.post("http://localhost:8000/api/demoLogin", {demoEmail: e.target.value}, {withCredentials:true})
+    Axios.post("http://localhost:8000/api/demoLogin", {demoId: e.target.value}, {withCredentials:true})
       .then(rsp => {
         logUserIn(rsp.data.userLogged);
       });
@@ -115,23 +115,23 @@ const LogReg = ({setLoggedIn}) => {
         </div>
 
         {/* DEMO USER BOX: */}
-        <div className="card bg-info mb-2">
+        <div className="card bg-dark mb-2 text-light">
           <div className="card-body">
             <h4 className="card-title">Demo Users:</h4>
 
             <p>For demonstrational purposes, click either of the buttons below to log in as a preselected demo user.</p>
 
             <button
-              className="btn btn-outline-light btn-secondary mx-1 my-1"
+              className="btn btn-outline-light btn-info mx-1 my-1"
               onClick={demoLogin}
-              value="pol.treidum@death.star"
+              value="60dc9bc7b5734eb4727b8ee0"
             >
               User 1
             </button>
             <button
-              className="btn btn-outline-light btn-secondary mx-1 my-1"
+              className="btn btn-outline-light btn-info mx-1 my-1"
               onClick={demoLogin}
-              value="osleo.prennert@yavin.iv"
+              value="60dcc9dbe565d2ef30747ea3"
             >
               User 2
             </button>

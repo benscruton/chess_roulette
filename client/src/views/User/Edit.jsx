@@ -11,22 +11,22 @@ const Edit = ({loggedIn, setLoggedIn}) => {
     }
   }, []);
 
+  const [showPasswordChange, setShowPasswordChange] = useState(false);
+
+  const initialPwData = {
+    oldpw: "",
+    newpw: "",
+    confirmpw: ""
+  };
+
   const [user, setUser] = useState({
     firstName: loggedIn.firstName,
     lastName: loggedIn.lastName,
     email: loggedIn.email,
     _id: loggedIn._id
   });
-  const [pwInputs, setPwInputs] = useState({
-    oldpw: "",
-    newpw: "",
-    confirmpw: ""
-  });
-  const [pwErrors, setPwErrors] = useState({
-    oldpw: false,
-    newpw: false,
-    confirmpw: false
-  });
+  const [pwInputs, setPwInputs] = useState(initialPwData);
+  const [pwErrors, setPwErrors] = useState(initialPwData);
   const [changedPW, setChangedPW] = useState("");
 
   const [errors, setErrors] = useState({
@@ -66,24 +66,16 @@ const Edit = ({loggedIn, setLoggedIn}) => {
     });
     if(e.target.name === "oldpw"){
       setPwErrors({...pwErrors,
-        oldpw: false
+        oldpw: ""
       });
     }
   }
 
-  const showPopup = e => {
+  const togglePopup = e => {
     e.preventDefault();
-    document.getElementById("changepw").style.display = "block";
-  }
-  
-  const goBack = e => {
-    e.preventDefault();
-    document.getElementById("changepw").style.display = "none";
-    setPwInputs({
-      oldpw: "",
-      newpw: "",
-      confirmpw: ""
-    });
+    setPwInputs(initialPwData);
+    setPwErrors(initialPwData);
+    setShowPasswordChange(!showPasswordChange);
     setChangedPW("");
   }
 
@@ -97,8 +89,7 @@ const Edit = ({loggedIn, setLoggedIn}) => {
       return;
     }
     // check oldpassword against bcrypt hash using Axios call
-    Axios.post('http://localhost:8000/api/checkpassword', 
-      {
+    Axios.post('http://localhost:8000/api/checkpassword', {
         email: loggedIn.email,
         password: pwInputs.oldpw,
         newPassword: pwInputs.newpw,
@@ -108,24 +99,14 @@ const Edit = ({loggedIn, setLoggedIn}) => {
     ).then(rsp => {
       if(rsp.data.msg){
         setChangedPW(rsp.data.msg);
-        setPwInputs({
-          oldpw: "",
-          newpw: "",
-          confirmpw: ""
-        });
-        setPwErrors({
-          oldpw: false,
-          newpw: false,
-          confirmpw: false
-        })
-        document.getElementById("changepw").style.display = "none";
+        setPwInputs(initialPwData);
+        setPwErrors(initialPwData)
+        setShowPasswordChange(false);
       }
       else {
-        setPwErrors({
-          oldpw: "Incorrect password.",
-          newpw: false,
-          confirmpw: false
-        })
+        setPwErrors({...initialPwData,
+          [rsp.data.category]: rsp.data.error
+        });
       }
     })
     .catch(err => console.error({errors: err}));
@@ -142,17 +123,21 @@ const Edit = ({loggedIn, setLoggedIn}) => {
         handleSubmit = {handleSubmit}
         errors = {errors}
         editing = {true}
-        showPopup = {showPopup}
+        togglePopup = {togglePopup}
       /> 
-      <div id="changepw" style={{display: "none"}}>
+      {/* <div id="changepw" style={{display: "none"}}> */}
+      {showPasswordChange ?
         <ChangePassword
           handleChange = {handlepwInputs}
           inputs = {pwInputs}
-          goBack = {goBack}
+          togglePopup = {togglePopup}
           handleSubmit = {updatePw}
           errors = {pwErrors}
         />
-      </div>
+        :
+        <></>
+      }
+      {/* // </div> */}
     </>
   );
 }

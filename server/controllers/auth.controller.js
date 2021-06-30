@@ -68,11 +68,15 @@ module.exports = {
         bcrypt.compare(req.body.password, data.password)
           .then(isValid => {
             if (!isValid){
-              rsp.json({error: "Invalid password."});
+              rsp.json({category: "oldpw", error: "Invalid password."});
+              return;
+            }
+            if(req.body.newPassword.length < 8){
+              rsp.json({category: "newpw", error: "Password must be at least 8 characters."});
               return;
             }
             if(req.body.newPassword !== req.body.confirmPassword){
-              rsp.json({error: "Passwords don't match."});
+              rsp.json({category: "confirmpw", error: "Passwords don't match."});
               return;
             }
             // If old password is valid and the new passwords match:
@@ -93,11 +97,11 @@ module.exports = {
   },
 
   demoLogin : (req, rsp) => {
-    let email = req.body.demoEmail;
-    if(email !== "pol.treidum@death.star" && email !== "osleo.prennert@yavin.iv"){
+    let demoId = req.body.demoId;
+    if(demoId !== "60dc9bc7b5734eb4727b8ee0" && demoId !== "60dcc9dbe565d2ef30747ea3"){
       rsp.json({error: "Demo email not recognized."});
     }
-    User.findOne({email})
+    User.findOne({_id: demoId})
       .then(data => {
         rsp.cookie("usertoken",jwt.sign({id:data._id}, process.env.JWT_KEY), {
           httpOnly:true,
