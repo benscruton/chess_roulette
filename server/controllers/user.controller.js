@@ -2,24 +2,35 @@ const {User} = require("../models/user.model");
 
 
 module.exports = {
-    index : (req,res) => {
+    index: (req,rsp) => {
         User.find()
-            .then(data => res.json({results:data}))
-            .catch(err => res.status(404).json({errors: err.errors}))
+            .then(data => rsp.json({results:data}))
+            .catch(err => rsp.status(404).json({errors: err.errors}))
     },
-    show : (req,res) => {
+    show: (req,rsp) => {
         User.findOne({_id: req.params.id})
-            .then(data => res.json({results:data}))
-            .catch(err => res.status(404).json({errors: err.errors}))
+            .then(data => rsp.json({results:data}))
+            .catch(err => rsp.status(404).json({errors: err.errors}))
     },
-    update : (req,res) => {
+    update: (req,rsp) => {
         User.findOneAndUpdate({_id:req.params.id}, req.body, {runValidators:true, new:true, useFindAndModify: false})
-            .then(data => res.json({results:data}))
-            .catch(err => res.status(404).json({errors: err.errors}))
+            .then(data => rsp.json({results:data}))
+            .catch(err => rsp.status(404).json({errors: err.errors}))
     },
-    destroy: (req,res) => {
+    destroy: (req,rsp) => {
         User.deleteOne({_id:req.params.id})
-            .then(data => res.redirect(303, '/api/users'))
-            .catch(err => res.status(404).json({errors: err.errors}))
+            .then(data => rsp.redirect(303, '/api/users'))
+            .catch(err => rsp.status(404).json({errors: err.errors}))
+    },
+    checkIfExists: (req, rsp) => {
+        User.findOne({[req.body.category]: req.body.value})
+            .then(data => {
+                if(data === null || data._id.toString() === req.body.userId){
+                    rsp.json({userExists: false});
+                } else {
+                    rsp.json({userExists: {[req.body.category]: true}});
+                }
+            })
+            .catch(err => rsp.status(404).json({errors: err.errors}));
     }
 }

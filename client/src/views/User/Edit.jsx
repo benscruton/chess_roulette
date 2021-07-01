@@ -44,20 +44,35 @@ const Edit = ({loggedIn, setLoggedIn}) => {
 
   const handleSubmit = e => {
     e.preventDefault();
-    Axios.put(`http://localhost:8000/api/users/${loggedIn._id}`, user, {withCredentials:true})
-    .then( () => {
-      setLoggedIn({...loggedIn,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email
-      });
-      localStorage.setItem("user", JSON.stringify(user));
-      navigate("/profile");
-    })
-    .catch(err => {
-        console.log(err.response.data.errors);
-        setErrors(err.response.data.errors)
-    })
+    let dataToCheck = {
+      category: "email",
+      value: user.email,
+      userId: loggedIn._id
+    };
+    Axios.post("http://localhost:8000/api/checkifexists", dataToCheck)
+      .then( rsp => {
+        if(rsp.data.userExists.email){
+          setErrors({...errors,
+            email: {message: "This email address is already taken."}
+          });
+        } else {
+          Axios.put(`http://localhost:8000/api/users/${loggedIn._id}`, user, {withCredentials:true})
+          .then( () => {
+            setLoggedIn({...loggedIn,
+              firstName: user.firstName,
+              lastName: user.lastName,
+              email: user.email
+            });
+            localStorage.setItem("user", JSON.stringify(user));
+            navigate("/profile");
+          })
+          .catch(err => {
+              console.log(err.response.data.errors);
+              setErrors(err.response.data.errors)
+          });
+        }
+      })
+      .catch(err => console.log(err.response.data.errors));
   }
 
   const handlepwInputs = e => {
