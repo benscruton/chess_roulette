@@ -51,6 +51,7 @@ const Edit = ({loggedIn, setLoggedIn}) => {
         lastName: user.lastName,
         email: user.email
       });
+      localStorage.setItem("user", JSON.stringify(user));
       navigate("/profile");
     })
     .catch(err => {

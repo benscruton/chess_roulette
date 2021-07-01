@@ -23,7 +23,7 @@ module.exports = {
       .catch( err => rsp.json(err.errors))
   },
   login: (req,rsp) => {
-    User.findOne({email:req.body.email})
+    User.findOne({$or: [{email:req.body.email}, {userName: req.body.email}]})
       .then(data => {
         if (data === null) {
           rsp.json({error: "Invalid login attempt."})
@@ -97,11 +97,11 @@ module.exports = {
   },
 
   demoLogin : (req, rsp) => {
-    let demoId = req.body.demoId;
-    if(demoId !== "60dc9bc7b5734eb4727b8ee0" && demoId !== "60dcc9dbe565d2ef30747ea3"){
-      rsp.json({error: "Demo email not recognized."});
+    let demoUserName = req.body.userName;
+    if(demoUserName !== "YavinBucketGuy" && demoUserName !== "LieutenantPol"){
+      rsp.json({error: "Demo username not recognized."});
     }
-    User.findOne({_id: demoId})
+    User.findOne({userName: demoUserName})
       .then(data => {
         rsp.cookie("usertoken",jwt.sign({id:data._id}, process.env.JWT_KEY), {
           httpOnly:true,

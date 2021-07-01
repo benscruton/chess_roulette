@@ -73,7 +73,7 @@ const LogReg = ({setLoggedIn}) => {
 
   const demoLogin = e => {
     e.preventDefault();
-    Axios.post("http://localhost:8000/api/demoLogin", {demoId: e.target.value}, {withCredentials:true})
+    Axios.post("http://localhost:8000/api/demoLogin", {userName: e.target.value}, {withCredentials:true})
       .then(rsp => {
         logUserIn(rsp.data.userLogged);
       });
@@ -86,9 +86,9 @@ const LogReg = ({setLoggedIn}) => {
         <h2 className="text-center">Log In</h2>
 
         <div className="form-group">
-          <label htmlFor="email">Email:</label>
+          <label htmlFor="email">Username or email:</label>
           <input 
-            type="email" 
+            type="text" 
             name="email"
             className="form-control"
             onChange={handleLogInputs}
@@ -124,14 +124,14 @@ const LogReg = ({setLoggedIn}) => {
             <button
               className="btn btn-outline-light btn-info mx-1 my-1"
               onClick={demoLogin}
-              value="60dc9bc7b5734eb4727b8ee0"
+              value="LieutenantPol"
             >
               User 1
             </button>
             <button
               className="btn btn-outline-light btn-info mx-1 my-1"
               onClick={demoLogin}
-              value="60dcc9dbe565d2ef30747ea3"
+              value="YavinBucketGuy"
             >
               User 2
             </button>

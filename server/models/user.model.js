@@ -1,5 +1,5 @@
-const mongoose = require('mongoose'),
-    bcrypt = require('bcrypt');
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const UserSchema = new mongoose.Schema({
     firstName: {
@@ -13,14 +13,18 @@ const UserSchema = new mongoose.Schema({
     userName: {
         type: String,
         required: [true, "Required Field"],
-        minlength: [5, "Must be at least 5 characters long."]
+        minlength: [5, "Must be at least 5 characters long."],
+        validate: {
+            validator: val => /^[a-zA-Z0-9_]*$/.test(val),
+            message: "Username can only contain numbers, letters, and underscores."
+        }
     },
     email: {
         type: String,
         required: [true, "Required Field"],
         validate: {
             validator: val => /^([\w-\.]+@([\w-]+\.)+[\w-]+)?$/.test(val),
-            message: `Invalid email.`
+            message: "Invalid email."
         }
     },
     password: {
@@ -28,7 +32,7 @@ const UserSchema = new mongoose.Schema({
         required: [true, "Required Field"],
         minlength: [8, "Must be at least 8 characters long."]
     },
-}, {timestamps:true})
+}, {timestamps:true});
 
 UserSchema.virtual('confirmPassword')
     .get(() => this._confirmPassword)
@@ -39,7 +43,7 @@ UserSchema.pre('validate', function(next){
         this.invalidate('confirmPassword', "Passwords do not match.")
     }
     next();
-})
+});
 
 UserSchema.pre('save', function(next){
     bcrypt.hash(this.password,10)
@@ -47,7 +51,7 @@ UserSchema.pre('save', function(next){
         this.password = hash;
         next();
     })
-})
+});
 
 const User = new mongoose.model("User", UserSchema);
 

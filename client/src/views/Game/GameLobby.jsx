@@ -136,22 +136,55 @@ const GameLobby = ({loggedIn}) => {
           </tr>
         </tbody>
       </table>
+      
+      <table className="table table-hover table-responsive-md">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Type</th>
+            <th>White</th>
+            <th>Black</th>
+            <th>Status</th>
+          </tr>
+        </thead>
 
-      {filteredGameList? 
-        filteredGameList.map( (game, i) =>
-          <p key={i}>
-            Game {gameList.indexOf(game) + 1}: &nbsp;
-            <Link to={`/games/${game._id}`}>
-            {game.type}, between {game.playerWhite.length?
-              game.playerWhite[0].userName :
-              "________"} and {game.playerBlack.length?
-              game.playerBlack[0].userName :
-              "________"}
-            </Link>
-          </p>
-        )
+        <tbody>
 
-        : <p>Loading...</p>}
+          {filteredGameList? 
+            filteredGameList.map( (game, i) =>
+              <tr key={i}>
+                <td>{gameList.indexOf(game) + 1}</td>
+                <td>
+                  <Link to={`/games/${game._id}`}>
+                    {game.type}
+                  </Link>
+                </td>
+                <td>
+                  {game.playerWhite.length?
+                    game.playerWhite[0].userName :
+                    "──────"}
+                </td>
+                <td>
+                  {game.playerBlack.length?
+                    game.playerBlack[0].userName :
+                    "──────"}
+                </td>
+                <td>
+                  {game.finished? "Completed" :
+                    game.begun? "In progress" : "Not started"
+                  }
+                </td>
+              </tr>
+            )
+
+            : <tr><td>Loading...</td></tr>}
+            <tr>
+              <td colSpan="5">
+                <Link to="/games/new">Add a new game</Link>
+              </td>
+            </tr>
+        </tbody>
+      </table>
     </>
   );
 }

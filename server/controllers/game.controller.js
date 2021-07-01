@@ -9,9 +9,13 @@ module.exports = {
             .catch(err => rsp.status(404).json({errors: err.errors}))
     },
     create : (req,rsp) => {
+        console.log("hello");
         Game.create(req.body)
             .then(data => rsp.json({results:data}))
-            .catch(err => rsp.status(404).json({errors: err.errors}))
+            .catch(err => {
+                console.log(err);
+                rsp.status(404).json({errors: err.errors})
+            })
     },
     show : (req,rsp) => {
         Game.findOne({_id: req.params.id})

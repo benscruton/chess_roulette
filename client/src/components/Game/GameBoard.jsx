@@ -64,6 +64,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
   useEffect( () => {
     adjustBoardSize();
     window.addEventListener("resize", adjustBoardSize);
+    return () => window.removeEventListener("resize", adjustBoardSize);
   }, []);
 
   // --------------- SOCKET FUNCTIONS: ----------------
