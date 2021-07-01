@@ -1,7 +1,7 @@
 import { navigate } from '@reach/router';
 import { useState } from 'react';
 import Axios from 'axios';
-
+import UserForm from "../../components/User/UserForm";
 
 const LogReg = ({setLoggedIn}) => {
   const initialReg = {
@@ -80,9 +80,9 @@ const LogReg = ({setLoggedIn}) => {
   };
 
   return (
-    <div className="d-flex justify-content-around p-5 flex-wrap">
+    <div className="d-flex justify-content-around flex-wrap">
       
-      <form className="col-lg-4 col-md-5 col-sm-10" onSubmit={handleLogin}>
+      <form className="col-lg-4 col-md-5 col-sm-6 col-10" onSubmit={handleLogin}>
         <h2 className="text-center">Log In</h2>
 
         <div className="form-group">
@@ -141,95 +141,18 @@ const LogReg = ({setLoggedIn}) => {
         </div>
       </form>
 
-      <form className="col-lg-4 col-md-5 col-sm-10" onSubmit={handleRegister}>
-        <h2 className="text-center">Register</h2>
-        <div className="form-group">
-          <label htmlFor="firstName">First Name:</label>
-          <input 
-            type="text" 
-            name="firstName"
-            className="form-control"
-            onChange={handleRegInputs}
-            value={reg.firstName}
-          />
-          <span className="text-danger">
-            {regErrors.firstName ? regErrors.firstName.message : ""}
-          </span>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="lastName">Last Name:</label>
-          <input 
-            type="text" 
-            name="lastName"
-            className="form-control"
-            onChange={handleRegInputs}
-            value={reg.lastName}
-          />
-          <span className="text-danger">
-            {regErrors.lastName ? regErrors.lastName.message : ""}
-          </span>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="userName">Username:</label>
-          <input 
-            type="text" 
-            name="userName"
-            className="form-control"
-            onChange={handleRegInputs}
-            value={reg.userName}
-          />
-          <span className="text-danger">
-            {regErrors.userName ? regErrors.userName.message : ""}
-          </span>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="email">Email:</label>
-          <input 
-            type="email" 
-            name="email"
-            className="form-control"
-            onChange={handleRegInputs}
-            value={reg.email}
-          />
-          <span className="text-danger">
-            {regErrors.email ? regErrors.email.message : ""}
-          </span>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
-          <input 
-            type="password" 
-            name="password"
-            className="form-control"
-            onChange={handleRegInputs}
-            value={reg.password}
-          />
-          <span className="text-danger">
-            {regErrors.password ? regErrors.password.message : ""}
-          </span>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="confirmPassword">Confirm Password:</label>
-          <input 
-            type="password" 
-            name="confirmPassword"
-            className="form-control"
-            onChange={handleRegInputs}
-            value={reg.confirmPassword}
-          />
-          <span className="text-danger">
-            {regErrors.confirmPassword ? regErrors.confirmPassword.message : ""}
-          </span>
-        </div>
-
-        <input type="submit" value="Register" className="btn btn-dark my-3"/>
-
-      </form>
+      <div className="col-lg-4 col-md-5 col-sm-6 col-10">
+        <UserForm
+          inputs = {reg}
+          title = "Register"
+          submitValue = "Register"
+          handleInputChange = {handleRegInputs}
+          handleSubmit = {handleRegister}
+          errors = {regErrors}
+          editing = {false}
+          togglePopup = {null}
+        />
+      </div>
     </div>
   )
 }

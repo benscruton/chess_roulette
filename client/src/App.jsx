@@ -37,7 +37,7 @@ const App = () => {
         noUser={noUser}
         className="col-12"
       />
-      <div className="col-lg-8 col-md-10 col-sm-12">
+      <div className="col-lg-10 col-md-12">
         <Router>
           <LogReg path="/" setLoggedIn={setLoggedIn} />
           {/* <Main path="/dashboard" /> */}

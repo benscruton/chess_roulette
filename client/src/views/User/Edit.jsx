@@ -11,7 +11,7 @@ const Edit = ({loggedIn, setLoggedIn}) => {
     }
   }, []);
 
-  const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   const initialPwData = {
     oldpw: "",
@@ -91,7 +91,7 @@ const Edit = ({loggedIn, setLoggedIn}) => {
     e.preventDefault();
     setPwInputs(initialPwData);
     setPwErrors(initialPwData);
-    setShowPasswordChange(!showPasswordChange);
+    setShowPopup(!showPopup);
     setChangedPW("");
   }
 
@@ -117,7 +117,7 @@ const Edit = ({loggedIn, setLoggedIn}) => {
         setChangedPW(rsp.data.msg);
         setPwInputs(initialPwData);
         setPwErrors(initialPwData)
-        setShowPasswordChange(false);
+        setShowPopup(false);
       }
       else {
         setPwErrors({...initialPwData,
@@ -131,18 +131,19 @@ const Edit = ({loggedIn, setLoggedIn}) => {
   return(
     <>
       <p className="text-success">{changedPW}</p>
-      <UserForm 
-        inputs = {user}
-        title = "Edit User"
-        submitValue = "Update"
-        handleInputChange = {handleChange}
-        handleSubmit = {handleSubmit}
-        errors = {errors}
-        editing = {true}
-        togglePopup = {togglePopup}
-      /> 
-      {/* <div id="changepw" style={{display: "none"}}> */}
-      {showPasswordChange ?
+      <div className="col-10 mx-auto">
+        <UserForm 
+          inputs = {user}
+          title = "Edit User"
+          submitValue = "Update"
+          handleInputChange = {handleChange}
+          handleSubmit = {handleSubmit}
+          errors = {errors}
+          editing = {true}
+          togglePopup = {togglePopup}
+        /> 
+      </div>
+      {showPopup ?
         <ChangePassword
           handleChange = {handlepwInputs}
           inputs = {pwInputs}
@@ -153,7 +154,6 @@ const Edit = ({loggedIn, setLoggedIn}) => {
         :
         <></>
       }
-      {/* // </div> */}
     </>
   );
 }

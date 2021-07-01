@@ -7,7 +7,7 @@ const UserForm = ({inputs, handleInputChange, handleSubmit, title, submitValue, 
   }
 
   return(
-    <form onSubmit={handleSubmit} className="col-10 mx-auto">
+    <form onSubmit={handleSubmit}>
       <h2 className="text-center">{title}</h2>
       <div className="form-group">
         <label htmlFor="firstName">First Name:</label>
@@ -67,50 +67,57 @@ const UserForm = ({inputs, handleInputChange, handleSubmit, title, submitValue, 
         </span>
       </div>
 
-      {!editing ?
-      <>
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
-          <input 
-            type="text" 
-            name="password" 
-            className="form-control"
-            onChange={handleInputChange}
-            value={inputs.password}
-          />
-          <span className="text-danger">
-            {errors.password ? errors.password.message : ""}
-          </span>
-        </div>
+      {editing ? <></> :
+        <>
+          <div className="form-group">
+            <label htmlFor="password">Password:</label>
+            <input 
+              type="password" 
+              name="password" 
+              className="form-control"
+              onChange={handleInputChange}
+              value={inputs.password}
+            />
+            <span className="text-danger">
+              {errors.password ? errors.password.message : ""}
+            </span>
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="confirmPassword">Confirm Password:</label>
-          <input 
-            type="text" 
-            name="confirmPassword" 
-            className="form-control"
-            onChange={handleInputChange}
-            value={inputs.confirmPassword}
-          />
-          <span className="text-danger">
-            {inputs.password !== inputs.confirmPassword? "Passwords must match!" : ""}
-          </span>
-        </div>
-      </>
-      : 
-      null}
+          <div className="form-group">
+            <label htmlFor="confirmPassword">Confirm Password:</label>
+            <input 
+              type="password" 
+              name="confirmPassword" 
+              className="form-control"
+              onChange={handleInputChange}
+              value={inputs.confirmPassword}
+            />
+            <span className="text-danger">
+              {inputs.password !== inputs.confirmPassword? "Passwords must match!" : ""}
+            </span>
+          </div>
+        </>
+      }
       
-      <input type="submit" value={submitValue} className="btn btn-primary"/> &nbsp;
+      <button type="submit" className="btn btn-success mx-1">{submitValue}</button>
       {editing ?
-        <button
-          className="btn btn-info"
-          onClick = {togglePopup}
-        >
-          Edit Password
-        </button> 
+        <>
+          <button
+            className="btn btn-info mx-1"
+            onClick = {togglePopup}
+          >
+            Edit Password
+          </button> 
+          <button
+            className="btn btn-warning mx-1"
+            onClick={handleCancel}
+          >
+            Cancel
+          </button>
+        </>
         :
-        ""}
-      <button className="btn btn-dark mx-2" onClick={handleCancel}>Cancel</button>
+        <></>
+      }
     </form>
   )
 }
