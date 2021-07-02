@@ -73,15 +73,11 @@ const GameLobby = ({loggedIn}) => {
   };
 
   const filterList = filter => {
-    // "all", "my", "unstarted", "ongoing", "finished", "joinable"
     if(!gameList){
       return;
     }
     let updatedList = gameList;
-    if(filter === "my"){
-      updatedList = updatedList.filter(game => (game.playerWhite[0]?._id === loggedIn._id || game.playerBlack[0]?._id === loggedIn._id));
-    }
-    else if(filter === "ongoing"){
+    if(filter === "ongoing"){
       updatedList = updatedList.filter(game => game.begun && !game.finished);
     }
     else if(filter === "unstarted"){
