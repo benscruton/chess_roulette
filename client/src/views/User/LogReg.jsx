@@ -4,6 +4,10 @@ import Axios from 'axios';
 import UserForm from "../../components/User/UserForm";
 
 const LogReg = ({setLoggedIn}) => {
+  const initialLog = {
+    email : "",
+    password : "",
+  };
   const initialReg = {
     firstName : "",
     lastName : "",
@@ -11,8 +15,10 @@ const LogReg = ({setLoggedIn}) => {
     email : "",
     password : "",
     confirmPassword : "",
-  }
+  };
   
+  const [log, setLog] = useState(initialLog);
+  const [logErrors, setLogErrors] = useState(initialLog);
   const [reg, setReg] = useState(initialReg);
   const [regErrors, setRegErrors] = useState(initialReg);
   
@@ -31,24 +37,39 @@ const LogReg = ({setLoggedIn}) => {
 
   const handleRegister = e => {
     e.preventDefault();
-    Axios.post('http://localhost:8000/api/register', reg, {withCredentials:true})
+    let dataToCheckForDuplicates = {
+      email: reg.email,
+      userName: reg.userName,
+      userId: false,
+    };
+    Axios.post("http://localhost:8000/api/checkifexists", dataToCheckForDuplicates)
       .then(rsp => {
-        console.log(rsp.data)
-        if (rsp.data.msg) {
-          logUserIn(rsp.data.userLogged);
-        } else {
-          setRegErrors(rsp.data);
+        let duplicateError = false;
+        let updatedRegErrors = {...initialReg};
+        if(rsp.data.unavailable.email){
+          duplicateError = true;
+          updatedRegErrors.email = {message: "This email address is already taken."};
         }
+        if(rsp.data.unavailable.userName){
+          duplicateError = true;
+          updatedRegErrors.userName = {message: "This username is already taken."};
+        }
+        if(duplicateError){
+          setRegErrors(updatedRegErrors);
+          return;
+        }
+        Axios.post('http://localhost:8000/api/register', reg, {withCredentials:true})
+          .then(rsp => {
+            if (rsp.data.msg) {
+              logUserIn(rsp.data.userLogged);
+            } else {
+              setRegErrors(rsp.data);
+            }
+          })
+          .catch(err => console.error(err));
       })
+      .catch(err => console.error(err));
   };
-  
-  const initialLog = {
-    email : "",
-    password : "",
-  };
-  
-  const [log, setLog] = useState(initialLog);
-  const [logErrors, setLogErrors] = useState(initialLog);
 
   const handleLogInputs = e => {
     setLog({...log,
@@ -68,7 +89,8 @@ const LogReg = ({setLoggedIn}) => {
             password: {message: rsp.data.error}
           });
         }
-    })
+      })
+      .catch(err => console.error(err));
   };
 
   const demoLogin = e => {
@@ -79,57 +101,52 @@ const LogReg = ({setLoggedIn}) => {
       });
   };
 
+  const regFields = {
+    firstName: true,
+    lastName: true,
+    userName: true,
+    email: true,
+    password: true,
+    confirmPassword: true
+  };
+
+  const logFields = {
+    email: true,
+    password: true
+  }
+
   return (
     <div className="d-flex justify-content-around flex-wrap">
-      
-      <form className="col-lg-4 col-md-5 col-sm-6 col-10" onSubmit={handleLogin}>
-        <h2 className="text-center">Log In</h2>
 
-        <div className="form-group">
-          <label htmlFor="email">Username or email:</label>
-          <input 
-            type="text" 
-            name="email"
-            className="form-control"
-            onChange={handleLogInputs}
-            value={log.email}
-          />
-          <span className="text-danger">
-            {logErrors.email ? logErrors.email.message : ""}
-          </span>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="password">Password:</label>
-          <input 
-            type="password" 
-            name="password"
-            className="form-control"
-            onChange={handleLogInputs}
-            value={log.password}
-          />
-          <span className="text-danger">
-            {/* {logErrors.password ? logErrors.password.message : ""} */}
-          </span>
-          <input type="submit" value="Login" className="btn btn-dark my-3"/>
-        </div>
+      <div className="col-lg-4 col-md-5 col-sm-6 col-10">
+        <UserForm
+          inputs = {log}
+          title = "Log In"
+          submitValue = "Log In"
+          handleInputChange = {handleLogInputs}
+          handleSubmit = {handleLogin}
+          errors = {logErrors}
+          showFields = {logFields}
+          specialTitles = {{email: "Username or email:"}}
+          togglePopup = {null}
+        />
 
         {/* DEMO USER BOX: */}
-        <div className="card bg-dark mb-2 text-light">
+        <div className="card bg-dark mb-2 text-light mt-4">
           <div className="card-body">
             <h4 className="card-title">Demo Users:</h4>
 
             <p>For demonstrational purposes, click either of the buttons below to log in as a preselected demo user.</p>
 
             <button
-              className="btn btn-outline-light btn-info mx-1 my-1"
+              className="btn btn-outline-light btn-info mx-2 my-1"
               onClick={demoLogin}
               value="LieutenantPol"
             >
               User 1
             </button>
             <button
-              className="btn btn-outline-light btn-info mx-1 my-1"
+              className="btn btn-outline-light btn-info mx-2 my-1"
               onClick={demoLogin}
               value="YavinBucketGuy"
             >
@@ -139,7 +156,7 @@ const LogReg = ({setLoggedIn}) => {
           {/* END DEMO USER BOX */}
 
         </div>
-      </form>
+      </div>
 
       <div className="col-lg-4 col-md-5 col-sm-6 col-10">
         <UserForm
@@ -149,7 +166,8 @@ const LogReg = ({setLoggedIn}) => {
           handleInputChange = {handleRegInputs}
           handleSubmit = {handleRegister}
           errors = {regErrors}
-          editing = {false}
+          showFields = {regFields}
+          specialTitles = {{}}
           togglePopup = {null}
         />
       </div>

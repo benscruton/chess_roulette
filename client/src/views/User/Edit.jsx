@@ -45,13 +45,13 @@ const Edit = ({loggedIn, setLoggedIn}) => {
   const handleSubmit = e => {
     e.preventDefault();
     let dataToCheck = {
-      category: "email",
-      value: user.email,
+      email: user.email,
       userId: loggedIn._id
     };
     Axios.post("http://localhost:8000/api/checkifexists", dataToCheck)
       .then( rsp => {
-        if(rsp.data.userExists.email){
+        console.log(rsp.data);
+        if(rsp.data.unavailable.email){
           setErrors({...errors,
             email: {message: "This email address is already taken."}
           });
@@ -128,6 +128,13 @@ const Edit = ({loggedIn, setLoggedIn}) => {
     .catch(err => console.error({errors: err}));
   }
 
+  const fields = {
+    firstName: true,
+    lastName: true,
+    email: true,
+    editingButtons: true
+  };
+
   return(
     <>
       <p className="text-success">{changedPW}</p>
@@ -139,7 +146,8 @@ const Edit = ({loggedIn, setLoggedIn}) => {
           handleInputChange = {handleChange}
           handleSubmit = {handleSubmit}
           errors = {errors}
-          editing = {true}
+          showFields = {fields}
+          specialTitles = {{}}
           togglePopup = {togglePopup}
         /> 
       </div>
