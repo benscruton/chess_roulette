@@ -22,23 +22,4 @@ module.exports = {
       .then(data => rsp.redirect(303, '/api/users'))
       .catch(err => rsp.status(404).json({errors: err.errors}))
   },
-  checkIfExists: (req, rsp) => {
-    console.log(req.body);
-    let unavailable = {};
-    User.findOne({email: req.body.email})
-      .then(userWithEmail => {
-        unavailable.email = (userWithEmail !== null && (req.body.userId !== userWithEmail._id.toString()));
-        if(req.body.userName){
-          User.findOne({userName: req.body.userName})
-            .then(userWithUserName => {
-              unavailable.userName = (userWithUserName !== null);
-              rsp.json({unavailable});
-            })
-            .catch(err => rsp.status(404).json({errors: err.errors}));
-        } else {
-          rsp.json({unavailable});
-        }
-      })
-      .catch(err => rsp.status(404).json({errors: err.errors}));
-  }
 }

@@ -12,5 +12,5 @@ module.exports = (app) => {
     app.delete('/api/users/:id',authenticate, UserController.destroy);
     app.get('/api/logout', authenticate, LogRegController.logout);
     app.post('/api/checkpassword', authenticate, LogRegController.checkPasswordBeforeChange);
-    app.post('/api/checkifexists', UserController.checkIfExists);
+    app.post('/api/checkifexists', LogRegController.checkIfExists);
 }

@@ -22,6 +22,7 @@ module.exports = {
       })
       .catch( err => rsp.json(err.errors))
   },
+
   login: (req,rsp) => {
     User.findOne({$or: [{email:req.body.email}, {userName: req.body.email}]})
       .then(data => {
@@ -53,6 +54,7 @@ module.exports = {
       })
       .catch(err => rsp.json({error: "Invalid login attempt."}))
   },
+
   logout: (req,rsp) => {
     rsp.clearCookie("usertoken");
     rsp.json({msg:"logged out"});
@@ -94,6 +96,25 @@ module.exports = {
           .catch(err => rsp.json({error: "Invalid login attempt."}))
       })
       .catch(err => rsp.json({error: "Invalid login attempt."}))
+  },
+
+  checkIfExists: (req, rsp) => {
+    let unavailable = {};
+    User.findOne({email: req.body.email})
+      .then(userWithEmail => {
+        unavailable.email = (userWithEmail !== null && (req.body.userId !== userWithEmail._id.toString()));
+        if(req.body.userName){
+          User.findOne({userName: req.body.userName})
+            .then(userWithUserName => {
+              unavailable.userName = (userWithUserName !== null);
+              rsp.json({unavailable});
+            })
+            .catch(err => rsp.status(404).json({errors: err.errors}));
+        } else {
+          rsp.json({unavailable});
+        }
+      })
+      .catch(err => rsp.status(404).json({errors: err.errors}));
   },
 
   demoLogin : (req, rsp) => {
