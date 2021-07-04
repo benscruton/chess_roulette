@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt');
 
 module.exports = {
   register: (req,rsp) => {
+    req.body.email = req.body.email.toLowerCase();
     User.create(req.body)
       .then(data => {
         rsp.cookie("usertoken",jwt.sign({id:data._id}, process.env.JWT_KEY), {
@@ -24,7 +25,7 @@ module.exports = {
   },
 
   login: (req,rsp) => {
-    User.findOne({$or: [{email:req.body.email}, {userName: req.body.email}]})
+    User.findOne({$or: [{email:req.body.email.toLowerCase()}, {userName: req.body.email}]})
       .then(data => {
         if (data === null) {
           rsp.json({error: "Invalid login attempt."})
@@ -119,7 +120,7 @@ module.exports = {
 
   demoLogin : (req, rsp) => {
     let demoUserName = req.body.userName;
-    if(demoUserName !== "YavinBucketGuy" && demoUserName !== "LieutenantPol"){
+    if(demoUserName !== "buckets" && demoUserName !== "barrels"){
       rsp.json({error: "Demo username not recognized."});
     }
     User.findOne({userName: demoUserName})

@@ -141,14 +141,14 @@ const LogReg = ({setLoggedIn}) => {
             <button
               className="btn btn-outline-light btn-info mx-2 my-1"
               onClick={demoLogin}
-              value="LieutenantPol"
+              value="barrels"
             >
               User 1
             </button>
             <button
               className="btn btn-outline-light btn-info mx-2 my-1"
               onClick={demoLogin}
-              value="YavinBucketGuy"
+              value="buckets"
             >
               User 2
             </button>

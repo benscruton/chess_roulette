@@ -4,7 +4,6 @@ import {Router} from '@reach/router';
 import Nav from "./components/Global/Nav";
 import Edit from './views/User/Edit';
 import Show from './views/User/Show';
-// import Main from './views/Main';
 import GameRoom from './views/Game/GameRoom';
 import LogReg from './views/User/LogReg';
 import NewGame from './views/Game/NewGame';
@@ -40,7 +39,6 @@ const App = () => {
       <div className="col-lg-10 col-md-12">
         <Router>
           <LogReg path="/" setLoggedIn={setLoggedIn} />
-          {/* <Main path="/dashboard" /> */}
           <Edit path="/profile/edit" loggedIn={loggedIn} setLoggedIn={setLoggedIn} />
           <Show path="/profile" loggedIn={loggedIn} />
 
