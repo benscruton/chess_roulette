@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 module.exports = {
   register: (req,rsp) => {
     req.body.email = req.body.email.toLowerCase();
+    req.body.userNameLower = req.body.userName.toLowerCase();
     User.create(req.body)
       .then(data => {
         rsp.cookie("usertoken",jwt.sign({id:data._id}, process.env.JWT_KEY), {
@@ -25,7 +26,10 @@ module.exports = {
   },
 
   login: (req,rsp) => {
-    User.findOne({$or: [{email:req.body.email.toLowerCase()}, {userName: req.body.email}]})
+    User.findOne({$or: [
+      {email:req.body.email.toLowerCase()},
+      {userNameLower: req.body.email.toLowerCase()}
+    ]})
       .then(data => {
         if (data === null) {
           rsp.json({error: "Invalid login attempt."})
@@ -62,7 +66,7 @@ module.exports = {
   },
 
   checkPasswordBeforeChange : (req, rsp) => {
-    User.findOne({email:req.body.email})
+    User.findOne({_id:req.body._id})
       .then(data => {
         if (data === null) {
           rsp.json({error: "Invalid user."});
@@ -101,11 +105,11 @@ module.exports = {
 
   checkIfExists: (req, rsp) => {
     let unavailable = {};
-    User.findOne({email: req.body.email})
+    User.findOne({email: req.body.email.toLowerCase()})
       .then(userWithEmail => {
         unavailable.email = (userWithEmail !== null && (req.body.userId !== userWithEmail._id.toString()));
         if(req.body.userName){
-          User.findOne({userName: req.body.userName})
+          User.findOne({userNameLower: req.body.userName.toLowerCase()})
             .then(userWithUserName => {
               unavailable.userName = (userWithUserName !== null);
               rsp.json({unavailable});

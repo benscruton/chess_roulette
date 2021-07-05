@@ -106,7 +106,7 @@ const Edit = ({loggedIn, setLoggedIn}) => {
     }
     // check oldpassword against bcrypt hash using Axios call
     Axios.post('http://localhost:8000/api/checkpassword', {
-        email: loggedIn.email,
+        _id: loggedIn._id,
         password: pwInputs.oldpw,
         newPassword: pwInputs.newpw,
         confirmPassword: pwInputs.confirmpw

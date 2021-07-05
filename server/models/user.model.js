@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+mongoose.set('useCreateIndex', true);
 const bcrypt = require('bcrypt');
 
 const UserSchema = new mongoose.Schema({
@@ -18,6 +19,10 @@ const UserSchema = new mongoose.Schema({
             validator: val => /^[a-zA-Z0-9_]*$/.test(val),
             message: "Username can only contain numbers, letters, and underscores."
         }
+    },
+    userNameLower: {
+        type: String,
+        unique: true
     },
     email: {
         type: String,
