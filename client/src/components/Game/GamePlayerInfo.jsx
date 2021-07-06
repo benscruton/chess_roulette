@@ -1,8 +1,6 @@
 import {useState, useEffect} from "react";
-import {Link} from "@reach/router";
 import axios from "axios";
-import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
-import Popover from 'react-bootstrap/Popover';
+import NotLoggedInPopover from "../Global/NotLoggedInPopover";
 
 const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun}) => {
 
@@ -68,24 +66,7 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
     return () => socket.disconnect(true);
   }, []);
 
-
   const colors = ["white", "black"];
-
-  const popoverStyle = {
-    fontFamily: "Raleway, serif",
-    textAlign: "center"
-  }
-
-  const popover = (
-    <Popover id="not-logged-in-message" style={popoverStyle}>
-      <Popover.Content>
-        You can only join games if you are logged in.
-      </Popover.Content>
-      <Popover.Title as="h3">
-        <Link to="/">Log In or Register</Link>
-      </Popover.Title>
-    </Popover>
-  );
 
   return (
     <>
@@ -99,11 +80,14 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
             {colors.map( (color, idx) =>
               <td key={idx}>
                 {players[color].length ?
-                    <h5>{players[color][0].userName}</h5> :
-                    <OverlayTrigger
-                      trigger={loggedIn.email? null : "click"}
+                    <h5>
+                      {players[color][0].userName}
+                    </h5>
+                    :
+                    <NotLoggedInPopover
+                      loggedIn={loggedIn}
+                      action="join a game"
                       placement="bottom"
-                      overlay={popover}
                     >
                       <button
                         className={
@@ -116,7 +100,7 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
                       >
                         Join as {color}
                       </button>
-                    </OverlayTrigger>
+                    </NotLoggedInPopover>
                 }
               </td>
             )}
