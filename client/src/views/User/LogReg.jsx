@@ -32,7 +32,7 @@ const LogReg = ({setLoggedIn}) => {
   const logUserIn = user => {
     localStorage.setItem("user", JSON.stringify(user));
     setLoggedIn(user);
-    navigate("profile");
+    navigate("/games");
   };
 
   const handleRegister = e => {

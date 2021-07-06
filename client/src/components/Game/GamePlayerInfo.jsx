@@ -1,5 +1,8 @@
 import {useState, useEffect} from "react";
+import {Link} from "@reach/router";
 import axios from "axios";
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger'
+import Popover from 'react-bootstrap/Popover';
 
 const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun}) => {
 
@@ -68,6 +71,22 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
 
   const colors = ["white", "black"];
 
+  const popoverStyle = {
+    fontFamily: "Raleway, serif",
+    textAlign: "center"
+  }
+
+  const popover = (
+    <Popover id="not-logged-in-message" style={popoverStyle}>
+      <Popover.Content>
+        You can only join games if you are logged in.
+      </Popover.Content>
+      <Popover.Title as="h3">
+        <Link to="/">Log In or Register</Link>
+      </Popover.Title>
+    </Popover>
+  );
+
   return (
     <>
       <table className="table-borderless w-100">
@@ -81,14 +100,23 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
               <td key={idx}>
                 {players[color].length ?
                     <h5>{players[color][0].userName}</h5> :
-                    <button
-                      className={`mb-2 mx-1 btn border ${color === "white" ? "btn-light border-dark" : "btn-dark"}`}
-                      onClick={joinGame}
-                      value={color[0].toUpperCase() + color.substring(1)}
-                      disabled={!loggedIn.email}
+                    <OverlayTrigger
+                      trigger={loggedIn.email? null : "click"}
+                      placement="bottom"
+                      overlay={popover}
                     >
-                      Join as {color}
-                    </button>
+                      <button
+                        className={
+                          `mb-2 mx-1 btn border ${
+                            color === "white" ? "btn-light border-dark" : "btn-dark"
+                          }`
+                        }
+                        onClick={joinGame}
+                        value={color[0].toUpperCase() + color.substring(1)}
+                      >
+                        Join as {color}
+                      </button>
+                    </OverlayTrigger>
                 }
               </td>
             )}
