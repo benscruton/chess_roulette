@@ -85,6 +85,7 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
                       className={`mb-2 mx-1 btn border ${color === "white" ? "btn-light border-dark" : "btn-dark"}`}
                       onClick={joinGame}
                       value={color[0].toUpperCase() + color.substring(1)}
+                      disabled={!loggedIn.email}
                     >
                       Join as {color}
                     </button>
@@ -121,7 +122,7 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
         >
           Begin game
         </button>
-        : ""
+        : <></>
       }
 
     </>
