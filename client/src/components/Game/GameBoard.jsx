@@ -171,9 +171,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     if(tile.occupied && !(tile.file === activeTile.file && tile.rank === activeTile.rank)){
       setActiveTile(tile);
       let moves = rules[tile.occupied.type](tile, boardStatus, info);
-      if(tile.occupied.color === (whiteToPlay? "white" : "black")){
-        removeCheckMoves(boardStatus, moves, tile);
-      }
+      removeCheckMoves(boardStatus, moves, tile);
       setAvailableMoves(moves);
     }
     else{
@@ -306,10 +304,6 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
   const removeCheckMoves = (origBoard, moves, tile) => {
     for(let i=0; i<moves.length; i++){
       let board = JSON.parse(JSON.stringify(origBoard));
-      // const fromFileIdx = fileArray.indexOf(tile.file);
-      // const fromRankIdx = 8 - tile.rank;
-      // const toFileIdx = fileArray.indexOf(moves[i][0]);
-      // const toRankIdx = 8 - moves[i][1];
       const fromTile = board[8 - tile.rank][fileArray.indexOf(tile.file)];
       const toTile = board[8 - moves[i][1]][fileArray.indexOf(moves[i][0])];
       const newKingLocations = JSON.parse(JSON.stringify(info.kingLocations));
@@ -322,8 +316,21 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
       if(isInCheck(board, tile.occupied.color, newKingLocations)){
         moves.splice(i, 1);
         i--;
+        continue;
+      }
+
+      // prevent castling through a check
+      if(tile.occupied.type === "king" && tile.file === "E"
+        && (moves[i][0] === "C" || moves[i][0] === "G")
+      ){
+        let checkFile = (moves[i][0] === "C" ? "D" : "F");
+        if(piecesAttackingThisSquare(origBoard, checkFile, tile.rank, tile.occupied.color)){
+          moves.splice(i, 1);
+          i--;
+        }
       }
     }
+
   };
 
   // NOTE: "color" refers to the player BEING ATTACKED at this square.
