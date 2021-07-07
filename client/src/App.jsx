@@ -19,13 +19,6 @@ const App = () => {
 
   const [loggedIn, setLoggedIn] = useState(
     JSON.parse(localStorage.getItem("user")) || noUser
-    // {
-    //   firstName: "hello",
-    //   lastName: "there",
-    //   userName: "chaps",
-    //   email: "not@real.email",
-    //   _id: "blarg"
-    // }
   );
 
   return (

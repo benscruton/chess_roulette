@@ -109,18 +109,16 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
           <tr>
             {colors.map( (color, idx) =>
             <td key={idx}>
-              {players[color].length ?
-                !begun && players[color][0]._id === loggedIn._id ?
-                    <button
-                      className="btn btn-danger"
-                      onClick={leaveGame}
-                      value={color[0].toUpperCase() + color.substring(1)}
-                    >
-                      Leave Game
-                    </button>
-                    : ""
-                  : ""
-                }
+              {players[color].length && !begun && players[color][0]._id === loggedIn._id ?
+                <button
+                  className="btn btn-danger"
+                  onClick={leaveGame}
+                  value={color[0].toUpperCase() + color.substring(1)}
+                >
+                  Leave Game
+                </button>
+                : <></>
+              }
             </td>
             )}
           </tr>

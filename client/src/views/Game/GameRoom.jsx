@@ -152,12 +152,19 @@ const GameRoom = ({id, loggedIn}) => {
         <MoveLog moves={moveLog? moveLog : []} />
       </div>
 
-      <div>
+      <div className="mb-5">
         <h5 className="mt-2">Sprite style:</h5>
-        <button className="btn btn-primary mx-2" onClick={() => setSpriteStyle("")}>Normal</button>
-        <button className="btn btn-primary mx-2" onClick={() => setSpriteStyle("crappy")}>Crappy</button>
+        <button className="btn btn-info mx-2" onClick={() => setSpriteStyle("")}>
+          Default
+        </button>
+        <button className="btn btn-info mx-2" onClick={() => setSpriteStyle("triangle")}>
+          Triangle
+        </button>
       </div>
-      <button className="btn btn-danger my-5" onClick={deleteGame}>Delete this game</button>
+
+      {/* <button className="btn btn-danger my-5" onClick={deleteGame}>
+        Delete this game
+      </button> */}
     </>
   );
 }
