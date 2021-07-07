@@ -30,7 +30,7 @@
     justify-content: center;
 }
 
-.tile{
+.fullTile{
     width: 60px;
     height: 60px;
     display: inline-flex;
@@ -38,9 +38,17 @@
     align-items: center;
 }
 
-.mediumTile{
+.largeTile{
     width: 45px;
     height: 45px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mediumTile{
+    width: 35px;
+    height: 35px;
     display: inline-flex;
     justify-content: center;
     align-items: center;
@@ -54,14 +62,19 @@
     align-items: center;
 }
 
-.piece{
+.fullPiece{
     width: default;
     height: default;
 }
 
-.mediumPiece{
+.largePiece{
     width: 40px;
     height: 40px;
+}
+
+.mediumPiece{
+    width: 32px;
+    height: 32px;
 }
 
 .smallPiece{

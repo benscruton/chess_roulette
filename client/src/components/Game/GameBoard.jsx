@@ -14,8 +14,8 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
   const [activeTile, setActiveTile] = useState(false);
   const [info, setInfo] = useState(specialInfo);
   const [viewAsBlack, setViewAsBlack] = useState(false);
-  const [tileStyle, setTileStyle] = useState(styles.tile);
-  const [pieceSize, setPieceSize] = useState(styles.piece);
+  const [tileStyle, setTileStyle] = useState(styles.fullTile);
+  const [pieceSize, setPieceSize] = useState(styles.fullPiece);
   const [showResignConfirm, setShowResignConfirm] = useState(false);
 
   const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
@@ -50,9 +50,12 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
 
   const adjustBoardSize = () => {
     if(window.innerWidth > 600){
-      setTileStyle(styles.tile);
-      setPieceSize(styles.piece);
+      setTileStyle(styles.fullTile);
+      setPieceSize(styles.fullPiece);
     } else if(window.innerWidth > 400){
+      setTileStyle(styles.largeTile);
+      setPieceSize(styles.largePiece);
+    } else if(window.innerWidth > 320){
       setTileStyle(styles.mediumTile);
       setPieceSize(styles.mediumPiece);
     } else {
