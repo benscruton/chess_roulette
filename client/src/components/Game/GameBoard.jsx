@@ -48,6 +48,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     }
   }, [begun]);
 
+  // ---------- BOARD SIZING ----------
   const adjustBoardSize = () => {
     if(window.innerWidth > 600){
       setTileStyle(styles.fullTile);
@@ -70,8 +71,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     return () => window.removeEventListener("resize", adjustBoardSize);
   }, []);
 
-  // --------------- SOCKET FUNCTIONS: ----------------
-  // when a new move comes in, update the board status
+  // ---------- RECEIVE FROM SOCKET ----------
   useEffect( () => {
     socket.on("newMoveCameIn", data => {
       setBoardStatus(data.boardStatus);
@@ -87,6 +87,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     return () => socket.disconnect(true);
   }, [socket]);
 
+  // ---------- GAMEPLAY ----------
   const clickTile = (tile) => {
     if(isValidMove(tile) && !info.pawnReady){
       // Make sure 1) game has begun, 2) it is their turn, and 3) it's the right player
@@ -202,26 +203,6 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     return castlingLegalAfterThisMove;
   };
 
-  const createGameFinishedStatus = (board, whoseTurnNext, nextPlayerInCheck) => {
-    if(playerHasNoLegalMoves(board, whoseTurnNext? "white" : "black")){
-      if(nextPlayerInCheck){
-        return `Checkmate, ${whoseTurnNext? "Black" : "White"} wins!`;
-      } else {
-        return "Stalemate, it's a draw!";
-      }
-    }
-    return "";
-  };
-
-  const addLatestMoveToLog = (log, moveDescription) => {
-    if((log.length > 0) && (log[log.length-1].length === 1)){
-      log[log.length-1].push(moveDescription);
-    } else {
-      log.push([moveDescription])
-    }
-    return log;
-  }
-
   const establishMoveParams = (fromTile, toTile, enPassantLocation) => {
     let params = {enPassant: false};
       if(toTile.occupied){
@@ -248,50 +229,6 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     return params;
   };
 
-  const buildMoveDescription = (fromTile, toTile, params) => {
-    if(params.castling){
-      return params.castling;
-    }
-    let moveDescription = (fromTile.occupied.type === "pawn" ? "" : fromTile.occupied.abbrev);
-    if(params.captureMove || params.enPassantCapture){
-      moveDescription += (fromTile.occupied.type === "pawn" ? fromTile.file.toLowerCase() : "");
-      moveDescription += "x";
-    }
-    moveDescription += toTile.file.toLowerCase() + toTile.rank;
-    if(params.nextPlayerInCheck){
-      moveDescription += "+";
-    }
-    return moveDescription;
-  };
-
-  const executeMove = (board, fromTile, toTile, params = {}) => {
-    // const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
-    // const fromFileIdx = fileArray.indexOf(fromTile.file);
-    // const fromRankIdx = 8 - fromTile.rank;
-    const toFileIdx = fileArray.indexOf(toTile.file);
-    const toRankIdx = 8 - toTile.rank;
-    fromTile = board[8 - fromTile.rank][fileArray.indexOf(fromTile.file)];
-    toTile = board[toRankIdx][toFileIdx];
-
-    toTile.occupied = fromTile.occupied;
-    fromTile.occupied = false;
-
-    if(params.enPassantCapture){
-      board[toTile.occupied.color === "white" ? 3 : 4][toFileIdx].occupied = false;
-    }
-    if(params.castling){
-      if(params.castling === "O-O"){
-        board[toRankIdx][5].occupied = {...board[toRankIdx][7].occupied};
-        board[toRankIdx][7].occupied = false;
-      }
-      else{
-        board[toRankIdx][3].occupied = {...board[toRankIdx][0].occupied};
-        board[toRankIdx][0].occupied = false;
-      }
-    }
-    return board;
-  }
-
   const isValidMove = tile => {
     for(let i=0; i<availableMoves.length; i++){
       if(availableMoves[i][0] === tile.file && availableMoves[i][1] === tile.rank) return true;
@@ -303,6 +240,26 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     let kingSpot = kingLocations[color];
     return piecesAttackingThisSquare(board, kingSpot[0], kingSpot[1], color);
   }
+
+  // NOTE: "color" refers to the player BEING ATTACKED at this square.
+  // p(file, rank, "black") will determine if any WHITE pieces are attacking the square.
+  const piecesAttackingThisSquare = (board, file, rank, color) => {
+    for(let i=0; i<board.length; i++){
+      for(let j=0; j<board[i].length; j++){
+        let tile = board[i][j];
+        if(!tile.occupied || tile.occupied.color === color){
+          continue;
+        }
+        let itsMoves = rules[tile.occupied.type](tile, board, info, true);
+        for(let k=0; k<itsMoves.length; k++){
+          if(itsMoves[k][0] === file && itsMoves[k][1] === rank){
+            return true;
+          }
+        }
+      }
+    }
+    return false;
+  };
 
   const removeCheckMoves = (origBoard, moves, tile) => {
     for(let i=0; i<moves.length; i++){
@@ -333,28 +290,35 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
         }
       }
     }
-
   };
 
-  // NOTE: "color" refers to the player BEING ATTACKED at this square.
-  // p(file, rank, "black") will determine if any WHITE pieces are attacking the square.
-  const piecesAttackingThisSquare = (board, file, rank, color) => {
-    for(let i=0; i<board.length; i++){
-      for(let j=0; j<board[i].length; j++){
-        let tile = board[i][j];
-        if(!tile.occupied || tile.occupied.color === color){
-          continue;
-        }
-        let itsMoves = rules[tile.occupied.type](tile, board, info, true);
-        for(let k=0; k<itsMoves.length; k++){
-          if(itsMoves[k][0] === file && itsMoves[k][1] === rank){
-            return true;
-          }
-        }
+  const executeMove = (board, fromTile, toTile, params = {}) => {
+    // const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
+    // const fromFileIdx = fileArray.indexOf(fromTile.file);
+    // const fromRankIdx = 8 - fromTile.rank;
+    const toFileIdx = fileArray.indexOf(toTile.file);
+    const toRankIdx = 8 - toTile.rank;
+    fromTile = board[8 - fromTile.rank][fileArray.indexOf(fromTile.file)];
+    toTile = board[toRankIdx][toFileIdx];
+
+    toTile.occupied = fromTile.occupied;
+    fromTile.occupied = false;
+
+    if(params.enPassantCapture){
+      board[toTile.occupied.color === "white" ? 3 : 4][toFileIdx].occupied = false;
+    }
+    if(params.castling){
+      if(params.castling === "O-O"){
+        board[toRankIdx][5].occupied = {...board[toRankIdx][7].occupied};
+        board[toRankIdx][7].occupied = false;
+      }
+      else{
+        board[toRankIdx][3].occupied = {...board[toRankIdx][0].occupied};
+        board[toRankIdx][0].occupied = false;
       }
     }
-    return false;
-  };
+    return board;
+  }
 
   const playerHasNoLegalMoves = (board, color) => {
     for(let i=0; i<board.length; i++){
@@ -422,6 +386,44 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     }
 
     setWhiteToPlay(!whiteToPlay);
+  };
+
+  // ---------- MOVE LOG ----------
+  const buildMoveDescription = (fromTile, toTile, params) => {
+    if(params.castling){
+      return params.castling;
+    }
+    let moveDescription = (fromTile.occupied.type === "pawn" ? "" : fromTile.occupied.abbrev);
+    if(params.captureMove || params.enPassantCapture){
+      moveDescription += (fromTile.occupied.type === "pawn" ? fromTile.file.toLowerCase() : "");
+      moveDescription += "x";
+    }
+    moveDescription += toTile.file.toLowerCase() + toTile.rank;
+    if(params.nextPlayerInCheck){
+      moveDescription += "+";
+    }
+    return moveDescription;
+  };
+
+  const addLatestMoveToLog = (log, moveDescription) => {
+    if((log.length > 0) && (log[log.length-1].length === 1)){
+      log[log.length-1].push(moveDescription);
+    } else {
+      log.push([moveDescription])
+    }
+    return log;
+  }
+
+  // ---------- ENDING GAMES ----------
+  const createGameFinishedStatus = (board, whoseTurnNext, nextPlayerInCheck) => {
+    if(playerHasNoLegalMoves(board, whoseTurnNext? "white" : "black")){
+      if(nextPlayerInCheck){
+        return `Checkmate, ${whoseTurnNext? "Black" : "White"} wins!`;
+      } else {
+        return "Stalemate, it's a draw!";
+      }
+    }
+    return "";
   };
 
   const resign = () => {
