@@ -3,9 +3,9 @@ import {navigate} from '@reach/router';
 import Axios from "axios";
 import io from "socket.io-client";
 
-const NewGame = (props) => {
+const NewGame = ({socket}) => {
 
-  const [socket] = useState( () => io(":8000"));
+  // const [socket] = useState( () => io(":8000"));
   const [gameType, setGameType] = useState("placeholder");
 
   const handleSubmit = e => {

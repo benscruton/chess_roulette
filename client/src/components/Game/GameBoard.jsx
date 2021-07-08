@@ -84,7 +84,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     socket.on("gameFinished", () => {
       setShowResignConfirm(false);
     });
-    return () => socket.disconnect(true);
+    // return () => socket.disconnect(true);
   }, [socket]);
 
   // ---------- GAMEPLAY ----------
@@ -339,12 +339,14 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     let boardRow = (tileCopy.rank === 8? 0 : 7);
     let boardFile = fileArray.indexOf(tileCopy.file);
     let updatedBoard = JSON.parse(JSON.stringify(boardStatus));
+    let abbrev = (choice === "knight"? "N" : choice.substring(0, 1).toUpperCase());
     updatedBoard[boardRow][boardFile].occupied.type = choice;
+    updatedBoard[boardRow][boardFile].occupied.abbrev = abbrev;
 
     let nextPlayerInCheck = isInCheck(updatedBoard, (whiteToPlay? "black" : "white"));
 
     let updatedMoveLog = JSON.parse(JSON.stringify(moveLog));
-    updatedMoveLog[updatedMoveLog.length - 1][whiteToPlay? 0 : 1] += (choice === "knight"? "N" : choice.substring(0, 1).toUpperCase() + (nextPlayerInCheck ? "+" : ""));
+    updatedMoveLog[updatedMoveLog.length - 1][whiteToPlay? 0 : 1] += (abbrev + (nextPlayerInCheck ? "+" : ""));
 
     let updatedSpecialInfo = {...info,
       pawnReady: false,

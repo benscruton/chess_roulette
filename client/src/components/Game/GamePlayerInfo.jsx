@@ -63,7 +63,7 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
       }
     });
 
-    return () => socket.disconnect(true);
+    // return () => socket.disconnect(true);
   }, []);
 
   const colors = ["white", "black"];

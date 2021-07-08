@@ -27,15 +27,20 @@ const corsPrefs = {
 app.use(cookieParser(), cors(corsPrefs), express.json(), express.urlencoded({"extended": true}));    
 
 io.on("connection", socket => {
-  console.log(socket.id);
+  // console.log("New user:", socket.id);
 
   socket.on("disconnect", () =>{
-    console.log("A User disconnected.");
+    // console.log("A User disconnected.");
   })
 
   socket.on("joinRoom", roomName => {
-    console.log(roomName);
+    // console.log("Room joined:", roomName);
     socket.join(roomName);
+  });
+
+  socket.on("leaveRoom", roomName => {
+    // console.log("Room left:", roomName);
+    socket.leave(roomName);
   });
 
   socket.on("madeAMove", data => {

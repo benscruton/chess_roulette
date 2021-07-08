@@ -3,9 +3,9 @@ import React, {useState, useEffect, useRef} from "react";
 import {Link} from "@reach/router";
 import io from "socket.io-client";
 
-const GameLobby = ({loggedIn}) => {
+const GameLobby = ({loggedIn, socket}) => {
 
-  const [socket] = useState( () => io(":8000"));
+  // const [socket] = useState( () => io(":8000"));
   const [gameList, setGameList] = useState(false);
   const [filteredGameList, setFilteredGameList] = useState(false);
   const [filter, setFilter] = useState("all");
@@ -30,7 +30,7 @@ const GameLobby = ({loggedIn}) => {
 
   useEffect( () => {
     socket.emit("joinRoom", "lobby");
-    return () => socket.disconnect(true);
+    return () => socket.emit("leaveRoom", "lobby");
   }, []);
 
   useEffect( () => {

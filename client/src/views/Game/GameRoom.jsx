@@ -7,9 +7,9 @@ import DrawOffer from "../../components/Game/DrawOffer";
 import GameBoard from "../../components/Game/GameBoard";
 import MoveLog from "../../components/Game/MoveLog";
 
-const GameRoom = ({id, loggedIn}) => {
+const GameRoom = ({id, loggedIn, socket}) => {
 
-  const [socket] = useState( () => io(":8000"));
+  // const [socket] = useState( () => io(":8000"));
   const [spriteStyle, setSpriteStyle] = useState("");
   const [game, setGame] = useState(false);
   const [moveLog, setMoveLog] = useState(false);
@@ -24,10 +24,7 @@ const GameRoom = ({id, loggedIn}) => {
 
   useEffect( () => {
     socket.emit("joinRoom", id);
-    return () => socket.disconnect(true);
-  }, [id]);
 
-  useEffect( () => {
     socket.on("gameBegun", game => {
       setGame(game);
     });
@@ -40,8 +37,14 @@ const GameRoom = ({id, loggedIn}) => {
     socket.on("drawOfferUpdate", game => {
       setGame(game);
     });
-    return () => socket.disconnect(true);
-  }, []);
+
+    return () => socket.emit("leaveRoom", id);
+  }, [id]);
+
+  // useEffect( () => {
+
+  //   // return () => socket.disconnect(true);
+  // }, []);
 
   const deleteGame = () => {
     axios.delete(`http://localhost:8000/api/games/${id}`, {withCredentials: true})
