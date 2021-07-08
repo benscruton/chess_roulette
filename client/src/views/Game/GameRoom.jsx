@@ -1,7 +1,6 @@
 import { navigate } from "@reach/router";
 import axios from "axios";
 import React, {useState, useEffect} from "react";
-import io from "socket.io-client";
 import GamePlayerInfo from "../../components/Game/GamePlayerInfo";
 import DrawOffer from "../../components/Game/DrawOffer";
 import GameBoard from "../../components/Game/GameBoard";
@@ -9,7 +8,6 @@ import MoveLog from "../../components/Game/MoveLog";
 
 const GameRoom = ({id, loggedIn, socket}) => {
 
-  // const [socket] = useState( () => io(":8000"));
   const [spriteStyle, setSpriteStyle] = useState("");
   const [game, setGame] = useState(false);
   const [moveLog, setMoveLog] = useState(false);
@@ -40,11 +38,6 @@ const GameRoom = ({id, loggedIn, socket}) => {
 
     return () => socket.emit("leaveRoom", id);
   }, [id]);
-
-  // useEffect( () => {
-
-  //   // return () => socket.disconnect(true);
-  // }, []);
 
   const deleteGame = () => {
     axios.delete(`http://localhost:8000/api/games/${id}`, {withCredentials: true})
@@ -165,9 +158,9 @@ const GameRoom = ({id, loggedIn, socket}) => {
         </button>
       </div>
 
-      {/* <button className="btn btn-danger my-5" onClick={deleteGame}>
+      <button className="btn btn-danger my-5" onClick={deleteGame}>
         Delete this game
-      </button> */}
+      </button>
     </>
   );
 }

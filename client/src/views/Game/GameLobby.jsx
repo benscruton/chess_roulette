@@ -1,19 +1,17 @@
 import Axios from "axios";
 import React, {useState, useEffect, useRef} from "react";
 import {Link} from "@reach/router";
-import io from "socket.io-client";
 
 const GameLobby = ({loggedIn, socket}) => {
 
-  // const [socket] = useState( () => io(":8000"));
   const [gameList, setGameList] = useState(false);
   const [filteredGameList, setFilteredGameList] = useState(false);
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState("unfinished");
   const [myGamesToggle, setMyGamesToggle] = useState(false);
 
   const gameListRef = useRef(gameList);
 
-  const filterOptions = ["all", "unstarted", "ongoing", "finished", "joinable"];
+  const filterOptions = ["all", "unfinished", "unstarted", "ongoing", "finished", "joinable"];
 
   useEffect( () => {
     gameListRef.current = gameList;
@@ -77,7 +75,10 @@ const GameLobby = ({loggedIn, socket}) => {
       return;
     }
     let updatedList = gameList;
-    if(filter === "ongoing"){
+    if(filter === "unfinished"){
+      updatedList = updatedList.filter(game => !game.finished);
+    }
+    else if(filter === "ongoing"){
       updatedList = updatedList.filter(game => game.begun && !game.finished);
     }
     else if(filter === "unstarted"){
@@ -108,30 +109,35 @@ const GameLobby = ({loggedIn, socket}) => {
           )}
         </select> Games:
       </h3>
-      <table className="table table-borderless p-0">
-        <tbody>
-          <tr>
-            <td className="text-right p-0">All Games</td>
-            <td className="p-0">
-              <div className="custom-control custom-switch">
-                <p>
-                  <input
-                    type="checkbox"
-                    checked={myGamesToggle}
-                    onChange={handleToggle}
-                    className="custom-control-input"
-                    id="customSwitches"
-                  />
-                <label className="custom-control-label" htmlFor="customSwitches">
-                  &nbsp;
-                </label>
-                </p>
-              </div>
-            </td>
-            <td className="text-left p-0">My Games</td>
-          </tr>
-        </tbody>
-      </table>
+
+      {loggedIn.email? 
+        <table className="table table-borderless p-0">
+          <tbody>
+            <tr>
+              <td className="text-right p-0">All Games</td>
+              <td className="p-0">
+                <div className="custom-control custom-switch">
+                  <p>
+                    <input
+                      type="checkbox"
+                      checked={myGamesToggle}
+                      onChange={handleToggle}
+                      className="custom-control-input"
+                      id="customSwitches"
+                    />
+                  <label className="custom-control-label" htmlFor="customSwitches">
+                    &nbsp;
+                  </label>
+                  </p>
+                </div>
+              </td>
+              <td className="text-left p-0">My Games</td>
+            </tr>
+          </tbody>
+        </table>
+        :
+        <></>
+      }
       
       <table className="table table-hover table-responsive-md">
         <thead>
