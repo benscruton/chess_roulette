@@ -18,13 +18,11 @@
 }
 
 .tileRowWhite{
-    /* min-width: 480px; */
     display: flex;
     justify-content: center;
 }
 
 .tileRowBlack{
-    /* min-width: 480px; */
     display: flex;
     flex-direction: row-reverse;
     justify-content: center;

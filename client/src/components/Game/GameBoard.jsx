@@ -25,11 +25,11 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
       .then(res => {
         setWhiteToPlay(res.data.results.whiteToPlay);
       }).catch(err => console.error(err.errors));
-  }, [gameId])
+  }, [gameId]);
   
   useEffect( () => {
     setBoardStatus(statusFromParent);
-  }, [statusFromParent])
+  }, [statusFromParent]);
 
   useEffect( () => {
     setActiveTile(false);
@@ -63,7 +63,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
       setTileStyle(styles.smallTile);
       setPieceSize(styles.smallPiece);
     }
-  }
+  };
 
   useEffect( () => {
     adjustBoardSize();
@@ -182,7 +182,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
       setActiveTile(false);
       setAvailableMoves(false);
     }
-  }
+  };
 
   const updateCastlingStatus = (castlingLegalAfterThisMove, toTile, fromTile) => {
     // rooks:
@@ -234,12 +234,12 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
       if(availableMoves[i][0] === tile.file && availableMoves[i][1] === tile.rank) return true;
     }
     return false;
-  }
+  };
 
   const isInCheck = (board, color, kingLocations = info.kingLocations) => {
     let kingSpot = kingLocations[color];
     return piecesAttackingThisSquare(board, kingSpot[0], kingSpot[1], color);
-  }
+  };
 
   // NOTE: "color" refers to the player BEING ATTACKED at this square.
   // p(file, rank, "black") will determine if any WHITE pieces are attacking the square.
@@ -293,9 +293,6 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
   };
 
   const executeMove = (board, fromTile, toTile, params = {}) => {
-    // const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
-    // const fromFileIdx = fileArray.indexOf(fromTile.file);
-    // const fromRankIdx = 8 - fromTile.rank;
     const toFileIdx = fileArray.indexOf(toTile.file);
     const toRankIdx = 8 - toTile.rank;
     fromTile = board[8 - fromTile.rank][fileArray.indexOf(fromTile.file)];
@@ -318,7 +315,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
       }
     }
     return board;
-  }
+  };
 
   const playerHasNoLegalMoves = (board, color) => {
     for(let i=0; i<board.length; i++){
@@ -412,7 +409,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
       log.push([moveDescription])
     }
     return log;
-  }
+  };
 
   // ---------- ENDING GAMES ----------
   const createGameFinishedStatus = (board, whoseTurnNext, nextPlayerInCheck) => {

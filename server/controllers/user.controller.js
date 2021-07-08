@@ -1,6 +1,5 @@
 const {User} = require("../models/user.model");
 
-
 module.exports = {
   index: (req,rsp) => {
     User.find()

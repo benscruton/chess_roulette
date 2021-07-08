@@ -33,14 +33,14 @@ const Edit = ({loggedIn, setLoggedIn}) => {
     firstName: "",
     lastName: "",
     email: ""
-  })
+  });
 
   const handleChange = e => {
     setUser({
       ...user,
       [e.target.name] : e.target.value
     });
-  }
+  };
 
   const handleSubmit = e => {
     e.preventDefault();
@@ -73,7 +73,7 @@ const Edit = ({loggedIn, setLoggedIn}) => {
         }
       })
       .catch(err => console.log(err.response.data.errors));
-  }
+  };
 
   const handlepwInputs = e => {
     setPwInputs({
@@ -85,7 +85,7 @@ const Edit = ({loggedIn, setLoggedIn}) => {
         oldpw: ""
       });
     }
-  }
+  };
 
   const togglePopup = e => {
     e.preventDefault();
@@ -93,7 +93,7 @@ const Edit = ({loggedIn, setLoggedIn}) => {
     setPwErrors(initialPwData);
     setShowPopup(!showPopup);
     setChangedPW("");
-  }
+  };
 
   const updatePw = e => {
     e.preventDefault();
@@ -126,7 +126,7 @@ const Edit = ({loggedIn, setLoggedIn}) => {
       }
     })
     .catch(err => console.error({errors: err}));
-  }
+  };
 
   const fields = {
     firstName: true,

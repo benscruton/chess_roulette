@@ -27,7 +27,7 @@ const LogReg = ({setLoggedIn}) => {
       ...reg,
       [e.target.name]: e.target.value
     })
-  }
+  };
 
   const logUserIn = user => {
     localStorage.setItem("user", JSON.stringify(user));
@@ -75,7 +75,7 @@ const LogReg = ({setLoggedIn}) => {
     setLog({...log,
       [e.target.name]: e.target.value
     })
-  }
+  };
 
   const handleLogin = e => {
     e.preventDefault();
@@ -113,7 +113,7 @@ const LogReg = ({setLoggedIn}) => {
   const logFields = {
     email: true,
     password: true
-  }
+  };
 
   return (
     <div className="d-flex justify-content-around flex-wrap">
@@ -172,7 +172,7 @@ const LogReg = ({setLoggedIn}) => {
         />
       </div>
     </div>
-  )
+  );
 }
 
 export default LogReg;

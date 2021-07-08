@@ -1,3 +1,3 @@
 module.exports = {
-    standardChess: require("./standardChess"),
+  standardChess: require("./standardChess"),
 }
