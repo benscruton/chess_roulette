@@ -1,4 +1,4 @@
-import { navigate } from "@reach/router";
+import {navigate} from "@reach/router";
 import axios from "axios";
 import React, {useState, useEffect} from "react";
 import GamePlayerInfo from "../../components/Game/GamePlayerInfo";

@@ -510,15 +510,8 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
         }
       </div>
 
-      <button
-        className="btn btn-info my-2 mx-1"
-        onClick = {() => setViewAsBlack(!viewAsBlack)}
-      >
-        Flip board
-      </button>
-
       {begun && !finished && (playerIds.white === loggedIn._id || playerIds.black === loggedIn._id)?
-        <>
+        <div className="col-12">
           <button
             className="btn btn-warning my-2 mx-1"
             onClick={offerDraw}
@@ -532,10 +525,17 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
           >
             Resign
           </button>
-        </>
+        </div>
         :
         <></>
       }
+
+      <button
+        className="btn btn-info my-2 mx-1"
+        onClick = {() => setViewAsBlack(!viewAsBlack)}
+      >
+        Rotate board
+      </button>
       
     </div>
   );

@@ -6,11 +6,12 @@ const port = process.env.PORT;
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const server = app.listen(port, () => console.log(`Listening on ${port}`));
-const io = require('socket.io')(server, {
-  cors: {
-    origin: "*"
-  }
-});
+
+const socketParams = {
+  cors: {origin: "*"},
+  path: "/chessmainsocket"
+};
+const io = require('socket.io')(server, socketParams);
 
 const corsWhitelist = ["http://localhost:3000", 'http://192.168.1.64:3000'];
 const corsPrefs = {
