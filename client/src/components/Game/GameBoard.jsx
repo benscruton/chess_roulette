@@ -84,8 +84,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     socket.on("gameFinished", () => {
       setShowResignConfirm(false);
     });
-    // return () => socket.disconnect(true);
-  }, [socket]);
+  }, []);
 
   // ---------- GAMEPLAY ----------
   const clickTile = (tile) => {
