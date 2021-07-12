@@ -124,7 +124,7 @@ module.exports = {
 
   demoLogin : (req, rsp) => {
     let demoUserName = req.body.userName;
-    if(demoUserName !== "buckets" && demoUserName !== "barrels"){
+    if(demoUserName !== "demo_1" && demoUserName !== "demo_2"){
       rsp.json({error: "Demo username not recognized."});
     }
     User.findOne({userName: demoUserName})
