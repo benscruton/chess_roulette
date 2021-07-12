@@ -513,6 +513,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
         <div className="col-12">
           <button
             className="btn btn-warning my-2 mx-1"
+            value={true}
             onClick={offerDraw}
           >
             Offer draw

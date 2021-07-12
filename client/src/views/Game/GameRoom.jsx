@@ -68,20 +68,19 @@ const GameRoom = ({id, loggedIn, socket}) => {
       .catch(err => console.error({errors:err}));
   };
 
-  const offerDraw = (e, reject = false) => {
+  const offerDraw = e => {
     if(!game || !loggedIn._id){
       return;
     }
+    let reject = !(JSON.parse(e.target.value));
     let drawOfferedTo = false;
     if(reject){
-      console.log(reject);
       drawOfferedTo = "";
     } else if(game.playerWhite[0]._id === loggedIn._id){
       drawOfferedTo = game.playerBlack[0]._id;
     } else {
       drawOfferedTo = game.playerWhite[0]._id;
     }
-    console.log(drawOfferedTo);
     axios.put(`http://localhost:8000/api/games/${id}`, {drawOfferedTo}, {withCredentials: true})
       .then(rsp => {
         let gameWithDrawOffer = rsp.data.results;

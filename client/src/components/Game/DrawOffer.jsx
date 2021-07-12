@@ -26,7 +26,8 @@ const DrawOffer = ({loggedIn, offeredTo, playerWhite, playerBlack, endGame, offe
 
           <button
             className="btn btn-danger mx-1"
-            onClick={e => offerDraw(e, true)}
+            value={false}
+            onClick={offerDraw}
           >
             Reject draw
           </button>
@@ -38,7 +39,8 @@ const DrawOffer = ({loggedIn, offeredTo, playerWhite, playerBlack, endGame, offe
       {offerer._id === loggedIn._id && offeree._id !== loggedIn._id ?
         <button
           className="btn btn-danger mx-1"
-          onClick={e => offerDraw(e, true)}
+          value={false}
+          onClick={offerDraw}
         >
           Rescind offer
         </button>
