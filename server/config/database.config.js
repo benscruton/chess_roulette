@@ -1,8 +1,13 @@
 const mongoose = require('mongoose');
 
-mongoose.connect(`mongodb://localhost/${process.env.DB_NAME}`, {
+let dbName = process.env.DB_NAME || "chessDB";
+let dbAddress = process.env.CLOUD_DB_STRING || `mongodb://localhost/${dbName}`;
+let connMethod = process.env.CLOUD_DB_STRING ? "in the cloud" : "locally";
+console.log(dbAddress);
+
+mongoose.connect(dbAddress, {
   useNewUrlParser:true,
   useUnifiedTopology:true
 })
-  .then(() => console.log(`You are now connected to ${process.env.DB_NAME}.`))
-  .catch(err => console.log("Melting down now...", err))
+  .then(() => console.log(`You are now connected to ${process.env.DB_NAME} ${connMethod}.`))
+  .catch(err => console.log("Melting down now...", err));
