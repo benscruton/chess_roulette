@@ -8,4 +8,8 @@ router.use("/api/games", gameRoutes);
 router.use("/api/users", userRoutes);
 router.use("/api", authRoutes);
 
+router.use( (req, rsp) => {
+  rsp.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
+
 module.exports = router;

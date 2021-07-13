@@ -1,4 +1,9 @@
-module.exports = socket => {
+const socketParams = {
+  cors: {origin: "*"},
+  path: "/chessmainsocket"
+};
+
+const socketFunctions = socket => {
   socket.on("joinRoom", roomName => {
     socket.join(roomName);
   });
@@ -28,3 +33,5 @@ module.exports = socket => {
   });
   // socket.on("disconnect", () => {});
 };
+
+module.exports = {socketParams, socketFunctions};
