@@ -1,14 +1,24 @@
+const router = require("express").Router();
 const GameController = require("../controllers/game.controller");
 const {authenticate} = require("../config/jwt.config");
 
-module.exports = (app) => {
-  app.get('/api/games', GameController.index);
-  app.post('/api/games', GameController.create);
-  app.get('/api/games/:id', GameController.show);
-  app.put('/api/games/:id', authenticate, GameController.update);
-  app.put('/api/games/:gameId/addPlayerWhite/:userId', authenticate, GameController.addPlayerWhite);
-  app.put('/api/games/:gameId/addPlayerBlack/:userId', authenticate, GameController.addPlayerBlack);
-  app.put('/api/games/:gameId/removePlayerWhite/:userId', authenticate, GameController.removePlayerWhite);
-  app.put('/api/games/:gameId/removePlayerBlack/:userId', authenticate, GameController.removePlayerBlack);
-  app.delete('/api/games/:id', authenticate, GameController.destroy);
-}
+router.route("/")
+  .get(GameController.index)
+  .post(GameController.create)
+  .delete(authenticate, GameController.destroy);
+
+router.route("/:id")
+  .get(GameController.show)
+  .put(authenticate, GameController.update);
+
+router.route('/:gameId/addPlayerWhite/:userId')
+  .put(authenticate, GameController.addPlayerWhite);
+router.route('/:gameId/addPlayerBlack/:userId')
+  .put(authenticate, GameController.addPlayerBlack);
+
+router.route('/:gameId/removePlayerWhite/:userId')
+  .put(authenticate, GameController.removePlayerWhite);
+router.route('/:gameId/removePlayerBlack/:userId')
+  .put(authenticate, GameController.removePlayerBlack);
+
+module.exports = router;

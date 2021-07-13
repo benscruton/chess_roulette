@@ -30,5 +30,6 @@ const io = require('socket.io')(server, socketParams);
 io.on("connection", socketFunctions);
 
 require('./server/config/database.config');
-require('./server/routes/user.routes')(app);
-require('./server/routes/game.routes')(app);  
+
+const routes = require("./server/routes");
+app.use(routes);
