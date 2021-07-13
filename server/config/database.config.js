@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
 
-let dbName = process.env.DB_NAME || "chessDB";
-let dbAddress = process.env.CLOUD_DB_STRING || `mongodb://localhost/${dbName}`;
-let connMethod = process.env.CLOUD_DB_STRING ? "in the cloud" : "locally";
-console.log(dbAddress);
+const dbName = process.env.DB_NAME || "chessDB";
+const dbAddress = process.env.CLOUD_DB_STRING || `mongodb://localhost/${dbName}`;
+const connMethod = process.env.CLOUD_DB_STRING ? "in the cloud" : "locally";
 
 mongoose.connect(dbAddress, {
   useNewUrlParser:true,
