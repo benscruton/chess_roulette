@@ -1,12 +1,14 @@
 const corsWhitelist = [
   "http://localhost:3000",
   "http://localhost:8000",
+  "chrome-extension://mpognobbkildjkofajifpdfhcoklimli",
   undefined
 ];
 
 const corsPrefs = {
   credentials: true,
   origin: (origin, callback) => {
+    console.log(origin);
     if(corsWhitelist.includes(origin)){
       callback(null, true);
     } else {
