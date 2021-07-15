@@ -23,4 +23,5 @@ io.on("connection", socketFunctions);
 require('./server/config/database.config');
 
 const routes = require("./server/routes");
+app.use(express.static('client/build'));
 app.use(routes);
