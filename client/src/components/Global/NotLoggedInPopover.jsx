@@ -1,6 +1,6 @@
 import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import Popover from "react-bootstrap/Popover";
-import {Link} from "@reach/router";
+import {Link} from "react-router-dom";
 
 const NotLoggedInPopover = ({loggedIn, action, placement, children}) => {
 

@@ -22,7 +22,7 @@ const UserSchema = new mongoose.Schema({
   },
   userNameLower: {
     type: String,
-    unique: true
+    // unique: true
   },
   email: {
     type: String,

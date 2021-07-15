@@ -1,4 +1,4 @@
-import {navigate} from "@reach/router";
+import {useParams, useHistory} from "react-router-dom";
 import axios from "axios";
 import React, {useState, useEffect} from "react";
 import GamePlayerInfo from "../../components/Game/GamePlayerInfo";
@@ -6,7 +6,10 @@ import DrawOffer from "../../components/Game/DrawOffer";
 import GameBoard from "../../components/Game/GameBoard";
 import MoveLog from "../../components/Game/MoveLog";
 
-const GameRoom = ({id, loggedIn, socket}) => {
+const GameRoom = ({loggedIn, socket}) => {
+  const {id} = useParams();
+  const history = useHistory();
+  const navigate = path => history.push(path);
 
   const [spriteStyle, setSpriteStyle] = useState("");
   const [game, setGame] = useState(false);

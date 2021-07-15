@@ -1,6 +1,10 @@
 import {useState, useEffect} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {Router} from '@reach/router';
+import {
+    HashRouter as Router,
+    Switch,
+    Route,
+  } from "react-router-dom";
 import io from "socket.io-client";
 import Nav from "./components/Global/Nav";
 import Edit from './views/User/Edit';
@@ -27,46 +31,58 @@ const App = () => {
   );
 
   return (
-    <div className="App d-flex flex-wrap justify-content-center">
-      <Nav
-        loggedIn={loggedIn}
-        setLoggedIn={setLoggedIn}
-        noUser={noUser}
-        className="col-12"
-      />
-      <div className="col-lg-10 col-md-12">
-        <Router>
-          <LogReg
-            path="/"
-            setLoggedIn={setLoggedIn}
-          />
-          <Edit
-            path="/profile/edit"
-            loggedIn={loggedIn}
-            setLoggedIn={setLoggedIn}
-          />
-          <Show
-            path="/profile"
-            loggedIn={loggedIn}
-          />
+    <Router>
+      <div className="App d-flex flex-wrap justify-content-center">
+        <Nav
+          loggedIn={loggedIn}
+          setLoggedIn={setLoggedIn}
+          noUser={noUser}
+          className="col-12"
+        />
+        <div className="col-lg-10 col-md-12">
+          <Switch>
+            <Route exact path="/">
+              <LogReg
+                setLoggedIn={setLoggedIn}
+              />
+            </Route>
 
-          <NewGame
-            path="/games/new"
-            socket={socket}
-          />
-          <GameLobby
-            path="/games"
-            loggedIn={loggedIn}
-            socket={socket}
-          />
-          <GameRoom
-            path="/games/:id"
-            loggedIn={loggedIn}
-            socket={socket}
-          />
-        </Router>
+            <Route exact path="/profile">
+              <Show
+                loggedIn={loggedIn}
+              />
+            </Route>
+
+            <Route path="/profile/edit">
+              <Edit
+                loggedIn={loggedIn}
+                setLoggedIn={setLoggedIn}
+              />
+            </Route>
+
+            <Route path="/games/new">
+              <NewGame
+                socket={socket}
+              />
+            </Route>
+
+            <Route exact path="/games">
+              <GameLobby
+                loggedIn={loggedIn}
+                socket={socket}
+              />
+            </Route>
+            
+            <Route path="/games/:id">
+              <GameRoom
+                loggedIn={loggedIn}
+                socket={socket}
+              />
+            </Route>
+          </Switch>
+        </div>
       </div>
-    </div>
+    </Router>
   );
 }
 

@@ -2,8 +2,8 @@ const Game = require("../models/game.model");
 const {User} = require("../models/user.model");
 
 const removePassword = user => {
-  const {_id, firstName, lastName, userName, email, createdAt, updatedAt} = user;
-  return {_id, firstName, lastName, userName, email, createdAt, updatedAt};
+  const {_id, firstName, lastName, userName, userNameLower, email, createdAt, updatedAt} = user;
+  return {_id, firstName, lastName, userName, userNameLower, email, createdAt, updatedAt};
 };
 
 module.exports = {

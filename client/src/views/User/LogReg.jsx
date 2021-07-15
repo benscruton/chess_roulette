@@ -1,9 +1,12 @@
-import { navigate } from '@reach/router';
+import { useHistory } from 'react-router-dom';
 import { useState } from 'react';
 import Axios from 'axios';
 import UserForm from "../../components/User/UserForm";
 
 const LogReg = ({setLoggedIn}) => {
+  const history = useHistory();
+  const navigate = path => history.push(path);
+  
   const initialLog = {
     email : "",
     password : "",

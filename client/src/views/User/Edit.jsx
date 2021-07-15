@@ -1,10 +1,13 @@
 import UserForm from '../../components/User/UserForm';
 import ChangePassword from "../../components/User/ChangePassword";
-import { navigate } from '@reach/router';
 import {useState, useEffect} from 'react';
+import {useHistory} from "react-router-dom";
 import Axios from 'axios';
 
 const Edit = ({loggedIn, setLoggedIn}) => {
+  const history = useHistory();
+  const navigate = path => history.push(path);
+
   useEffect( () => {
     if(!loggedIn.email){
       navigate("/profile");
@@ -64,7 +67,7 @@ const Edit = ({loggedIn, setLoggedIn}) => {
               email: user.email
             });
             localStorage.setItem("user", JSON.stringify(user));
-            navigate("/profile");
+            // navigate("/profile");
           })
           .catch(err => {
               console.log(err.response.data.errors);

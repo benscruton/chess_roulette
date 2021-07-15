@@ -1,6 +1,7 @@
 import Axios from "axios";
 import React, {useState, useEffect, useRef} from "react";
-import {Link} from "@reach/router";
+import {Link} from "react-router-dom";
+import separateCamelCase from "../../utils/separateCamelCase";
 
 const GameLobby = ({loggedIn, socket}) => {
 
@@ -72,12 +73,12 @@ const GameLobby = ({loggedIn, socket}) => {
     setMyGamesToggle(!myGamesToggle);
   };
 
-  const separateCamelCase = str => {
-    let output = str.split("")
-      .map(char => char === char.toLowerCase() ? char : " " + char);
-    output[0] = output[0].toUpperCase();
-    return output.join("");
-  }
+  // const separateCamelCase = str => {
+  //   let output = str.split("")
+  //     .map(char => char === char.toLowerCase() ? char : " " + char);
+  //   output[0] = output[0].toUpperCase();
+  //   return output.join("");
+  // }
 
   const filterList = filter => {
     if(!gameList){

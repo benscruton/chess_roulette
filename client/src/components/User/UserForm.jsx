@@ -1,6 +1,10 @@
-import {navigate} from '@reach/router'
+import {useHistory} from "react-router-dom";
 
 const UserForm = ({inputs, handleInputChange, handleSubmit, title, submitValue, errors, showFields, specialTitles, togglePopup}) => {
+
+  const history = useHistory();
+  const navigate = path => history.push(path);
+
   const handleCancel = (e) => {
     e.preventDefault();
     navigate("/profile");

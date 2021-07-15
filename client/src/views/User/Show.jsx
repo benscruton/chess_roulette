@@ -1,4 +1,4 @@
-import { navigate } from '@reach/router';
+import { Link } from 'react-router-dom';
 
 const Show = ({id, loggedIn}) => {
 
@@ -10,7 +10,9 @@ const Show = ({id, loggedIn}) => {
             <h2 className="card-title">{loggedIn.firstName}</h2>
             <p className="card-text">{loggedIn.lastName}</p>
           </div>
-          <button className="btn btn-warning mb-2" onClick={() => navigate("/profile/edit")}>Edit</button>
+          <Link className="btn btn-warning mb-2" to="/profile/edit">
+            Edit
+          </Link>
         </>
         :
         <p>You must be logged in to view user profiles.</p>

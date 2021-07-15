@@ -1,17 +1,13 @@
 import React, {useState} from 'react';
-import {navigate} from '@reach/router';
+import {useHistory} from 'react-router-dom';
 import Axios from "axios";
+import separateCamelCase from "../../utils/separateCamelCase";
 
 const NewGame = ({socket}) => {
+  const history = useHistory();
+  const navigate = path => history.push(path);
+
   const variants = ["standardChess"];
-
-  const separateCamelCase = str => {
-    let output = str.split("")
-      .map(char => char === char.toLowerCase() ? char : " " + char);
-    output[0] = output[0].toUpperCase();
-    return output.join("");
-  }
-
   const [gameType, setGameType] = useState("placeholder");
 
   const handleSubmit = e => {

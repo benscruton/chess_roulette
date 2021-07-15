@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from "react";
-import {Link, navigate} from "@reach/router";
+import {Link, useHistory} from "react-router-dom";
 import axios from "axios";
 import styles from "./Nav.module.css";
 import {List} from "react-bootstrap-icons";
 import MobileNavMenu from "./MobileNavMenu";
 
-
 const Nav = ({loggedIn, setLoggedIn, noUser}) => {
+  const history = useHistory();
+  const navigate = path => history.push(path);
 
   const logout = e => {
     e.preventDefault();

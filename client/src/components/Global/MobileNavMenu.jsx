@@ -1,5 +1,5 @@
 import React from "react";
-import {Link} from "@reach/router";
+import {Link} from "react-router-dom";
 import styles from "./MobileNavMenu.module.css";
 
 const MobileNavMenu = ({loggedIn, logout, hideMenu}) => {
@@ -17,7 +17,7 @@ const MobileNavMenu = ({loggedIn, logout, hideMenu}) => {
           <li>
             <Link
               className={`nav-link ${styles.navlink}`}
-              to={"/profile"}
+              to="/profile"
               onClick={hideMenu}
             >
               Profile
