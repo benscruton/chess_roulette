@@ -4,12 +4,12 @@ const {authenticate} = require("../config/jwt.config");
 
 router.route("/")
   .get(GameController.index)
-  .post(GameController.create)
-  .delete(authenticate, GameController.destroy);
+  .post(GameController.create);
 
 router.route("/:id")
   .get(GameController.show)
-  .put(authenticate, GameController.update);
+  .put(authenticate, GameController.update)
+  .delete(authenticate, GameController.destroy);
 
 router.route('/:gameId/addPlayerWhite/:userId')
   .put(authenticate, GameController.addPlayerWhite);
