@@ -72,6 +72,13 @@ const GameLobby = ({loggedIn, socket}) => {
     setMyGamesToggle(!myGamesToggle);
   };
 
+  const separateCamelCase = str => {
+    let output = str.split("")
+      .map(char => char === char.toLowerCase() ? char : " " + char);
+    output[0] = output[0].toUpperCase();
+    return output.join("");
+  }
+
   const filterList = filter => {
     if(!gameList){
       return;
@@ -160,7 +167,7 @@ const GameLobby = ({loggedIn, socket}) => {
                 <td>{gameList.indexOf(game) + 1}</td>
                 <td>
                   <Link to={`/games/${game._id}`}>
-                    {game.type}
+                    {separateCamelCase(game.type)}
                   </Link>
                 </td>
                 <td>

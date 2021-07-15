@@ -3,6 +3,14 @@ import {navigate} from '@reach/router';
 import Axios from "axios";
 
 const NewGame = ({socket}) => {
+  const variants = ["standardChess"];
+
+  const separateCamelCase = str => {
+    let output = str.split("")
+      .map(char => char === char.toLowerCase() ? char : " " + char);
+    output[0] = output[0].toUpperCase();
+    return output.join("");
+  }
 
   const [gameType, setGameType] = useState("placeholder");
 
@@ -22,11 +30,21 @@ const NewGame = ({socket}) => {
   
   return (
     <>
-      <h2 className=" mt-5">Create a new game!</h2>
+      <h2 className="mt-5">Create a new game:</h2>
       <form onSubmit = {handleSubmit}>
-        <select className="w-50 my-5 p-2" name="type" id="type" onChange={handleChange} defaultValue="">
-          <option value="placeholder">Select a game type...</option>
-          <option value="Chess">Chess</option>
+        <select
+          className="mt-5 mb-3 p-2"
+          name="type"
+          id="type"
+          onChange={handleChange}
+          defaultValue="placeholder"
+        >
+          <option value="placeholder" disabled>Select a game type...</option>
+          {variants.map( (variant, idx) =>
+            <option value={variant} key={idx}>
+              {separateCamelCase(variant)}
+            </option>
+          )}
         </select>
         <br />
         <button type="submit" className=" btn btn-success" disabled={gameType === "placeholder"}>Create!</button>
