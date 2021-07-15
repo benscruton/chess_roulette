@@ -28,10 +28,6 @@ const GameLobby = ({loggedIn, socket}) => {
 
   useEffect( () => {
     socket.emit("joinRoom", "lobby");
-    return () => socket.emit("leaveRoom", "lobby");
-  }, []);
-
-  useEffect( () => {
     socket.on("playerUpdate", data => {
       let list = JSON.parse(JSON.stringify(gameListRef.current));
       let ids = list.map(game => game._id);
@@ -56,6 +52,12 @@ const GameLobby = ({loggedIn, socket}) => {
       let list = [...JSON.parse(JSON.stringify(gameListRef.current)), newGame];
       setGameList(list);
     });
+    return () => {
+      socket.emit("leaveRoom", "lobby");
+      socket.removeAllListeners("playerUpdate");
+      socket.removeAllListeners("removeGame");
+      socket.removeAllListeners("addGameToList");
+    }
   }, []);
 
   useEffect( () => {

@@ -84,6 +84,10 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     socket.on("gameFinished", () => {
       setShowResignConfirm(false);
     });
+    return () => {
+      socket.removeAllListeners("newMoveCameIn");
+      socket.removeAllListeners("gameFinished");
+    }
   }, []);
 
   // ---------- GAMEPLAY ----------

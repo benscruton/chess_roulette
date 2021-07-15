@@ -62,8 +62,7 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
         setPlayerBlack(data.player);
       }
     });
-
-    // return () => socket.disconnect(true);
+    return () => socket.removeAllListeners("playerUpdate");
   }, []);
 
   const colors = ["white", "black"];
