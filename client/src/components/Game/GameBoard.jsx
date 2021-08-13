@@ -4,7 +4,7 @@ import styles from "./GameBoard.module.css";
 import images from "./ImageSets/standardChess";
 import PawnPromotion from "./PawnPromotion";
 import ConfirmResign from "./ConfirmResign";
-const rules = require("./MoveLogic/StandardChess/standardChessMoves");
+const rules = require("./MoveLogic/standardChess");
 
 const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGame, finished, playerIds, spriteStyle, loggedIn, moveLog, setMoveLog, offerDraw, drawOfferPending}) => {
 
@@ -14,8 +14,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
   const [activeTile, setActiveTile] = useState(false);
   const [info, setInfo] = useState(specialInfo);
   const [viewAsBlack, setViewAsBlack] = useState(false);
-  const [tileStyle, setTileStyle] = useState(styles.fullTile);
-  const [pieceSize, setPieceSize] = useState(styles.fullPiece);
+  const [size, setSize] = useState("full");
   const [showResignConfirm, setShowResignConfirm] = useState(false);
 
   const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
@@ -51,17 +50,13 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
   // ---------- BOARD SIZING ----------
   const adjustBoardSize = () => {
     if(window.innerWidth > 600){
-      setTileStyle(styles.fullTile);
-      setPieceSize(styles.fullPiece);
+      setSize("full");
     } else if(window.innerWidth > 400){
-      setTileStyle(styles.largeTile);
-      setPieceSize(styles.largePiece);
+      setSize("large");
     } else if(window.innerWidth > 320){
-      setTileStyle(styles.mediumTile);
-      setPieceSize(styles.mediumPiece);
+      setSize("medium");
     } else {
-      setTileStyle(styles.smallTile);
-      setPieceSize(styles.smallPiece);
+      setSize("small");
     }
   };
 
@@ -482,7 +477,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
               {row.map( (tile, j) =>
                 <div
                   className={`
-                    ${tileStyle}
+                    ${styles[`${size}Tile`]}
                     ${(i+j) % 2 === 0? styles.white : styles.black}
                     ${activeTile.file === tile.file && activeTile.rank === tile.rank ? styles.active : ""}
                     ${isValidMove(tile) ? 
@@ -499,7 +494,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
                     <img 
                       src={images[`${tile.occupied.color}${tile.occupied.type}${spriteStyle}`]} 
                       alt={`${tile.occupied.color[0]} ${tile.occupied.abbrev}`}
-                      className={pieceSize}
+                      className={styles[`${size}Piece`]}
                     />
                     : 
                     " "
