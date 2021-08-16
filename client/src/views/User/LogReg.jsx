@@ -134,7 +134,7 @@ const LogReg = ({setLoggedIn}) => {
           togglePopup = {null}
         />
 
-        {/* DEMO USER BOX: 
+        {/* DEMO USER BOX:  */}
         <div className="card bg-dark mb-2 text-light mt-4">
           <div className="card-body">
             <h4 className="card-title">Demo Users:</h4>
