@@ -16,7 +16,7 @@ import GameLobby from './views/Game/GameLobby';
 import './App.css';
 
 const App = () => {
-  const [socket] = useState( () => io(":8000", {path: "/chessmainsocket"}));
+  const [socket] = useState( () => io("/", {path: "/chessmainsocket"}));
   useEffect( () => {
     return () => socket.disconnect(true);
   }, [])

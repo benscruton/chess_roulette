@@ -1,4 +1,5 @@
 const router = require("express").Router();
+const path = require("path");
 
 const gameRoutes = require("./game.routes");
 const userRoutes = require("./user.routes");
@@ -9,7 +10,7 @@ router.use("/api/users", userRoutes);
 router.use("/api", authRoutes);
 
 router.use(function(req, res) {
-	res.sendFile(path.join(__dirname, '../client/build/index.html'));
+	res.sendFile(path.join(__dirname, '../../client/build/index.html'));
 });
 
 module.exports = router;
