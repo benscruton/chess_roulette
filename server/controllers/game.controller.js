@@ -34,6 +34,20 @@ module.exports = {
       .catch(err => rsp.status(404).json({errors: err.errors}))
   },
 
+  begin : (req, rsp) => {
+    Game.findOne({_id: req.params.id})
+      .then(game => {
+        if(!game.playerWhite.length || !game.playerBlack.length){
+          rsp.json({results: game});
+          return;
+        }
+        req.body = {begun: true};
+        console.log("third time's the charm?");
+        module.exports.update(req, rsp);
+      })
+      .catch( err => rsp.status(404).json({errors: err.errors}));
+  },
+
   addPlayerWhite : (req, rsp) => {
     User.findOne({_id: req.params.userId})
       .then(data => {

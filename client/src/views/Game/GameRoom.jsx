@@ -52,7 +52,7 @@ const GameRoom = ({loggedIn, socket}) => {
   }
 
   const beginGame = () => {
-    axios.put(`http://localhost:8000/api/games/${id}`, {begun: true}, {withCredentials: true})
+    axios.put(`http://localhost:8000/api/games/${id}/begin`, {begun: true}, {withCredentials: true})
       .then(rsp => {
         let begunGame = rsp.data.results;
         setGame(begunGame);

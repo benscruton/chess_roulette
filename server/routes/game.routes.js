@@ -11,6 +11,9 @@ router.route("/:id")
   .put(authenticate, GameController.update)
   .delete(authenticate, GameController.destroy);
 
+router.route("/:id/begin")
+  .put(authenticate, GameController.begin);
+
 router.route('/:gameId/addPlayerWhite/:userId')
   .put(authenticate, GameController.addPlayerWhite);
 router.route('/:gameId/addPlayerBlack/:userId')
