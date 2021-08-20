@@ -4,10 +4,12 @@ import styles from "./GameBoard.module.css";
 import images from "./ImageSets/standardChess";
 import PawnPromotion from "./PawnPromotion";
 import ConfirmResign from "./ConfirmResign";
-const rules = require("./MoveLogic/standardChess");
 
-const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGame, finished, playerIds, spriteStyle, loggedIn, moveLog, setMoveLog, offerDraw, drawOfferPending}) => {
 
+const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specialInfo, begun, endGame, finished, playerIds, spriteStyle, moveLog, setMoveLog, offerDraw, drawOfferPending}) => {
+
+  const moveLogic = require(`./MoveLogic`)[gameType];
+  
   const [availableMoves, setAvailableMoves] = useState(false);
   const [boardStatus, setBoardStatus] = useState(statusFromParent);
   const [whiteToPlay, setWhiteToPlay] = useState(true);
@@ -16,6 +18,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
   const [viewAsBlack, setViewAsBlack] = useState(false);
   const [size, setSize] = useState("full");
   const [showResignConfirm, setShowResignConfirm] = useState(false);
+  const [testState, setTestState] = useState(0);
 
   const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
@@ -172,7 +175,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
 
     if(tile.occupied && !(tile.file === activeTile.file && tile.rank === activeTile.rank)){
       setActiveTile(tile);
-      let moves = rules[tile.occupied.type](tile, boardStatus, info);
+      let moves = moveLogic[tile.occupied.type](tile, boardStatus, info);
       removeCheckMoves(boardStatus, moves, tile);
       setAvailableMoves(moves);
     }
@@ -248,7 +251,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
         if(!tile.occupied || tile.occupied.color === color){
           continue;
         }
-        let itsMoves = rules[tile.occupied.type](tile, board, info, true);
+        let itsMoves = moveLogic[tile.occupied.type](tile, board, info, true);
         for(let k=0; k<itsMoves.length; k++){
           if(itsMoves[k][0] === file && itsMoves[k][1] === rank){
             return true;
@@ -322,7 +325,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
         if(!tile.occupied || tile.occupied.color !== color){
           continue;
         }
-        let itsMoves = rules[tile.occupied.type](tile, board, info);
+        let itsMoves = moveLogic[tile.occupied.type](tile, board, info);
         removeCheckMoves(board, itsMoves, tile);
         if(itsMoves.length) return false;
       }
@@ -439,6 +442,7 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
     endGame(message);
     setShowResignConfirm(false);
   };
+
 
   return (
     <div id="board">

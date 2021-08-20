@@ -5,4 +5,5 @@ module.exports =  {
     pawn: require("./pawn"),
     queen: require("./queen"),
     rook: require("./rook"),
+    clickTileUtils: require("./clickTileUtils")
 }
