@@ -38,11 +38,10 @@ module.exports = {
     Game.findOne({_id: req.params.id})
       .then(game => {
         if(!game.playerWhite.length || !game.playerBlack.length){
-          rsp.json({results: game});
+          rsp.json({results: game, incomplete: true});
           return;
         }
         req.body = {begun: true};
-        console.log("third time's the charm?");
         module.exports.update(req, rsp);
       })
       .catch( err => rsp.status(404).json({errors: err.errors}));

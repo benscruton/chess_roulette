@@ -52,8 +52,11 @@ const GameRoom = ({loggedIn, socket}) => {
   }
 
   const beginGame = () => {
-    axios.put(`http://localhost:8000/api/games/${id}/begin`, {begun: true}, {withCredentials: true})
+    axios.put(`http://localhost:8000/api/games/${id}/begin`, null, {withCredentials: true})
       .then(rsp => {
+        if(rsp.data.incomplete){
+          return;
+        }
         let begunGame = rsp.data.results;
         setGame(begunGame);
         socket.emit("startGame", begunGame);

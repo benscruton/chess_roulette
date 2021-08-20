@@ -443,10 +443,14 @@ const GameBoard = ({socket, statusFromParent, gameId, specialInfo, begun, endGam
   return (
     <div id="board">
       <h3>
-        {finished.length?
-          finished
+        {begun?
+          finished.length?
+            finished
+            :
+            `${whiteToPlay? "White" : "Black"}${info.inCheck? " is in check" : "'s move"}`
           :
-          `${whiteToPlay? "White" : "Black"}${info.inCheck? " is in check" : "'s move"}`}
+          "Not Started"
+        }
       </h3>
 
       {info.pawnReady && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id?
