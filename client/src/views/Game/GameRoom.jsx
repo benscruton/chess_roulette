@@ -5,7 +5,6 @@ import GamePlayerInfo from "../../components/Game/GamePlayerInfo";
 import DrawOffer from "../../components/Game/DrawOffer";
 import GameBoard from "../../components/Game/GameBoard";
 import MoveLog from "../../components/Game/MoveLog";
-import UtilFunctionTests from "../../components/Game/UtilFunctionTests";
 
 const GameRoom = ({loggedIn, socket}) => {
   const {id} = useParams();
@@ -99,7 +98,6 @@ const GameRoom = ({loggedIn, socket}) => {
 
   return (
     <>
-      <UtilFunctionTests />
       {game? 
         <div className="mx-auto">
           <GamePlayerInfo
