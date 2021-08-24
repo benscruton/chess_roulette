@@ -89,120 +89,121 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
   }, []);
 
   // ---------- GAMEPLAY ----------
-  const clickTile = (tile) => {
-    if(isValidMove(tile) && !info.pawnReady){
-      // Make sure 1) game has begun, 2) it is their turn, and 3) it's the right player
-      if(begun && !finished.length && !drawOfferPending
-        && (activeTile.occupied.color === "white") - (whiteToPlay) === 0
-        && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id
-      ){
-        // Get updated board status:
-        let params = establishMoveParams(activeTile, tile, info.enPassantAvailable);
-        let updatedBoard = JSON.parse(JSON.stringify(boardStatus));
-        updatedBoard = executeMove(updatedBoard, activeTile, tile, params);
+
+  // const clickTile = (tile) => {
+  //   if(isValidMove(tile) && !info.pawnReady){
+  //     // Make sure 1) game has begun, 2) it is their turn, and 3) it's the right player
+  //     if(begun && !finished.length && !drawOfferPending
+  //       && (activeTile.occupied.color === "white") - (whiteToPlay) === 0
+  //       && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id
+  //     ){
+  //       // Get updated board status:
+  //       let params = establishMoveParams(activeTile, tile, info.enPassantAvailable);
+  //       let updatedBoard = JSON.parse(JSON.stringify(boardStatus));
+  //       updatedBoard = executeMove(updatedBoard, activeTile, tile, params);
         
-        // Other game info:
-        let castlingLegalAfterThisMove = updateCastlingStatus({...info.castlingLegal}, tile, activeTile);
-        let pawnReadyNow = info.pawnReady;
-        if(activeTile.occupied.type === "pawn" && (tile.rank === 1 || tile.rank === 8)){
-          pawnReadyNow = tile;
-        }
-        let newKingLocations = {...info.kingLocations};
-        if(activeTile.occupied.type === "king"){
-          newKingLocations[activeTile.occupied.color] = [tile.file, tile.rank];
-        }
-        let whoseTurnNext = (pawnReadyNow? whiteToPlay : !whiteToPlay);
-        params.nextPlayerInCheck = !pawnReadyNow && isInCheck(updatedBoard, whoseTurnNext? "white" : "black");
+  //       // Other game info:
+  //       let castlingLegalAfterThisMove = updateCastlingStatus({...info.castlingLegal}, tile, activeTile);
+  //       let pawnReadyNow = info.pawnReady;
+  //       if(activeTile.occupied.type === "pawn" && (tile.rank === 1 || tile.rank === 8)){
+  //         pawnReadyNow = tile;
+  //       }
+  //       let newKingLocations = {...info.kingLocations};
+  //       if(activeTile.occupied.type === "king"){
+  //         newKingLocations[activeTile.occupied.color] = [tile.file, tile.rank];
+  //       }
+  //       let whoseTurnNext = (pawnReadyNow? whiteToPlay : !whiteToPlay);
+  //       params.nextPlayerInCheck = !pawnReadyNow && isInCheck(updatedBoard, whoseTurnNext? "white" : "black");
 
-        let updatedSpecialInfo = {...info,
-          castlingLegal: castlingLegalAfterThisMove,
-          enPassantAvailable: params.enPassant,
-          pawnReady: pawnReadyNow,
-          kingLocations: newKingLocations,
-          inCheck: params.nextPlayerInCheck
-        }
+  //       let updatedSpecialInfo = {...info,
+  //         castlingLegal: castlingLegalAfterThisMove,
+  //         enPassantAvailable: params.enPassant,
+  //         pawnReady: pawnReadyNow,
+  //         kingLocations: newKingLocations,
+  //         inCheck: params.nextPlayerInCheck
+  //       }
 
-        // Move log with latest move added:
-        let moveDescription = buildMoveDescription(activeTile, tile, params);
-        let updatedMoveLog = JSON.parse(JSON.stringify(moveLog));
-        updatedMoveLog = addLatestMoveToLog(updatedMoveLog, moveDescription);
+  //       // Move log with latest move added:
+  //       let moveDescription = buildMoveDescription(activeTile, tile, params);
+  //       let updatedMoveLog = JSON.parse(JSON.stringify(moveLog));
+  //       updatedMoveLog = addLatestMoveToLog(updatedMoveLog, moveDescription);
 
-        // Update all front-end info:
-        setBoardStatus(updatedBoard);
-        setActiveTile(false);
-        setAvailableMoves(false);
-        setMoveLog(updatedMoveLog);
-        setWhiteToPlay(whoseTurnNext);
-        setInfo(updatedSpecialInfo);
+  //       // Update all front-end info:
+  //       setBoardStatus(updatedBoard);
+  //       setActiveTile(false);
+  //       setAvailableMoves(false);
+  //       setMoveLog(updatedMoveLog);
+  //       setWhiteToPlay(whoseTurnNext);
+  //       setInfo(updatedSpecialInfo);
         
-        // send move to database:
-        let databaseInfo = {
-          boardStatus: updatedBoard,
-          whiteToPlay: whoseTurnNext,
-          moveLog: updatedMoveLog,
-          $set: {
-            "specialInfo.castlingLegal": castlingLegalAfterThisMove,
-            "specialInfo.enPassantAvailable": params.enPassant,
-            "specialInfo.pawnReady": pawnReadyNow,
-            "specialInfo.kingLocations": newKingLocations,
-            "specialInfo.inCheck": params.nextPlayerInCheck
-          }
-        };
-        Axios.put(`http://localhost:8000/api/games/${gameId}`, databaseInfo, {withCredentials: true})
-          .catch(err => console.error({errors: err}))
-        let socketInfo = {
-          gameId,
-          boardStatus: updatedBoard,
-          whiteToPlay: whoseTurnNext,
-          info: updatedSpecialInfo,
-          moveLog: updatedMoveLog,
-        }
-        socket.emit("madeAMove", socketInfo);
+  //       // send move to database:
+  //       let databaseInfo = {
+  //         boardStatus: updatedBoard,
+  //         whiteToPlay: whoseTurnNext,
+  //         moveLog: updatedMoveLog,
+  //         $set: {
+  //           "specialInfo.castlingLegal": castlingLegalAfterThisMove,
+  //           "specialInfo.enPassantAvailable": params.enPassant,
+  //           "specialInfo.pawnReady": pawnReadyNow,
+  //           "specialInfo.kingLocations": newKingLocations,
+  //           "specialInfo.inCheck": params.nextPlayerInCheck
+  //         }
+  //       };
+  //       Axios.put(`http://localhost:8000/api/games/${gameId}`, databaseInfo, {withCredentials: true})
+  //         .catch(err => console.error({errors: err}))
+  //       let socketInfo = {
+  //         gameId,
+  //         boardStatus: updatedBoard,
+  //         whiteToPlay: whoseTurnNext,
+  //         info: updatedSpecialInfo,
+  //         moveLog: updatedMoveLog,
+  //       }
+  //       socket.emit("madeAMove", socketInfo);
 
-        let gameFinished = createGameFinishedStatus(updatedBoard, whoseTurnNext, params.nextPlayerInCheck);
-        if(!pawnReadyNow && gameFinished.length){
-          endGame(gameFinished);
-        }
-      }
+  //       let gameFinished = createGameFinishedStatus(updatedBoard, whoseTurnNext, params.nextPlayerInCheck);
+  //       if(!pawnReadyNow && gameFinished.length){
+  //         endGame(gameFinished);
+  //       }
+  //     }
 
-      // if it's not this player's turn / piece
-      else{
-        setActiveTile(false);
-        setAvailableMoves(false);
-      }
-      return;
-    }
+  //     // if it's not this player's turn / piece
+  //     else{
+  //       setActiveTile(false);
+  //       setAvailableMoves(false);
+  //     }
+  //     return;
+  //   }
 
-    if(tile.occupied && !(tile.file === activeTile.file && tile.rank === activeTile.rank)){
-      setActiveTile(tile);
-      let moves = moveLogic[tile.occupied.type](tile, boardStatus, info);
-      removeCheckMoves(boardStatus, moves, tile);
-      setAvailableMoves(moves);
-    }
-    else{
-      setActiveTile(false);
-      setAvailableMoves(false);
-    }
-  };
+  //   if(tile.occupied && !(tile.file === activeTile.file && tile.rank === activeTile.rank)){
+  //     setActiveTile(tile);
+  //     let moves = moveLogic[tile.occupied.type](tile, boardStatus, info);
+  //     removeCheckMoves(boardStatus, moves, tile);
+  //     setAvailableMoves(moves);
+  //   }
+  //   else{
+  //     setActiveTile(false);
+  //     setAvailableMoves(false);
+  //   }
+  // };
 
-  const updateCastlingStatus = (castlingLegalAfterThisMove, toTile, fromTile) => {
-    // rooks:
-    let castleFilesRooks = ["A", "H"], castleRanks = [1, 8];
-    for(let file of castleFilesRooks){
-      for(let rank of castleRanks){
-        if((toTile.file === file && toTile.rank === rank) || (fromTile.file === file && fromTile.rank === rank)){
-          castlingLegalAfterThisMove[`${file}${rank}`] = false;
-        }
-      }
-    }
-    // kings:
-    if(fromTile.file === "E" && castleRanks.includes(fromTile.rank)){
-      castlingLegalAfterThisMove[`A${fromTile.rank}`] = false;
-      castlingLegalAfterThisMove[`E${fromTile.rank}`] = false;
-      castlingLegalAfterThisMove[`H${fromTile.rank}`] = false;
-    }
-    return castlingLegalAfterThisMove;
-  };
+  // const updateCastlingStatus = (castlingLegalAfterThisMove, toTile, fromTile) => {
+  //   // rooks:
+  //   let castleFilesRooks = ["A", "H"], castleRanks = [1, 8];
+  //   for(let file of castleFilesRooks){
+  //     for(let rank of castleRanks){
+  //       if((toTile.file === file && toTile.rank === rank) || (fromTile.file === file && fromTile.rank === rank)){
+  //         castlingLegalAfterThisMove[`${file}${rank}`] = false;
+  //       }
+  //     }
+  //   }
+  //   // kings:
+  //   if(fromTile.file === "E" && castleRanks.includes(fromTile.rank)){
+  //     castlingLegalAfterThisMove[`A${fromTile.rank}`] = false;
+  //     castlingLegalAfterThisMove[`E${fromTile.rank}`] = false;
+  //     castlingLegalAfterThisMove[`H${fromTile.rank}`] = false;
+  //   }
+  //   return castlingLegalAfterThisMove;
+  // };
 
   const establishMoveParams = (fromTile, toTile, enPassantLocation) => {
     let params = {enPassant: false};
@@ -389,30 +390,30 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
   };
 
   // ---------- MOVE LOG ----------
-  const buildMoveDescription = (fromTile, toTile, params) => {
-    if(params.castling){
-      return params.castling;
-    }
-    let moveDescription = (fromTile.occupied.type === "pawn" ? "" : fromTile.occupied.abbrev);
-    if(params.captureMove || params.enPassantCapture){
-      moveDescription += (fromTile.occupied.type === "pawn" ? fromTile.file.toLowerCase() : "");
-      moveDescription += "x";
-    }
-    moveDescription += toTile.file.toLowerCase() + toTile.rank;
-    if(params.nextPlayerInCheck){
-      moveDescription += "+";
-    }
-    return moveDescription;
-  };
+  // const buildMoveDescription = (fromTile, toTile, params) => {
+  //   if(params.castling){
+  //     return params.castling;
+  //   }
+  //   let moveDescription = (fromTile.occupied.type === "pawn" ? "" : fromTile.occupied.abbrev);
+  //   if(params.captureMove || params.enPassantCapture){
+  //     moveDescription += (fromTile.occupied.type === "pawn" ? fromTile.file.toLowerCase() : "");
+  //     moveDescription += "x";
+  //   }
+  //   moveDescription += toTile.file.toLowerCase() + toTile.rank;
+  //   if(params.nextPlayerInCheck){
+  //     moveDescription += "+";
+  //   }
+  //   return moveDescription;
+  // };
 
-  const addLatestMoveToLog = (log, moveDescription) => {
-    if((log.length > 0) && (log[log.length-1].length === 1)){
-      log[log.length-1].push(moveDescription);
-    } else {
-      log.push([moveDescription])
-    }
-    return log;
-  };
+  // const addLatestMoveToLog = (log, moveDescription) => {
+  //   if((log.length > 0) && (log[log.length-1].length === 1)){
+  //     log[log.length-1].push(moveDescription);
+  //   } else {
+  //     log.push([moveDescription])
+  //   }
+  //   return log;
+  // };
 
   // ---------- ENDING GAMES ----------
   const createGameFinishedStatus = (board, whoseTurnNext, nextPlayerInCheck) => {
@@ -442,6 +443,35 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
     endGame(message);
     setShowResignConfirm(false);
   };
+
+
+  const everything = {
+    activeTile,
+    availableMoves,
+    Axios,
+    begun,
+    boardStatus,
+    drawOfferPending,
+    endGame,
+    fileArray,
+    finished,
+    gameId,
+    info,
+    loggedIn,
+    moveLog,
+    moveLogic,
+    playerIds,
+    setActiveTile,
+    setAvailableMoves,
+    setBoardStatus,
+    setInfo,
+    setMoveLog,
+    setWhiteToPlay,
+    socket,
+    whiteToPlay,
+  };
+
+  const clickTileOffScreen = require(`./MoveUtils`)[gameType];
 
 
   return (
@@ -495,7 +525,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
                   `} 
                   key={j}
                   id={`${tile.file}${tile.rank}`}
-                  onClick={() => clickTile(tile)}
+                  onClick={() => clickTileOffScreen(tile, everything)}
                 >
                 
                   {tile.occupied? 
