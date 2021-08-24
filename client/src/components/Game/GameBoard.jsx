@@ -18,7 +18,6 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
   const [viewAsBlack, setViewAsBlack] = useState(false);
   const [size, setSize] = useState("full");
   const [showResignConfirm, setShowResignConfirm] = useState(false);
-  const [testState, setTestState] = useState(0);
 
   const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
@@ -48,7 +47,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
     }else{
       setViewAsBlack(false);
     }
-  }, [begun]);
+  }, [begun]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ---------- BOARD SIZING ----------
   const adjustBoardSize = () => {
@@ -86,7 +85,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
       socket.removeAllListeners("newMoveCameIn");
       socket.removeAllListeners("gameFinished");
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ---------- GAMEPLAY ----------
 

@@ -63,7 +63,7 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
       }
     });
     return () => socket.removeAllListeners("playerUpdate");
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const colors = ["white", "black"];
 

@@ -59,11 +59,11 @@ const GameLobby = ({loggedIn, socket}) => {
       socket.removeAllListeners("removeGame");
       socket.removeAllListeners("addGameToList");
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect( () => {
     filterList(filter);
-  }, [filter, myGamesToggle, gameList]);
+  }, [filter, myGamesToggle, gameList]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleChange = e => {
     setFilter(e.target.value);

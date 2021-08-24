@@ -40,7 +40,7 @@ const GameRoom = ({loggedIn, socket}) => {
     });
 
     return () => socket.emit("leaveRoom", id);
-  }, [id]);
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const deleteGame = () => {
     axios.delete(`http://localhost:8000/api/games/${id}`, {withCredentials: true})

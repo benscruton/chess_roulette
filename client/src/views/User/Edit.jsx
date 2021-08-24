@@ -12,7 +12,7 @@ const Edit = ({loggedIn, setLoggedIn}) => {
     if(!loggedIn.email){
       navigate("/profile");
     }
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [showPopup, setShowPopup] = useState(false);
 

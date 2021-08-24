@@ -19,7 +19,7 @@ const App = () => {
   const [socket] = useState( () => io("/", {path: "/chessmainsocket"}));
   useEffect( () => {
     return () => socket.disconnect(true);
-  }, [])
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const noUser = {
     firstName: "No One",
