@@ -1,15 +1,14 @@
 const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
 const moveLogic = require("./MoveLogic");
 
-const doMove = (tile, necessaryData) => {
-
+const doMove = (tile, additionalData) => {
   const {
     activeTile,
     boardStatus,
     info,
     moveLog,
     whiteToPlay
-  } = necessaryData;
+  } = additionalData;
 
   // Get updated board status:
   let params = establishMoveParams(activeTile, tile, info.enPassantAvailable);
@@ -60,18 +59,118 @@ const doMove = (tile, necessaryData) => {
 
 
 
-const getMoves = (tile, necessaryData) => {
-
+const getMoves = (tile, additionalData) => {
   const {
     boardStatus,
     info
-  } = necessaryData;
+  } = additionalData;
 
   let moves = moveLogic[tile.occupied.type](tile, boardStatus, info);
   moves = removeCheckMoves(boardStatus, info, moves, tile);
   return moves;
 
 };
+
+
+
+
+
+
+
+
+
+const promotePawn = (tile, choice, additionalData) => {
+  // if(playerIds[whiteToPlay ? "white" : "black"] !== loggedIn._id){
+  //   return;
+  // }
+
+  const {
+    boardStatus,
+    info,
+    moveLog,
+    whiteToPlay
+  } = additionalData;
+
+  let boardRow = (tile.rank === 8? 0 : 7);
+  let boardFile = fileArray.indexOf(tile.file);
+  let updatedBoard = JSON.parse(JSON.stringify(boardStatus));
+  let abbrev = (choice === "knight"? "N" : choice.substring(0, 1).toUpperCase());
+  updatedBoard[boardRow][boardFile].occupied.type = choice;
+  updatedBoard[boardRow][boardFile].occupied.abbrev = abbrev;
+
+  let nextPlayerInCheck = isInCheck(updatedBoard, info, (whiteToPlay? "black" : "white"), info.kingLocations);
+
+  let updatedMoveLog = JSON.parse(JSON.stringify(moveLog));
+  updatedMoveLog[updatedMoveLog.length - 1][whiteToPlay? 0 : 1] += (abbrev + (nextPlayerInCheck ? "+" : ""));
+
+  let updatedSpecialInfo = {...info,
+    pawnReady: false,
+    inCheck: nextPlayerInCheck
+  };
+
+  let gameFinished = createGameFinishedStatus(updatedBoard, updatedSpecialInfo, !whiteToPlay, nextPlayerInCheck);
+  
+  // Package info to return to GameBoard:
+  const results = {
+    updatedBoard,
+    updatedMoveLog,
+    updatedWhiteToPlay: !whiteToPlay,
+    updatedSpecialInfo,
+    gameFinished
+  };
+
+  return results;
+
+
+
+
+  // setBoardStatus(updatedBoard);
+  // setMoveLog(updatedMoveLog);
+  // setInfo(updatedSpecialInfo);
+
+  // let databaseInfo = {
+  //   boardStatus: updatedBoard,
+  //   whiteToPlay: !whiteToPlay,
+  //   moveLog: updatedMoveLog,
+  //   $set: {
+  //     "specialInfo.pawnReady": false,
+  //     "specialInfo.inCheck": nextPlayerInCheck
+  //   }
+  // }
+  // Axios.put(`http://localhost:8000/api/games/${gameId}`, databaseInfo, {withCredentials: true})
+  //     .catch(err => console.error({errors: err}))
+  
+  // let socketInfo = {
+  //   gameId,
+  //   boardStatus: updatedBoard,
+  //   whiteToPlay: !whiteToPlay,
+  //   info: updatedSpecialInfo,
+  //   moveLog: updatedMoveLog,
+  // }
+  // socket.emit("madeAMove", socketInfo);
+
+  // let gameFinished = createGameFinishedStatus(updatedBoard, !whiteToPlay, nextPlayerInCheck);
+  // console.log(gameFinished);
+  // if(gameFinished.length){
+  //   endGame(gameFinished);
+  // }
+
+  // setWhiteToPlay(!whiteToPlay);
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const updateCastlingStatus = (castlingLegalAfterThisMove, toTile, fromTile) => {
   // rooks:
@@ -118,12 +217,6 @@ const establishMoveParams = (fromTile, toTile, enPassantLocation) => {
   return params;
 };
 
-// const isValidMove = tile => {
-//   for(let i=0; i<availableMoves.length; i++){
-//     if(availableMoves[i][0] === tile.file && availableMoves[i][1] === tile.rank) return true;
-//   }
-//   return false;
-// };
 
 const isInCheck = (board, info, color, kingLocations) => {
   let kingSpot = kingLocations[color];
@@ -264,5 +357,6 @@ const createGameFinishedStatus = (board, info, whoseTurnNext, nextPlayerInCheck)
 
 module.exports = {
   doMove,
-  getMoves
+  getMoves,
+  promotePawn
 };
