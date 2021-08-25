@@ -8,7 +8,7 @@ import ConfirmResign from "./ConfirmResign";
 
 const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specialInfo, begun, endGame, finished, playerIds, spriteStyle, moveLog, setMoveLog, offerDraw, drawOfferPending}) => {
 
-  const moveLogic = require(`./MoveLogic`)[gameType];
+  const moveLogic = require(`./MoveUtils/${gameType ? gameType : "standardChess"}/MoveLogic`);
   
   const [availableMoves, setAvailableMoves] = useState(false);
   const [boardStatus, setBoardStatus] = useState(statusFromParent);
@@ -116,29 +116,13 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
 
   const clickTile = (tile) => {
 
-    const everything = {
+    const necessaryData = {
       activeTile,
       availableMoves,
-      // Axios,
-      // begun,
       boardStatus,
-      // drawOfferPending,
       endGame,
-      // fileArray,
-      // finished,
-      // gameId,
       info,
-      // loggedIn,
       moveLog,
-      // moveLogic,
-      // playerIds,
-      // setActiveTile,
-      // setAvailableMoves,
-      // setBoardStatus,
-      // setInfo,
-      // setMoveLog,
-      // setWhiteToPlay,
-      // socket,
       whiteToPlay,
     };
 
@@ -153,7 +137,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
         && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id
       ){
 
-        const results = offScreenFunctions.doMove(tile, everything);
+        const results = offScreenFunctions.doMove(tile, necessaryData);
         const {
           boardStatus,
           moveLog,
@@ -211,12 +195,15 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
       
       // GET THE POSSIBLE MOVES FOR THIS PIECE HERE
 
+      setActiveTile(tile);
+      let moves = offScreenFunctions.getMoves(tile, necessaryData);
+      setAvailableMoves(moves);
       // temporarily, the og version:
 
-      setActiveTile(tile);
-      let moves = moveLogic[tile.occupied.type](tile, boardStatus, info);
-      removeCheckMoves(boardStatus, moves, tile);
-      setAvailableMoves(moves);
+      // setActiveTile(tile);
+      // let moves = moveLogic[tile.occupied.type](tile, boardStatus, info);
+      // removeCheckMoves(boardStatus, moves, tile);
+      // setAvailableMoves(moves);
 
     }
 
@@ -614,33 +601,33 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
   };
 
 
-  const everything = {
-    activeTile,
-    availableMoves,
-    Axios,
-    begun,
-    boardStatus,
-    drawOfferPending,
-    endGame,
-    fileArray,
-    finished,
-    gameId,
-    info,
-    loggedIn,
-    moveLog,
-    moveLogic,
-    playerIds,
-    setActiveTile,
-    setAvailableMoves,
-    setBoardStatus,
-    setInfo,
-    setMoveLog,
-    setWhiteToPlay,
-    socket,
-    whiteToPlay,
-  };
+  // const necessaryData = {
+  //   activeTile,
+  //   availableMoves,
+  //   Axios,
+  //   begun,
+  //   boardStatus,
+  //   drawOfferPending,
+  //   endGame,
+  //   fileArray,
+  //   finished,
+  //   gameId,
+  //   info,
+  //   loggedIn,
+  //   moveLog,
+  //   moveLogic,
+  //   playerIds,
+  //   setActiveTile,
+  //   setAvailableMoves,
+  //   setBoardStatus,
+  //   setInfo,
+  //   setMoveLog,
+  //   setWhiteToPlay,
+  //   socket,
+  //   whiteToPlay,
+  // };
 
-  const clickTileOffScreen = require(`./MoveUtils`)[gameType];
+  // const clickTileOffScreen = require(`./MoveUtils`)[gameType];
 
 
   return (

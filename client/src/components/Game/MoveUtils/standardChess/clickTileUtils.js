@@ -1,8 +1,7 @@
 const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
+const moveLogic = require("./MoveLogic");
 
-const moveLogic = require("../../MoveLogic").standardChess;
-
-const doMove = (tile, everything) => {
+const doMove = (tile, necessaryData) => {
 
   const {
     activeTile,
@@ -10,7 +9,7 @@ const doMove = (tile, everything) => {
     info,
     moveLog,
     whiteToPlay
-  } = everything;
+  } = necessaryData;
 
   // Get updated board status:
   let params = establishMoveParams(activeTile, tile, info.enPassantAvailable);
@@ -57,54 +56,22 @@ const doMove = (tile, everything) => {
   };
 
   return results;
-
-  // // Update all front-end info:
-  // setBoardStatus(updatedBoard);
-  // setActiveTile(false);
-  // setAvailableMoves(false);
-  // setMoveLog(updatedMoveLog);
-  // setWhiteToPlay(whoseTurnNext);
-  // setInfo(updatedSpecialInfo);
-  
-  // // send move to database:
-  // let databaseInfo = {
-  //   boardStatus: updatedBoard,
-  //   whiteToPlay: whoseTurnNext,
-  //   moveLog: updatedMoveLog,
-  //   $set: {
-  //     "specialInfo.castlingLegal": castlingLegalAfterThisMove,
-  //     "specialInfo.enPassantAvailable": params.enPassant,
-  //     "specialInfo.pawnReady": pawnReadyNow,
-  //     "specialInfo.kingLocations": newKingLocations,
-  //     "specialInfo.inCheck": params.nextPlayerInCheck
-  //   }
-  // };
-  // Axios.put(`http://localhost:8000/api/games/${gameId}`, databaseInfo, {withCredentials: true})
-  //   .catch(err => console.error({errors: err}))
-  // let socketInfo = {
-  //   gameId,
-  //   boardStatus: updatedBoard,
-  //   whiteToPlay: whoseTurnNext,
-  //   info: updatedSpecialInfo,
-  //   moveLog: updatedMoveLog,
-  // }
-  // socket.emit("madeAMove", socketInfo);
 }
 
 
 
-// const getMoves = () => {
-//   if(tile.occupied && !(tile.file === activeTile.file && tile.rank === activeTile.rank)){
-//     setActiveTile(tile);
-//     let moves = moveLogic[tile.occupied.type](tile, boardStatus, info);
-//     removeCheckMoves(boardStatus, moves, tile);
-//     setAvailableMoves(moves);
-//   }
-//   else{
-//     setActiveTile(false);
-//     setAvailableMoves(false);
-//   }
-// };
+const getMoves = (tile, necessaryData) => {
+
+  const {
+    boardStatus,
+    info
+  } = necessaryData;
+
+  let moves = moveLogic[tile.occupied.type](tile, boardStatus, info);
+  moves = removeCheckMoves(boardStatus, info, moves, tile);
+  return moves;
+
+};
 
 const updateCastlingStatus = (castlingLegalAfterThisMove, toTile, fromTile) => {
   // rooks:
@@ -184,9 +151,9 @@ const piecesAttackingThisSquare = (board, info, file, rank, color) => {
 };
 
 const removeCheckMoves = (origBoard, info, moves, tile) => {
+  const fromTile = origBoard[8 - tile.rank][fileArray.indexOf(tile.file)];
   for(let i=0; i<moves.length; i++){
     let board = JSON.parse(JSON.stringify(origBoard));
-    const fromTile = board[8 - tile.rank][fileArray.indexOf(tile.file)];
     const toTile = board[8 - moves[i][1]][fileArray.indexOf(moves[i][0])];
     const newKingLocations = JSON.parse(JSON.stringify(info.kingLocations));
     if(tile.occupied.type === "king"){
@@ -212,6 +179,8 @@ const removeCheckMoves = (origBoard, info, moves, tile) => {
       }
     }
   }
+
+  return moves;
 };
 
 const executeMove = (board, fromTile, toTile, params = {}) => {
@@ -293,4 +262,7 @@ const createGameFinishedStatus = (board, info, whoseTurnNext, nextPlayerInCheck)
 };
 
 
-module.exports = {doMove};
+module.exports = {
+  doMove,
+  getMoves
+};
