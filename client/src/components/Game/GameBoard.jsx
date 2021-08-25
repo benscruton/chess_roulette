@@ -87,7 +87,177 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   // ---------- GAMEPLAY ----------
+
+  const clickTile = (tile) => {
+
+    const everything = {
+      activeTile,
+      availableMoves,
+      // Axios,
+      // begun,
+      boardStatus,
+      // drawOfferPending,
+      endGame,
+      // fileArray,
+      // finished,
+      // gameId,
+      info,
+      // loggedIn,
+      moveLog,
+      // moveLogic,
+      // playerIds,
+      // setActiveTile,
+      // setAvailableMoves,
+      // setBoardStatus,
+      // setInfo,
+      // setMoveLog,
+      // setWhiteToPlay,
+      // socket,
+      whiteToPlay,
+    };
+
+    const offScreenFunctions = require("./MoveUtils")[gameType];
+
+
+    // clicked on a green square:
+    if(isValidMove(tile) && !info.pawnReady){
+      // Make sure 1) game has begun, 2) it is their turn, and 3) it's the right player
+      if(begun && !finished.length && !drawOfferPending
+        && (activeTile.occupied.color === "white") - (whiteToPlay) === 0
+        && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id
+      ){
+
+        const results = offScreenFunctions.doMove(tile, everything);
+        const {
+          boardStatus,
+          moveLog,
+          whiteToPlay,
+          info,
+          gameFinished
+        } = results;
+
+        // Update all front-end info:
+        setBoardStatus(boardStatus);
+        setActiveTile(false);
+        setAvailableMoves(false);
+        setMoveLog(moveLog);
+        setWhiteToPlay(whiteToPlay);
+        setInfo(info);
+
+        // send move to database:
+        let databaseInfo = {
+          boardStatus,
+          whiteToPlay,
+          moveLog,
+          $set: {
+            "specialInfo.castlingLegal": info.castlingLegal,
+            "specialInfo.enPassantAvailable": info.enPassantAvailable,
+            "specialInfo.pawnReady": info.pawnReady,
+            "specialInfo.kingLocations": info.kingLocations,
+            "specialInfo.inCheck": info.inCheck
+          }
+        };
+        Axios.put(`http://localhost:8000/api/games/${gameId}`, databaseInfo, {withCredentials: true})
+          .catch(err => console.error({errors: err}));
+
+        let socketInfo = {
+          gameId,
+          boardStatus,
+          whiteToPlay,
+          info,
+          moveLog,
+        }
+        socket.emit("madeAMove", socketInfo);
+
+        // End game, if applicable:
+        if(!info.pawnReady && gameFinished.length){
+          endGame(gameFinished);
+        }
+
+      } else { // green square but not a valid move:
+        setActiveTile(false);
+        setAvailableMoves(false);
+      }
+    }
+
+    // clicked on a piece that isn't already active:
+    else if(tile.occupied && !(tile.file === activeTile.file && tile.rank === activeTile.rank)){
+      
+      // GET THE POSSIBLE MOVES FOR THIS PIECE HERE
+
+      // temporarily, the og version:
+
+      setActiveTile(tile);
+      let moves = moveLogic[tile.occupied.type](tile, boardStatus, info);
+      removeCheckMoves(boardStatus, moves, tile);
+      setAvailableMoves(moves);
+
+    }
+
+    // clicked on the active square, or an empty square:
+    else {
+      setActiveTile(false);
+      setAvailableMoves(false);
+    }
+
+
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   // const clickTile = (tile) => {
   //   if(isValidMove(tile) && !info.pawnReady){
@@ -524,7 +694,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
                   `} 
                   key={j}
                   id={`${tile.file}${tile.rank}`}
-                  onClick={() => clickTileOffScreen(tile, everything)}
+                  onClick={() => clickTile(tile)}
                 >
                 
                   {tile.occupied? 
