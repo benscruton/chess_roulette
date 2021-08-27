@@ -94,14 +94,12 @@ const promotePawn = (tile, choice, additionalData) => {
   let boardRow = (tile.rank === 8? 0 : 7);
   let boardFile = fileArray.indexOf(tile.file);
   let updatedBoard = JSON.parse(JSON.stringify(boardStatus));
-  let abbrev = (choice === "knight"? "N" : choice.substring(0, 1).toUpperCase());
-  updatedBoard[boardRow][boardFile].occupied.type = choice;
-  updatedBoard[boardRow][boardFile].occupied.abbrev = abbrev;
+  updatedBoard[boardRow][boardFile].occupied = choice;
 
   let nextPlayerInCheck = isInCheck(updatedBoard, info, (whiteToPlay? "black" : "white"), info.kingLocations);
 
   let updatedMoveLog = JSON.parse(JSON.stringify(moveLog));
-  updatedMoveLog[updatedMoveLog.length - 1][whiteToPlay? 0 : 1] += (abbrev + (nextPlayerInCheck ? "+" : ""));
+  updatedMoveLog[updatedMoveLog.length - 1][whiteToPlay? 0 : 1] += (choice.abbrev + (nextPlayerInCheck ? "+" : ""));
 
   let updatedSpecialInfo = {...info,
     pawnReady: false,
