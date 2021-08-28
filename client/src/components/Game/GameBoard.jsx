@@ -5,10 +5,7 @@ import images from "./ImageSets/standardChess";
 import PawnPromotion from "./PawnPromotion";
 import ConfirmResign from "./ConfirmResign";
 
-
 const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specialInfo, begun, endGame, finished, playerIds, spriteStyle, moveLog, setMoveLog, offerDraw, drawOfferPending}) => {
-
-  // const moveLogic = require(`./MoveUtils/${gameType ? gameType : "standardChess"}/MoveLogic`);
   
   const [availableMoves, setAvailableMoves] = useState(false);
   const [boardStatus, setBoardStatus] = useState(statusFromParent);
@@ -19,7 +16,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
   const [size, setSize] = useState("full");
   const [showResignConfirm, setShowResignConfirm] = useState(false);
 
-  // const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
+  const gameplayUtils = require("./MoveUtils")[gameType];
 
   useEffect( () => {
     Axios.get(`http://localhost:8000/api/games/${gameId}`)
@@ -101,9 +98,6 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
       whiteToPlay,
     };
 
-    const offScreenFunctions = require("./MoveUtils")[gameType];
-
-
     // clicked on a green square:
     if(isValidMove(tile) && !info.pawnReady){
       // Make sure 1) game has begun, 2) it is their turn, and 3) it's the right player
@@ -111,48 +105,23 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
         && (activeTile.occupied.color === "white") - (whiteToPlay) === 0
         && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id
       ){
-
-        const results = offScreenFunctions.doMove(tile, additionalData);
         const {
           boardStatus,
           moveLog,
           whiteToPlay,
           info,
           gameFinished
-        } = results;
+        } = gameplayUtils.doMove(tile, additionalData);
 
-        // Update all front-end info:
-        setBoardStatus(boardStatus);
-        setActiveTile(false);
-        setAvailableMoves(false);
-        setMoveLog(moveLog);
-        setWhiteToPlay(whiteToPlay);
-        setInfo(info);
-
-        // send move to database:
-        let databaseInfo = {
-          boardStatus,
-          whiteToPlay,
-          moveLog,
-          $set: {
-            "specialInfo.castlingLegal": info.castlingLegal,
-            "specialInfo.enPassantAvailable": info.enPassantAvailable,
-            "specialInfo.pawnReady": info.pawnReady,
-            "specialInfo.kingLocations": info.kingLocations,
-            "specialInfo.inCheck": info.inCheck
-          }
+        let dbSet = {
+          "specialInfo.castlingLegal": info.castlingLegal,
+          "specialInfo.enPassantAvailable": info.enPassantAvailable,
+          "specialInfo.pawnReady": info.pawnReady,
+          "specialInfo.kingLocations": info.kingLocations,
+          "specialInfo.inCheck": info.inCheck
         };
-        Axios.put(`http://localhost:8000/api/games/${gameId}`, databaseInfo, {withCredentials: true})
-          .catch(err => console.error({errors: err}));
 
-        let socketInfo = {
-          gameId,
-          boardStatus,
-          whiteToPlay,
-          info,
-          moveLog,
-        }
-        socket.emit("madeAMove", socketInfo);
+        updateGameStatus(boardStatus, moveLog, whiteToPlay, info, dbSet);
 
         // End game, if applicable:
         if(!info.pawnReady && gameFinished.length){
@@ -167,14 +136,9 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
 
     // clicked on a piece that isn't already active:
     else if(tile.occupied && !(tile.file === activeTile.file && tile.rank === activeTile.rank)){
-      
-      // GET THE POSSIBLE MOVES FOR THIS PIECE HERE
-
       setActiveTile(tile);
-      let moves = offScreenFunctions.getMoves(tile, additionalData);
+      let moves = gameplayUtils.getMoves(tile, additionalData);
       setAvailableMoves(moves);
-
-
     }
 
     // clicked on the active square, or an empty square:
@@ -195,9 +159,6 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
     if(playerIds[whiteToPlay ? "white" : "black"] !== loggedIn._id){
       return;
     }
-
-    const offScreenFunctions = require("./MoveUtils")[gameType];
-
     const additionalData = {
       boardStatus,
       info,
@@ -205,47 +166,60 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
       whiteToPlay
     };
 
-    const results = offScreenFunctions.promotePawn(tileCopy, choice, additionalData);
-
-    console.log(results);
     const {
       updatedBoard,
       updatedMoveLog,
       updatedWhiteToPlay,
       updatedSpecialInfo,
       gameFinished
-    } = results;
+    } = gameplayUtils.promotePawn(tileCopy, choice, additionalData);
 
-    setBoardStatus(updatedBoard);
-    setMoveLog(updatedMoveLog);
-    setInfo(updatedSpecialInfo);
-    setWhiteToPlay(updatedWhiteToPlay);
+    const dbSet = {
+      "specialInfo.pawnReady": updatedSpecialInfo.pawnReady,
+      "specialInfo.inCheck": updatedSpecialInfo.inCheck
+    };
 
-    let databaseInfo = {
-      boardStatus: updatedBoard,
-      whiteToPlay: updatedWhiteToPlay,
-      moveLog: updatedMoveLog,
-      $set: {
-        "specialInfo.pawnReady": updatedSpecialInfo.pawnReady,
-        "specialInfo.inCheck": updatedSpecialInfo.inCheck
-      }
-    }
-    Axios.put(`http://localhost:8000/api/games/${gameId}`, databaseInfo, {withCredentials: true})
-        .catch(err => console.error({errors: err}))
-    
-    let socketInfo = {
-      gameId,
-      boardStatus: updatedBoard,
-      whiteToPlay: updatedWhiteToPlay,
-      info: updatedSpecialInfo,
-      moveLog: updatedMoveLog,
-    }
-    socket.emit("madeAMove", socketInfo);
-
+    updateGameStatus(
+      updatedBoard,
+      updatedMoveLog,
+      updatedWhiteToPlay,
+      updatedSpecialInfo,
+      dbSet
+    );
 
     if(gameFinished.length){
       endGame(gameFinished);
     }
+  };
+
+  const updateGameStatus = (board, log, turn, spInfo, dbSet) => {
+    // Update all front-end info:
+    setBoardStatus(board);
+    setMoveLog(log);
+    setWhiteToPlay(turn);
+    setInfo(spInfo);
+    setActiveTile(false);
+    setAvailableMoves(false);
+
+    // send move to database:
+    let databaseInfo = {
+      boardStatus: board,
+      whiteToPlay: turn,
+      moveLog: log,
+      $set: dbSet
+    };
+    Axios.put(`http://localhost:8000/api/games/${gameId}`, databaseInfo, {withCredentials: true})
+      .catch(err => console.error({errors: err}));
+
+    // send move to socket
+    let socketInfo = {
+      gameId,
+      boardStatus: board,
+      whiteToPlay: turn,
+      info: spInfo,
+      moveLog: log,
+    }
+    socket.emit("madeAMove", socketInfo);
   };
 
   // ---------- ENDING GAMES ----------
@@ -312,7 +286,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
                     ${(i+j) % 2 === 0? styles.white : styles.black}
                     ${activeTile.file === tile.file && activeTile.rank === tile.rank ? styles.active : ""}
                     ${isValidMove(tile) ? 
-                      (tile.occupied ||(tile.file === info.enPassantAvailable[0] && tile.rank === info.enPassantAvailable[1] && activeTile.occupied.type === "pawn")) ?
+                      (tile.occupied || (tile.file === info.enPassantAvailable[0] && tile.rank === info.enPassantAvailable[1] && activeTile.occupied.type === "pawn")) ?
                         styles.capture : styles.available
                       : ""}
                   `} 
