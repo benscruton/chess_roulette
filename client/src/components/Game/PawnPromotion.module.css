@@ -1,10 +1,36 @@
-.wrapper{
+.fullWrapper{
     background-color: navajowhite;
     border: 3px solid peru;
     border-radius: 5px;
     width: 300px;
     height: 100px;
+    margin: 0 auto 15px;
+}
 
+.largeWrapper{
+    background-color: navajowhite;
+    border: 3px solid peru;
+    border-radius: 5px;
+    width: 250px;
+    height: 90px;
+    margin: 0 auto 15px;
+}
+
+.mediumWrapper{
+    background-color: navajowhite;
+    border: 3px solid peru;
+    border-radius: 5px;
+    width: 200px;
+    height: 75px;
+    margin: 0 auto 15px;
+}
+
+.smallWrapper{
+    background-color: navajowhite;
+    border: 3px solid peru;
+    border-radius: 5px;
+    width: 175px;
+    height: 65px;
     margin: 0 auto 15px;
 }
 
@@ -15,7 +41,7 @@
     align-items: flex-end;
 }
 
-.promotionTile{
+.fullPromotionTile{
     width: 60px;
     height: 60px;
     display: inline-flex;
@@ -23,4 +49,54 @@
     align-items: center;
     background-color: peru;
     margin-bottom: 10px;
+}
+
+.largePromotionTile{
+    width: 45px;
+    height: 45px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background-color: peru;
+    margin-bottom: 10px;
+}
+
+.mediumPromotionTile{
+    width: 35px;
+    height: 35px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background-color: peru;
+    margin-bottom: 5px;
+}
+
+.smallPromotionTile{
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    background-color: peru;
+    margin-bottom: 5px;
+}
+
+.fullPiece{
+    width: default;
+    height: default;
+}
+
+.largePiece{
+    width: 40px;
+    height: 40px;
+}
+
+.mediumPiece{
+    width: 32px;
+    height: 32px;
+}
+
+.smallPiece{
+    width: 25px;
+    height: 25px;
 }

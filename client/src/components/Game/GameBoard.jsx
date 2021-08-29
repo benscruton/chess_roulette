@@ -16,7 +16,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
   const [size, setSize] = useState("full");
   const [showResignConfirm, setShowResignConfirm] = useState(false);
 
-  const gameplayUtils = require("./MoveUtils")[gameType];
+  const gameplayUtils = require("./GameTypes")[gameType];
 
   useEffect( () => {
     Axios.get(`http://localhost:8000/api/games/${gameId}`)
@@ -111,7 +111,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
           whiteToPlay,
           info,
           gameFinished
-        } = gameplayUtils.doMove(tile, additionalData);
+        } = gameplayUtils.clickUtils.doMove(tile, additionalData);
 
         let dbSet = {
           "specialInfo.castlingLegal": info.castlingLegal,
@@ -137,7 +137,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
     // clicked on a piece that isn't already active:
     else if(tile.occupied && !(tile.file === activeTile.file && tile.rank === activeTile.rank)){
       setActiveTile(tile);
-      let moves = gameplayUtils.getMoves(tile, additionalData);
+      let moves = gameplayUtils.clickUtils.getMoves(tile, additionalData);
       setAvailableMoves(moves);
     }
 
@@ -172,7 +172,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
       updatedWhiteToPlay,
       updatedSpecialInfo,
       gameFinished
-    } = gameplayUtils.promotePawn(tileCopy, choice, additionalData);
+    } = gameplayUtils.clickUtils.promotePawn(tileCopy, choice, additionalData);
 
     const dbSet = {
       "specialInfo.pawnReady": updatedSpecialInfo.pawnReady,
@@ -258,6 +258,8 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
         <PawnPromotion
           images={images}
           spriteStyle={spriteStyle}
+          size={size}
+          gameType={gameType}
           whiteToPlay={whiteToPlay}
           tile={info.pawnReady}
           promotePawn={promotePawn}

@@ -1,21 +1,17 @@
 import React from "react";
 import styles from "./PawnPromotion.module.css";
 
-const PawnPromotion = ({images, spriteStyle, whiteToPlay, tile, promotePawn}) => {
+const PawnPromotion = ({images, spriteStyle, size, gameType, whiteToPlay, tile, promotePawn}) => {
 
-  const choices = [
-    {type: "knight", abbrev: "N"},
-    {type: "bishop", abbrev: "B"},
-    {type: "rook", abbrev: "R"},
-    {type: "queen", abbrev: "Q"}
-  ].map( piece => {
+  const {promotionPieces} = require("./GameTypes")[gameType]
+  const choices = promotionPieces.map( piece => {
     return {...piece, 
       color: whiteToPlay? "white" : "black"
     }
   });
 
   return (
-    <div className={styles.wrapper}>
+    <div className={styles[`${size}Wrapper`]}>
       <span className="font-weight-bold">PROMOTE PAWN:</span>
 
       <div className={styles.piecesBox}>
@@ -23,12 +19,13 @@ const PawnPromotion = ({images, spriteStyle, whiteToPlay, tile, promotePawn}) =>
         {choices.map( (piece, idx) =>
           <div
             key={idx}
-            className={styles.promotionTile}
+            className={styles[`${size}PromotionTile`]}
             onClick={() => promotePawn(tile, piece)}
           >
             <img
               src={images[`${whiteToPlay? "white" : "black"}${piece.type}${spriteStyle}`]}
               alt={piece.abbrev}
+              className={styles[`${size}Piece`]}
             />
           </div>
         )}
