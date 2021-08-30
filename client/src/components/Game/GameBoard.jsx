@@ -2,7 +2,7 @@ import {useState, useEffect} from "react";
 import Axios from "axios";
 import styles from "./GameBoard.module.css";
 import images from "./ImageSets/standardChess";
-import PawnPromotion from "./PawnPromotion";
+import PiecePromotion from "./PiecePromotion";
 import ConfirmResign from "./ConfirmResign";
 
 const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specialInfo, begun, endGame, finished, playerIds, spriteStyle, moveLog, setMoveLog, offerDraw, drawOfferPending}) => {
@@ -155,7 +155,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
     return false;
   };
 
-  const promotePawn = (tileCopy, choice) => {
+  const promotePiece = (tileCopy, choice) => {
     if(playerIds[whiteToPlay ? "white" : "black"] !== loggedIn._id){
       return;
     }
@@ -172,7 +172,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
       updatedWhiteToPlay,
       updatedSpecialInfo,
       gameFinished
-    } = gameplayUtils.clickUtils.promotePawn(tileCopy, choice, additionalData);
+    } = gameplayUtils.clickUtils.promotePiece(tileCopy, choice, additionalData);
 
     const dbSet = {
       "specialInfo.pawnReady": updatedSpecialInfo.pawnReady,
@@ -255,14 +255,14 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
       </h3>
 
       {info.pawnReady && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id?
-        <PawnPromotion
+        <PiecePromotion
           images={images}
           spriteStyle={spriteStyle}
           size={size}
           gameType={gameType}
           whiteToPlay={whiteToPlay}
           tile={info.pawnReady}
-          promotePawn={promotePawn}
+          promotePiece={promotePiece}
         />
         :
         <></>

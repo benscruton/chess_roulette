@@ -79,7 +79,7 @@ const getMoves = (tile, additionalData) => {
 
 
 
-const promotePawn = (tile, choice, additionalData) => {
+const promotePiece = (tile, choice, additionalData) => {
   // if(playerIds[whiteToPlay ? "white" : "black"] !== loggedIn._id){
   //   return;
   // }
@@ -356,5 +356,5 @@ const createGameFinishedStatus = (board, info, whoseTurnNext, nextPlayerInCheck)
 module.exports = {
   doMove,
   getMoves,
-  promotePawn
+  promotePiece
 };

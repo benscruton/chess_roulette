@@ -1,7 +1,7 @@
 import React from "react";
-import styles from "./PawnPromotion.module.css";
+import styles from "./PiecePromotion.module.css";
 
-const PawnPromotion = ({images, spriteStyle, size, gameType, whiteToPlay, tile, promotePawn}) => {
+const PiecePromotion = ({images, spriteStyle, size, gameType, whiteToPlay, tile, promotePiece}) => {
 
   const {promotionPieces} = require("./GameTypes")[gameType]
   const choices = promotionPieces.map( piece => {
@@ -20,7 +20,7 @@ const PawnPromotion = ({images, spriteStyle, size, gameType, whiteToPlay, tile, 
           <div
             key={idx}
             className={styles[`${size}PromotionTile`]}
-            onClick={() => promotePawn(tile, piece)}
+            onClick={() => promotePiece(tile, piece)}
           >
             <img
               src={images[`${whiteToPlay? "white" : "black"}${piece.type}${spriteStyle}`]}
@@ -35,4 +35,4 @@ const PawnPromotion = ({images, spriteStyle, size, gameType, whiteToPlay, tile, 
   );
 }
 
-export default PawnPromotion;
+export default PiecePromotion;
