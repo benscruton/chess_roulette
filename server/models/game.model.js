@@ -31,6 +31,10 @@ const GameSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  lastMove: {
+    type: [[String | Number]],
+    default: []
+  },
   moveLog: {
     type: [[String]],
     default: []

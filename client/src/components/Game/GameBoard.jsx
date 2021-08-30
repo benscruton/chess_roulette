@@ -5,12 +5,13 @@ import images from "./ImageSets/standardChess";
 import PiecePromotion from "./PiecePromotion";
 import ConfirmResign from "./ConfirmResign";
 
-const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specialInfo, begun, endGame, finished, playerIds, spriteStyle, moveLog, setMoveLog, offerDraw, drawOfferPending}) => {
+const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType, specialInfo, begun, endGame, finished, playerIds, spriteStyle, moveLog, setMoveLog, offerDraw, drawOfferPending}) => {
   
   const [availableMoves, setAvailableMoves] = useState(false);
-  const [boardStatus, setBoardStatus] = useState(statusFromParent);
+  const [boardStatus, setBoardStatus] = useState(origStatus);
   const [whiteToPlay, setWhiteToPlay] = useState(true);
   const [activeTile, setActiveTile] = useState(false);
+  const [lastMove, setLastMove] = useState(origLastMove);
   const [info, setInfo] = useState(specialInfo);
   const [viewAsBlack, setViewAsBlack] = useState(false);
   const [size, setSize] = useState("full");
@@ -26,8 +27,12 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
   }, [gameId]);
   
   useEffect( () => {
-    setBoardStatus(statusFromParent);
-  }, [statusFromParent]);
+    setBoardStatus(origStatus);
+  }, [origStatus]);
+
+  useEffect( () => {
+    setLastMove(origLastMove);
+  }, [origLastMove]);
 
   useEffect( () => {
     setActiveTile(false);
@@ -72,6 +77,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
       setInfo(data.info);
       setWhiteToPlay(data.whiteToPlay);
       setMoveLog(data.moveLog);
+      setLastMove(data.lastMove);
       setActiveTile(false);
       setAvailableMoves(false);
     });
@@ -87,7 +93,6 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
   // ---------- GAMEPLAY ----------
 
   const clickTile = (tile) => {
-
     const additionalData = {
       activeTile,
       availableMoves,
@@ -110,6 +115,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
           moveLog,
           whiteToPlay,
           info,
+          lastMove,
           gameFinished
         } = gameplayUtils.clickUtils.doMove(tile, additionalData);
 
@@ -121,7 +127,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
           "specialInfo.inCheck": info.inCheck
         };
 
-        updateGameStatus(boardStatus, moveLog, whiteToPlay, info, dbSet);
+        updateGameStatus(boardStatus, moveLog, whiteToPlay, info, dbSet, lastMove);
 
         // End game, if applicable:
         if(!info.pawnReady && gameFinished.length){
@@ -139,12 +145,14 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
       setActiveTile(tile);
       let moves = gameplayUtils.clickUtils.getMoves(tile, additionalData);
       setAvailableMoves(moves);
+      setLastMove([]);
     }
 
     // clicked on the active square, or an empty square:
     else {
       setActiveTile(false);
       setAvailableMoves(false);
+      setLastMove([]);
     }
   };
 
@@ -154,6 +162,13 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
     }
     return false;
   };
+
+  const involvedInLastMove = tile => {
+    for(let i=0; i<lastMove.length; i++){
+      if(lastMove[i][0] === tile.file && lastMove[i][1] === tile.rank) return true;
+    }
+    return false;
+  }
 
   const promotePiece = (tileCopy, choice) => {
     if(playerIds[whiteToPlay ? "white" : "black"] !== loggedIn._id){
@@ -184,7 +199,8 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
       updatedMoveLog,
       updatedWhiteToPlay,
       updatedSpecialInfo,
-      dbSet
+      dbSet,
+      lastMove
     );
 
     if(gameFinished.length){
@@ -192,18 +208,20 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
     }
   };
 
-  const updateGameStatus = (board, log, turn, spInfo, dbSet) => {
+  const updateGameStatus = (board, log, turn, spInfo, dbSet, last) => {
     // Update all front-end info:
     setBoardStatus(board);
     setMoveLog(log);
     setWhiteToPlay(turn);
     setInfo(spInfo);
+    setLastMove(last);
     setActiveTile(false);
     setAvailableMoves(false);
 
     // send move to database:
     let databaseInfo = {
       boardStatus: board,
+      lastMove: last,
       whiteToPlay: turn,
       moveLog: log,
       $set: dbSet
@@ -215,6 +233,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
     let socketInfo = {
       gameId,
       boardStatus: board,
+      lastMove: last,
       whiteToPlay: turn,
       info: spInfo,
       moveLog: log,
@@ -253,7 +272,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
           "Not Started"
         }
       </h3>
-
+      
       {info.pawnReady && playerIds[whiteToPlay ? "white" : "black"] === loggedIn._id?
         <PiecePromotion
           images={images}
@@ -286,6 +305,7 @@ const GameBoard = ({socket, loggedIn, statusFromParent, gameId, gameType, specia
                   className={`
                     ${styles[`${size}Tile`]}
                     ${(i+j) % 2 === 0? styles.white : styles.black}
+                    ${involvedInLastMove(tile) ? styles.lastMove : ""}
                     ${activeTile.file === tile.file && activeTile.rank === tile.rank ? styles.active : ""}
                     ${isValidMove(tile) ? 
                       (tile.occupied || (tile.file === info.enPassantAvailable[0] && tile.rank === info.enPassantAvailable[1] && activeTile.occupied.type === "pawn")) ?

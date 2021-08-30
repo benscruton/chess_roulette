@@ -130,10 +130,8 @@ const GameRoom = ({loggedIn, socket}) => {
         <GameBoard
           socket={socket}
           loggedIn={loggedIn}
-
-          // gameInfo={game}
-
-          statusFromParent={game? game.boardStatus : false}
+          origLastMove = {game? game.lastMove : []}
+          origStatus={game? game.boardStatus : false}
           whiteToPlay={game? game.whiteToPlay : true}
           playerIds = {{
               white: game && game.playerWhite.length ? game.playerWhite[0]._id : "",

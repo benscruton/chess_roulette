@@ -101,3 +101,8 @@
     background-color: firebrick;
     border: 2px solid lightcoral;
 }
+
+.lastMove{
+    background-color: mediumpurple;
+    border: 2px solid rebeccapurple;
+}

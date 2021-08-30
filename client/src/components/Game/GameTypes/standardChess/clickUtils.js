@@ -10,6 +10,11 @@ const doMove = (tile, additionalData) => {
     whiteToPlay
   } = additionalData;
 
+  const lastMove = [
+    [activeTile.file, activeTile.rank],
+    [tile.file, tile.rank]
+  ];
+
   // Get updated board status:
   let params = establishMoveParams(activeTile, tile, info.enPassantAvailable);
   let updatedBoard = JSON.parse(JSON.stringify(boardStatus));
@@ -51,6 +56,7 @@ const doMove = (tile, additionalData) => {
     moveLog: updatedMoveLog,
     whiteToPlay: whoseTurnNext,
     info: updatedSpecialInfo,
+    lastMove,
     gameFinished
   };
 
@@ -71,19 +77,7 @@ const getMoves = (tile, additionalData) => {
 
 };
 
-
-
-
-
-
-
-
-
 const promotePiece = (tile, choice, additionalData) => {
-  // if(playerIds[whiteToPlay ? "white" : "black"] !== loggedIn._id){
-  //   return;
-  // }
-
   const {
     boardStatus,
     info,
@@ -118,57 +112,7 @@ const promotePiece = (tile, choice, additionalData) => {
   };
 
   return results;
-
-
-
-
-  // setBoardStatus(updatedBoard);
-  // setMoveLog(updatedMoveLog);
-  // setInfo(updatedSpecialInfo);
-
-  // let databaseInfo = {
-  //   boardStatus: updatedBoard,
-  //   whiteToPlay: !whiteToPlay,
-  //   moveLog: updatedMoveLog,
-  //   $set: {
-  //     "specialInfo.pawnReady": false,
-  //     "specialInfo.inCheck": nextPlayerInCheck
-  //   }
-  // }
-  // Axios.put(`http://localhost:8000/api/games/${gameId}`, databaseInfo, {withCredentials: true})
-  //     .catch(err => console.error({errors: err}))
-  
-  // let socketInfo = {
-  //   gameId,
-  //   boardStatus: updatedBoard,
-  //   whiteToPlay: !whiteToPlay,
-  //   info: updatedSpecialInfo,
-  //   moveLog: updatedMoveLog,
-  // }
-  // socket.emit("madeAMove", socketInfo);
-
-  // let gameFinished = createGameFinishedStatus(updatedBoard, !whiteToPlay, nextPlayerInCheck);
-  // console.log(gameFinished);
-  // if(gameFinished.length){
-  //   endGame(gameFinished);
-  // }
-
-  // setWhiteToPlay(!whiteToPlay);
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 const updateCastlingStatus = (castlingLegalAfterThisMove, toTile, fromTile) => {
   // rooks:
