@@ -18,7 +18,7 @@ const doMove = (tile, additionalData) => {
   // Get updated board status:
   let params = establishMoveParams(activeTile, tile, info.enPassantAvailable);
   let updatedBoard = JSON.parse(JSON.stringify(boardStatus));
-  updatedBoard = executeMove(updatedBoard, activeTile, tile, params);
+  updatedBoard = createUpdatedBoard(updatedBoard, activeTile, tile, params);
   
   // Other game info:
   let castlingLegalAfterThisMove = updateCastlingStatus({...info.castlingLegal}, tile, activeTile);
@@ -62,8 +62,6 @@ const doMove = (tile, additionalData) => {
 
   return results;
 }
-
-
 
 const getMoves = (tile, additionalData) => {
   const {
@@ -196,7 +194,7 @@ const removeCheckMoves = (origBoard, info, moves, tile) => {
     }
     
     let params = establishMoveParams(fromTile, toTile, info.enPassantAvailable);
-    board = executeMove(board, fromTile, toTile, params);
+    board = createUpdatedBoard(board, fromTile, toTile, params);
     if(isInCheck(board, info, tile.occupied.color, newKingLocations)){
       moves.splice(i, 1);
       i--;
@@ -218,7 +216,7 @@ const removeCheckMoves = (origBoard, info, moves, tile) => {
   return moves;
 };
 
-const executeMove = (board, fromTile, toTile, params = {}) => {
+const createUpdatedBoard = (board, fromTile, toTile, params = {}) => {
   const toFileIdx = fileArray.indexOf(toTile.file);
   const toRankIdx = 8 - toTile.rank;
   fromTile = board[8 - fromTile.rank][fileArray.indexOf(fromTile.file)];

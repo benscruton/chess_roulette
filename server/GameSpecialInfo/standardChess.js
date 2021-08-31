@@ -1,4 +1,4 @@
-function addSpecialInfo(){
+const generateSpecialInfo = board => {
   const specialInfo = {};
 
   specialInfo.kingLocations = {
@@ -29,4 +29,4 @@ function addSpecialInfo(){
   return specialInfo;
 }
 
-module.exports = addSpecialInfo;
+module.exports = generateSpecialInfo;

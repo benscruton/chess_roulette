@@ -42,4 +42,4 @@ function createBoard(){
     return startingBoard;
 }
 
-module.exports = createBoard;
+module.exports = createBoard();
