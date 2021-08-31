@@ -7,7 +7,7 @@ const NewGame = ({socket}) => {
   const history = useHistory();
   const navigate = path => history.push(path);
 
-  const variants = ["standardChess"];
+  const variants = ["standardChess", "fischerRandomChess"];
   const [gameType, setGameType] = useState("placeholder");
 
   const handleSubmit = e => {
