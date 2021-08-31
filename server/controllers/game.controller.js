@@ -1,7 +1,7 @@
 const Game = require("../models/game.model");
 const {User} = require("../models/user.model");
-const gameBoards = require("../GameBoards");
-const gameSpecialInfo = require("../GameSpecialInfo");
+const createBoard = require("../GameBoards");
+const createSpecialInfo = require("../GameSpecialInfo");
 
 const removePassword = user => {
   const {_id, firstName, lastName, userName, userNameLower, email, createdAt, updatedAt} = user;
@@ -17,8 +17,8 @@ module.exports = {
 
   create : (req,rsp) => {
     const type = req.body.type;
-    const boardStatus = gameBoards[type];
-    const specialInfo = gameSpecialInfo[type](boardStatus);
+    const boardStatus = createBoard[type]();
+    const specialInfo = createSpecialInfo[type](boardStatus);
     Game.create({type, boardStatus, specialInfo})
       .then(data => rsp.json({results:data}))
       .catch(err => {
