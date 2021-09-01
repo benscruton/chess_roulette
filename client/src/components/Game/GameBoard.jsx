@@ -55,9 +55,9 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
   const adjustBoardSize = () => {
     if(window.innerWidth > 600){
       setSize("full");
-    } else if(window.innerWidth > 400){
+    } else if(window.innerWidth > 440){
       setSize("large");
-    } else if(window.innerWidth > 320){
+    } else if(window.innerWidth > 350){
       setSize("medium");
     } else {
       setSize("small");
@@ -97,7 +97,6 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
       activeTile,
       availableMoves,
       boardStatus,
-      endGame,
       info,
       moveLog,
       whiteToPlay,
@@ -127,14 +126,9 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
           "specialInfo.inCheck": info.inCheck
         };
 
-        updateGameStatus(boardStatus, moveLog, whiteToPlay, info, dbSet, lastMove);
-
-        // End game, if applicable:
-        if(!info.pawnReady && gameFinished.length){
-          endGame(gameFinished);
-        }
-
-      } else { // green square but not a valid move:
+        updateGameStatus(boardStatus, moveLog, whiteToPlay, info, dbSet, lastMove, gameFinished);
+      }
+      else { // green square but not a valid move:
         setActiveTile(false);
         setAvailableMoves(false);
       }
@@ -174,13 +168,7 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
     if(playerIds[whiteToPlay ? "white" : "black"] !== loggedIn._id){
       return;
     }
-    const additionalData = {
-      boardStatus,
-      info,
-      moveLog,
-      whiteToPlay
-    };
-
+    const additionalData = { boardStatus, info, moveLog, whiteToPlay};
     const {
       updatedBoard,
       updatedMoveLog,
@@ -200,15 +188,12 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
       updatedWhiteToPlay,
       updatedSpecialInfo,
       dbSet,
-      lastMove
+      lastMove,
+      gameFinished
     );
-
-    if(gameFinished.length){
-      endGame(gameFinished);
-    }
   };
 
-  const updateGameStatus = (board, log, turn, spInfo, dbSet, last) => {
+  const updateGameStatus = (board, log, turn, spInfo, dbSet, last, finished) => {
     // Update all front-end info:
     setBoardStatus(board);
     setMoveLog(log);
@@ -239,6 +224,10 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
       moveLog: log,
     }
     socket.emit("madeAMove", socketInfo);
+
+    if(!spInfo.pawnReady && finished.length){
+      endGame(finished);
+    }
   };
 
   // ---------- ENDING GAMES ----------
@@ -259,6 +248,33 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
     endGame(message);
     setShowResignConfirm(false);
   };
+
+  const labelSquare = (text, justifyContent, alignItems, idx) => (
+    <div
+      key={idx}
+      className={styles[`${size}Tile`]}
+      style={{
+        justifyContent,
+        alignItems,
+        padding: size === "small" ? "0 5px" : "5px"
+      }}
+    >
+      {text}
+    </div>
+  );
+  
+  const labelRow = (
+    boardStatus ? 
+      <div className={styles[viewAsBlack ? "tileRowBlack" : "tileRowWhite"]}>
+        {viewAsBlack ? <></> : labelSquare("")}
+        {boardStatus[0].map( (tile, idx) => 
+          labelSquare(tile.file, "center", "flex-start", idx)
+        )}
+        {viewAsBlack ? labelSquare("") : <></>}
+      </div>
+      :
+      <></>
+  );
 
   return (
     <div id="board">
@@ -297,9 +313,13 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
       }
 
       <div className={viewAsBlack? styles.boardContainerBlack : styles.boardContainerWhite}>
+        {viewAsBlack ? labelRow : <></>}
+
         {boardStatus?
           boardStatus.map( (row, i) =>
             <div className={viewAsBlack? styles.tileRowBlack : styles.tileRowWhite} key={i}>
+              {viewAsBlack ? <></> : labelSquare(row[0].rank, "flex-end")}
+
               {row.map( (tile, j) =>
                 <div
                   className={`
@@ -328,11 +348,16 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
                   }
                 </div>
               )}
+
+              {viewAsBlack ? labelSquare(row[0].rank, "flex-end") : <></>}
+
             </div>
           )
           :
           <p>Loading...</p>
         }
+
+        {viewAsBlack ? <></> : labelRow}
       </div>
 
       {begun && !finished && (playerIds.white === loggedIn._id || playerIds.black === loggedIn._id)?

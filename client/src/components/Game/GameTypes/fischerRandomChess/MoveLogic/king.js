@@ -56,7 +56,7 @@ const checkMoves =  (tile, boardStatus, specialInfo, onlyCheckingAttackingSquare
   }
 
   // Castling:
-  const {kingFile, rook1File, rook2File} = specialInfo.startingFiles;
+  // const {kingFile, rook1File, rook2File} = specialInfo.startingFiles;
 
 
 
