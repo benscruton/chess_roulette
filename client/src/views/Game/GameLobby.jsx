@@ -29,6 +29,9 @@ const GameLobby = ({loggedIn, socket}) => {
 
   useEffect( () => {
     socket.emit("joinRoom", "lobby");
+    socket.on("reconnect", () => {
+      socket.emit("joinRoom", "lobby");
+    });
     socket.on("playerUpdate", data => {
       let list = JSON.parse(JSON.stringify(gameListRef.current));
       let ids = list.map(game => game._id);
@@ -69,16 +72,9 @@ const GameLobby = ({loggedIn, socket}) => {
     setFilter(e.target.value);
   };
 
-  const handleToggle = e => {
+  const handleToggle = () => {
     setMyGamesToggle(!myGamesToggle);
   };
-
-  // const separateCamelCase = str => {
-  //   let output = str.split("")
-  //     .map(char => char === char.toLowerCase() ? char : " " + char);
-  //   output[0] = output[0].toUpperCase();
-  //   return output.join("");
-  // }
 
   const filterList = filter => {
     if(!gameList){

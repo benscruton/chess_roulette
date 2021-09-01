@@ -3,7 +3,7 @@ const generateSpecialInfo = board => {
 
   const kingFile = findKingFile(board);
   const [rook1File, rook2File] = findRookFiles(board);
-  console.log(kingFile, rook1File, rook2File);
+  specialInfo.startingFiles = {kingFile, rook1File, rook2File};
   
   specialInfo.kingLocations = {
     white: [kingFile, 1],

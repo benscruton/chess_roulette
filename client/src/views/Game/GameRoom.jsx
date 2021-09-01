@@ -38,6 +38,10 @@ const GameRoom = ({loggedIn, socket}) => {
     socket.on("drawOfferUpdate", game => {
       setGame(game);
     });
+    socket.on("reconnect", () => {
+      socket.emit("joinRoom", id);
+      console.log("Reconnected!");
+    });
 
     return () => socket.emit("leaveRoom", id);
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
