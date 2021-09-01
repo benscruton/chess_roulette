@@ -1,5 +1,5 @@
+import moveLogic from "./MoveLogic";
 const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
-const moveLogic = require("./MoveLogic");
 
 const doMove = (tile, additionalData) => {
   const {
@@ -295,7 +295,7 @@ const createGameFinishedStatus = (board, info, whoseTurnNext, nextPlayerInCheck)
 };
 
 
-module.exports = {
+export default {
   doMove,
   getMoves,
   promotePiece

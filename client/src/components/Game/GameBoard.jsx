@@ -4,6 +4,7 @@ import styles from "./GameBoard.module.css";
 import images from "./ImageSets/standardChess";
 import PiecePromotion from "./PiecePromotion";
 import ConfirmResign from "./ConfirmResign";
+import gameTypes from "./GameTypes";
 
 const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType, specialInfo, begun, endGame, finished, playerIds, spriteStyle, moveLog, setMoveLog, offerDraw, drawOfferPending}) => {
   
@@ -17,7 +18,7 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
   const [size, setSize] = useState("full");
   const [showResignConfirm, setShowResignConfirm] = useState(false);
 
-  const gameplayUtils = require("./GameTypes")[gameType];
+  const gameplayUtils = gameTypes[gameType];
 
   useEffect( () => {
     Axios.get(`http://localhost:8000/api/games/${gameId}`)

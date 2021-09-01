@@ -1,4 +1,7 @@
-module.exports = {
-  clickUtils: require("./clickUtils"),
-  promotionPieces: require("../standardChess/promotionPieces")
+import clickUtils from "./clickUtils";
+import promotionPieces from "../standardChess/promotionPieces";
+
+export default {
+  clickUtils,
+  promotionPieces
 };

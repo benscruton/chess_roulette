@@ -1,10 +1,9 @@
 import Axios from "axios";
 import React, {useState, useEffect, useRef} from "react";
 import {Link} from "react-router-dom";
-import separateCamelCase from "../../utils/separateCamelCase";
+import {separateCamelCase} from "../../utils";
 
 const GameLobby = ({loggedIn, socket}) => {
-
   const [gameList, setGameList] = useState(false);
   const [filteredGameList, setFilteredGameList] = useState(false);
   const [filter, setFilter] = useState("unfinished");

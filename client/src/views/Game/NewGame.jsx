@@ -1,13 +1,13 @@
 import React, {useState} from 'react';
 import {useHistory} from 'react-router-dom';
 import Axios from "axios";
-import separateCamelCase from "../../utils/separateCamelCase";
+import {separateCamelCase} from "../../utils";
 
 const NewGame = ({socket}) => {
   const history = useHistory();
   const navigate = path => history.push(path);
 
-  const variants = ["standardChess", "fischerRandomChess"];
+  const variants = ["standardChess"];
   const [gameType, setGameType] = useState("placeholder");
 
   const handleSubmit = e => {

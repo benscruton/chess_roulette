@@ -1,7 +1,3 @@
-// Pawns list of legal moves
-
-
-
 const checkMoves =  (tile, boardStatus, specialInfo, onlyCheckingAttackingSquares = false) => {
   const rankIdx = 8 - tile.rank;
   const fileArray = ["A", "B", "C", "D", "E", "F", "G", "H"];
@@ -87,4 +83,4 @@ const checkMoves =  (tile, boardStatus, specialInfo, onlyCheckingAttackingSquare
   return moves;
 }
 
-module.exports = checkMoves;
+export default checkMoves;

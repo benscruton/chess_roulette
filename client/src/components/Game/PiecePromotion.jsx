@@ -1,9 +1,10 @@
 import React from "react";
 import styles from "./PiecePromotion.module.css";
+import gameTypes from "./GameTypes";
 
 const PiecePromotion = ({images, spriteStyle, size, gameType, whiteToPlay, tile, promotePiece}) => {
 
-  const {promotionPieces} = require("./GameTypes")[gameType]
+  const {promotionPieces} = gameTypes[gameType]
   const choices = promotionPieces.map( piece => {
     return {...piece, 
       color: whiteToPlay? "white" : "black"

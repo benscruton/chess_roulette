@@ -1,4 +1,7 @@
-module.exports = {
-  standardChess: require("./standardChess"),
-  fischerRandomChess: require("./fischerRandomChess")
+import standardChess from "./standardChess";
+import fischerRandomChess from "./fischerRandomChess";
+
+export default {
+  standardChess,
+  fischerRandomChess
 };

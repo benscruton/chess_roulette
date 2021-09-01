@@ -1,8 +1,15 @@
-module.exports =  {
-    bishop: require("./bishop"),
-    king: require("./king"),
-    knight: require("./knight"),
-    pawn: require("./pawn"),
-    queen: require("./queen"),
-    rook: require("./rook"),
-}
+import bishop from "./bishop";
+import king from "./king";
+import knight from "./knight";
+import pawn from "./pawn";
+import queen from "./queen";
+import rook from "./rook";
+
+export default {
+    bishop,
+    king,
+    knight,
+    pawn,
+    queen,
+    rook,
+};

@@ -58,4 +58,4 @@ const checkMoves =  (tile, boardStatus, specialInfo, onlyCheckingAttackingSquare
   return moves;
 }
 
-module.exports = checkMoves;
+export default checkMoves;
