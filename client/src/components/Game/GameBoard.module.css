@@ -80,6 +80,77 @@
     height: 25px;
 }
 
+.boardLabel{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* font-weight: bold; */
+}
+
+.fullVerticalLabel{
+    width: 35px;
+    height: 60px;
+}
+
+.fullHorizontalLabel{
+    width: 60px;
+    height: 35px;
+}
+
+.fullCornerLabel{
+    width: 35px;
+    height: 35px;
+}
+
+.largeVerticalLabel{
+    width: 22px;
+    height: 45px;
+}
+
+.largeHorizontalLabel{
+    width: 45px;
+    height: 22px;
+}
+
+.largeCornerLabel{
+    width: 22px;
+    height: 22px;
+}
+
+.mediumVerticalLabel{
+    width: 20px;
+    height: 35px;
+    font-size: 0.9em;
+}
+
+.mediumHorizontalLabel{
+    width: 35px;
+    height: 20px;
+    font-size: 0.9em;
+}
+
+.mediumCornerLabel{
+    width: 20px;
+    height: 20px;
+}
+
+.smallVerticalLabel{
+    width: 20px;
+    height: 25px;
+    font-size: 0.8em;
+}
+
+.smallHorizontalLabel{
+    width: 25px;
+    height: 20px;
+    font-size: 0.8em;
+}
+
+.smallCornerLabel{
+    width: 20px;
+    height: 20px;
+}
+
 .white{
     background-color: navajowhite;
 }

@@ -250,15 +250,13 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
     setShowResignConfirm(false);
   };
 
-  const labelSquare = (text, justifyContent, alignItems, idx) => (
+  const labelSquare = (text, orientation, idx) => (
     <div
       key={idx}
-      className={styles[`${size}Tile`]}
-      style={{
-        justifyContent,
-        alignItems,
-        padding: size === "small" ? "0 5px" : "5px"
-      }}
+      className={`
+        ${styles.boardLabel}
+        ${styles[`${size}${orientation}Label`]}
+      `}
     >
       {text}
     </div>
@@ -267,11 +265,11 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
   const labelRow = (
     boardStatus ? 
       <div className={styles[viewAsBlack ? "tileRowBlack" : "tileRowWhite"]}>
-        {viewAsBlack ? <></> : labelSquare("")}
+        {labelSquare("", "Corner")}
         {boardStatus[0].map( (tile, idx) => 
-          labelSquare(tile.file, "center", "flex-start", idx)
+          labelSquare(tile.file, "Horizontal", idx)
         )}
-        {viewAsBlack ? labelSquare("") : <></>}
+        {labelSquare("", "Corner")}
       </div>
       :
       <></>
@@ -319,7 +317,7 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
         {boardStatus?
           boardStatus.map( (row, i) =>
             <div className={viewAsBlack? styles.tileRowBlack : styles.tileRowWhite} key={i}>
-              {viewAsBlack ? <></> : labelSquare(row[0].rank, "flex-end")}
+              {labelSquare(row[0].rank, "Vertical")}
 
               {row.map( (tile, j) =>
                 <div
@@ -350,7 +348,7 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
                 </div>
               )}
 
-              {viewAsBlack ? labelSquare(row[0].rank, "flex-end") : <></>}
+              {labelSquare(row[0].rank, "Vertical")}
 
             </div>
           )
