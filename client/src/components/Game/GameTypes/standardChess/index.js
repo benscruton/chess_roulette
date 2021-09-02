@@ -1,7 +1,9 @@
 import clickUtils from "./clickUtils";
 import promotionPieces from "./promotionPieces";
 
-export default {
+const standardChess = {
   clickUtils,
   promotionPieces,
 };
+
+export default standardChess;

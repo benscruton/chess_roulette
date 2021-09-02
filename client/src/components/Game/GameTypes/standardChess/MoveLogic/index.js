@@ -5,7 +5,7 @@ import pawn from "./pawn";
 import queen from "./queen";
 import rook from "./rook";
 
-export default {
+const pieceMoves = {
     bishop,
     king,
     knight,
@@ -13,3 +13,5 @@ export default {
     queen,
     rook,
 };
+
+export default pieceMoves;

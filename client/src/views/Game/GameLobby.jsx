@@ -28,9 +28,6 @@ const GameLobby = ({loggedIn, socket}) => {
 
   useEffect( () => {
     socket.emit("joinRoom", "lobby");
-    socket.on("reconnect", () => {
-      socket.emit("joinRoom", "lobby");
-    });
     socket.on("playerUpdate", data => {
       let list = JSON.parse(JSON.stringify(gameListRef.current));
       let ids = list.map(game => game._id);
@@ -55,6 +52,14 @@ const GameLobby = ({loggedIn, socket}) => {
       let list = [...JSON.parse(JSON.stringify(gameListRef.current)), newGame];
       setGameList(list);
     });
+    socket.on("reconnect", () => {
+      console.log("Socket reconnecting...");
+    });
+    socket.on("connect", () => {
+      socket.emit("joinRoom", "lobby");
+      console.log("Socket connection established!");
+    });
+
     return () => {
       socket.emit("leaveRoom", "lobby");
       socket.removeAllListeners("playerUpdate");

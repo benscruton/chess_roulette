@@ -262,9 +262,9 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
     </div>
   );
   
-  const labelRow = (
+  const labelRow = viewStyle => (
     boardStatus ? 
-      <div className={styles[viewAsBlack ? "tileRowBlack" : "tileRowWhite"]}>
+      <div className={styles[viewStyle]}>
         {labelSquare("", "Corner")}
         {boardStatus[0].map( (tile, idx) => 
           labelSquare(tile.file, "Horizontal", idx)
@@ -312,7 +312,7 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
       }
 
       <div className={viewAsBlack? styles.boardContainerBlack : styles.boardContainerWhite}>
-        {viewAsBlack ? labelRow : <></>}
+        {viewAsBlack ? labelRow("tileRowBlack") : <></>}
 
         {boardStatus?
           boardStatus.map( (row, i) =>
@@ -349,14 +349,13 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
               )}
 
               {labelSquare(row[0].rank, "Vertical")}
-
             </div>
           )
           :
           <p>Loading...</p>
         }
 
-        {viewAsBlack ? <></> : labelRow}
+        {viewAsBlack ? <></> : labelRow("tileRowWhite")}
       </div>
 
       {begun && !finished && (playerIds.white === loggedIn._id || playerIds.black === loggedIn._id)?

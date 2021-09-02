@@ -39,8 +39,11 @@ const GameRoom = ({loggedIn, socket}) => {
       setGame(game);
     });
     socket.on("reconnect", () => {
+      console.log("Socket reconnecting...");
+    });
+    socket.on("connect", () => {
       socket.emit("joinRoom", id);
-      console.log("Reconnected!");
+      console.log("Socket connection established!");
     });
 
     return () => socket.emit("leaveRoom", id);

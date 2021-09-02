@@ -5,7 +5,7 @@ import pawn from "../../standardChess/MoveLogic/pawn";
 import queen from "../../standardChess/MoveLogic/queen";
 import rook from "../../standardChess/MoveLogic/rook";
 
-export default {
+const pieceMoves = {
   bishop,
   king,
   knight,
@@ -13,3 +13,5 @@ export default {
   queen,
   rook,
 }
+
+export default pieceMoves;

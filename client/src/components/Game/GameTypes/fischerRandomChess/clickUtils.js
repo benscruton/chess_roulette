@@ -295,8 +295,10 @@ const createGameFinishedStatus = (board, info, whoseTurnNext, nextPlayerInCheck)
 };
 
 
-export default {
+const clickUtils = {
   doMove,
   getMoves,
   promotePiece
 };
+
+export default clickUtils;

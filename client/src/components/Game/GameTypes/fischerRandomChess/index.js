@@ -1,7 +1,9 @@
 import clickUtils from "./clickUtils";
 import promotionPieces from "../standardChess/promotionPieces";
 
-export default {
+const fischerRandomChess = {
   clickUtils,
   promotionPieces
 };
+
+export default fischerRandomChess;
