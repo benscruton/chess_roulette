@@ -28,7 +28,7 @@ const Home = ({loggedIn}) => {
           Play chess against other users, or against yourself
         </li>
         <li>
-          Games update in real time, even across different browswers and devices -- no need for page refreshes
+          Games update in real time, even across different browsers and devices -- no need for page refreshes
         </li>
         <li>
           Visit <Link to="/games">Games</Link> to browse existing games, or <Link to="/games/new">New Game</Link> to create your own
