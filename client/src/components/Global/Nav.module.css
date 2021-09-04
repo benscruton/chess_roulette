@@ -42,6 +42,14 @@
 
 .logo{
     font-family: Girassol, cursive;
+    color: navajowhite;
+    text-decoration: none;
+}
+
+.logo:hover{
+    font-family: Girassol, cursive;
+    color: #e6b276;
+    text-decoration: none;  
 }
 
 .navlink, .loginlink, .logoutlink{

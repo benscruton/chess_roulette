@@ -1,0 +1,28 @@
+.helloUser{
+    margin: 15px 0;
+}
+
+.logoHolder{
+    display: inline-flex;
+    flex-direction: column;
+    padding: 5px 10px;
+    border-radius: 10px;
+    background-color: navajowhite;
+    color: peru;
+    border: 2px solid peru;
+    font-family: Girassol, cursive;
+}
+
+.features{
+    text-align: left;
+    /* border: 2px solid blue; */
+    list-style-type: none;
+}
+
+.features li{
+    margin: 10px 0;
+}
+
+.features li:before{
+    content: "»\00a0\00a0";
+}

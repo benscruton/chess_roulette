@@ -45,7 +45,15 @@ const Nav = ({loggedIn, setLoggedIn, noUser}) => {
   return (
     <>
       <nav id="navbar1" className={`navbar navbar-expand-md col-12 mb-1 ${styles.bar}`}>
-        <h1 className={`${styles.logo} mb-auto`}>Chess Roulette</h1>
+        <h1 className={`mb-auto`}>
+          <Link
+            to="/"
+            className={styles.logo}
+            onClick={() => setViewMobileMenu(false)}
+          >
+            Chess Roulette
+          </Link>
+        </h1>
 
         <div id="collapsingmenu" className="ml-auto">
           <ul className="navbar-nav ml-auto">
@@ -74,7 +82,7 @@ const Nav = ({loggedIn, setLoggedIn, noUser}) => {
               </li>
               :
               <li className="nav-item mx-lg-3 mx-md-1">
-                <Link className={`nav-link ${styles.loginlink}`} to="/">Log In</Link>
+                <Link className={`nav-link ${styles.loginlink}`} to="/login">Log In</Link>
               </li>
             }
           </ul>

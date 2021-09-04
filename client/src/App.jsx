@@ -1,18 +1,19 @@
 import {useState, useEffect} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {
-    HashRouter as Router,
-    Switch,
-    Route,
+    HashRouter as Router, 
+    Switch, 
+    Route
   } from "react-router-dom";
 import io from "socket.io-client";
 import Nav from "./components/Global/Nav";
-import Edit from './views/User/Edit';
-import Show from './views/User/Show';
-import GameRoom from './views/Game/GameRoom';
+import Home from "./views/Home";
 import LogReg from './views/User/LogReg';
+import Show from './views/User/Show';
+import Edit from './views/User/Edit';
 import NewGame from './views/Game/NewGame';
 import GameLobby from './views/Game/GameLobby';
+import GameRoom from './views/Game/GameRoom';
 import './App.css';
 
 const App = () => {
@@ -42,6 +43,12 @@ const App = () => {
         <div className="col-lg-10 col-md-12">
           <Switch>
             <Route exact path="/">
+              <Home
+                loggedIn={loggedIn}
+              />
+            </Route>
+
+            <Route exact path="/login">
               <LogReg
                 setLoggedIn={setLoggedIn}
               />

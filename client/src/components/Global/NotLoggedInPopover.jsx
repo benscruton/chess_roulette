@@ -18,10 +18,10 @@ const NotLoggedInPopover = ({loggedIn, action, placement, children}) => {
         You must be logged in to {action}.
       </Popover.Content>
       <Popover.Title as="h3">
-        <Link to="/">Log In or Register Here</Link>
+        <Link to="/login">Log In or Register Here</Link>
       </Popover.Title>
     </Popover>
-    );
+  );
 
   return (
     <OverlayTrigger

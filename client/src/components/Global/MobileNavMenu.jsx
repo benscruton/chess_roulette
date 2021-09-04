@@ -61,7 +61,7 @@ const MobileNavMenu = ({loggedIn, logout, hideMenu}) => {
           <li>
             <Link
               className={`nav-link ${styles.loginlink}`}
-              to="/"
+              to="/login"
               onClick={hideMenu}
             >Log In</Link>
           </li>
