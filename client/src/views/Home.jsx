@@ -17,7 +17,7 @@ const Home = ({loggedIn}) => {
 
       <p className={styles.helloUser}>
         {loggedIn.email ?
-          <>Welcome back, {loggedIn.userName}!</>
+          <>Welcome back, <Link to="/profile">{loggedIn.userName}</Link>!</>
           :
           <Link to="/">Click here to log in or register</Link>
         }
