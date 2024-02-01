@@ -13,7 +13,9 @@ const GameRoom = ({loggedIn, socket}) => {
   const history = useHistory();
   const navigate = path => history.push(path);
 
-  const [spriteStyle, setSpriteStyle] = useState("");
+  const [spriteStyle, setSpriteStyle] = useState(
+    localStorage.getItem("cr_sprite_style") || ""
+  );
   const [game, setGame] = useState(false);
   const [moveLog, setMoveLog] = useState(false);
   
@@ -23,7 +25,7 @@ const GameRoom = ({loggedIn, socket}) => {
         setGame(res.data.results);
         setMoveLog(res.data.results.moveLog);
       }).catch(err => console.error(err.errors));
-  }, [id]);
+  }, [id, serverUrl]);
 
   useEffect( () => {
     socket.emit("joinRoom", id);
@@ -166,13 +168,22 @@ const GameRoom = ({loggedIn, socket}) => {
 
       <div className="mb-5">
         <h5 className="mt-2">Sprite style:</h5>
-        <button className="btn btn-info mx-2" onClick={() => setSpriteStyle("")}>
+        <button className="btn btn-info mx-2" onClick={() => {
+          setSpriteStyle("");
+          localStorage.setItem("cr_sprite_style", "");
+        }}>
           Default
         </button>
-        <button className="btn btn-info mx-2" onClick={() => setSpriteStyle("triangle")}>
+        <button className="btn btn-info mx-2" onClick={() => {
+          setSpriteStyle("triangle");
+          localStorage.setItem("cr_sprite_style", "triangle");
+        }}>
           Triangle
         </button>
-        <button className="btn btn-info mx-2" onClick={() => setSpriteStyle("crappy")}>
+        <button className="btn btn-info mx-2" onClick={() => {
+          setSpriteStyle("crappy");
+          localStorage.setItem("cr_sprite_style", "crappy");
+        }}>
           Crappy
         </button>
       </div>

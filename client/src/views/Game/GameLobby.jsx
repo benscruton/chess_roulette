@@ -27,7 +27,7 @@ const GameLobby = ({loggedIn, socket}) => {
         setFilteredGameList(res.data.results);
       })
       .catch(err => console.error(err))
-  }, []);
+  }, [serverUrl]);
 
   useEffect( () => {
     socket.emit("joinRoom", "lobby");

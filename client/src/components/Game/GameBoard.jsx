@@ -27,7 +27,7 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
       .then(res => {
         setWhiteToPlay(res.data.results.whiteToPlay);
       }).catch(err => console.error(err.errors));
-  }, [gameId]);
+  }, [gameId, serverUrl]);
   
   useEffect( () => {
     setBoardStatus(origStatus);
