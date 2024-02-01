@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {
     HashRouter as Router, 
@@ -6,6 +6,7 @@ import {
     Route
   } from "react-router-dom";
 import io from "socket.io-client";
+import AppContext from "./context/AppContext";
 import Nav from "./components/Global/Nav";
 import Home from "./views/Home";
 import LogReg from './views/User/LogReg';
@@ -31,65 +32,73 @@ const App = () => {
     JSON.parse(localStorage.getItem("user")) || noUser
   );
 
+  const serverUrl = (process.env.NODE_ENV === "production" ?
+    "" : "http://localhost:8000"
+  );
+
   return (
-    <Router>
-      <div className="App d-flex flex-wrap justify-content-center">
-        <Nav
-          loggedIn={loggedIn}
-          setLoggedIn={setLoggedIn}
-          noUser={noUser}
-          className="col-12"
-        />
-        <div className="col-lg-10 col-md-12">
-          <Switch>
-            <Route exact path="/">
-              <Home
-                loggedIn={loggedIn}
-              />
-            </Route>
+    <AppContext.Provider
+      value={{serverUrl}}
+    >
+      <Router>
+        <div className="App d-flex flex-wrap justify-content-center">
+          <Nav
+            loggedIn={loggedIn}
+            setLoggedIn={setLoggedIn}
+            noUser={noUser}
+            className="col-12"
+          />
+          <div className="col-lg-10 col-md-12">
+            <Switch>
+              <Route exact path="/">
+                <Home
+                  loggedIn={loggedIn}
+                />
+              </Route>
 
-            <Route exact path="/login">
-              <LogReg
-                setLoggedIn={setLoggedIn}
-              />
-            </Route>
+              <Route exact path="/login">
+                <LogReg
+                  setLoggedIn={setLoggedIn}
+                />
+              </Route>
 
-            <Route exact path="/profile">
-              <Show
-                loggedIn={loggedIn}
-              />
-            </Route>
+              <Route exact path="/profile">
+                <Show
+                  loggedIn={loggedIn}
+                />
+              </Route>
 
-            <Route path="/profile/edit">
-              <Edit
-                loggedIn={loggedIn}
-                setLoggedIn={setLoggedIn}
-              />
-            </Route>
+              <Route path="/profile/edit">
+                <Edit
+                  loggedIn={loggedIn}
+                  setLoggedIn={setLoggedIn}
+                />
+              </Route>
 
-            <Route path="/games/new">
-              <NewGame
-                socket={socket}
-              />
-            </Route>
+              <Route path="/games/new">
+                <NewGame
+                  socket={socket}
+                />
+              </Route>
 
-            <Route exact path="/games">
-              <GameLobby
-                loggedIn={loggedIn}
-                socket={socket}
-              />
-            </Route>
-            
-            <Route path="/games/:id">
-              <GameRoom
-                loggedIn={loggedIn}
-                socket={socket}
-              />
-            </Route>
-          </Switch>
+              <Route exact path="/games">
+                <GameLobby
+                  loggedIn={loggedIn}
+                  socket={socket}
+                />
+              </Route>
+              
+              <Route path="/games/:id">
+                <GameRoom
+                  loggedIn={loggedIn}
+                  socket={socket}
+                />
+              </Route>
+            </Switch>
+          </div>
         </div>
-      </div>
-    </Router>
+      </Router>
+    </AppContext.Provider>
   );
 }
 

@@ -1,9 +1,11 @@
-import React, {useState} from 'react';
+import {useState, useContext} from 'react';
 import {useHistory} from 'react-router-dom';
-import Axios from "axios";
+import axios from "axios";
 import {separateCamelCase} from "../../utils";
+import AppContext from '../../context/AppContext';
 
 const NewGame = ({socket}) => {
+  const {serverUrl} = useContext(AppContext);
   const history = useHistory();
   const navigate = path => history.push(path);
 
@@ -12,7 +14,7 @@ const NewGame = ({socket}) => {
 
   const handleSubmit = e => {
     e.preventDefault();
-    Axios.post("http://localhost:8000/api/games/", {type: gameType})
+    axios.post(`${serverUrl}/api/games/`, {type: gameType})
       .then(rsp => {
         socket.emit("gameCreated", rsp.data.results);
         navigate(`/games/${rsp.data.results._id}`);

@@ -1,8 +1,10 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useContext} from "react";
 import axios from "axios";
+import AppContext from "../../context/AppContext";
 import NotLoggedInPopover from "../Global/NotLoggedInPopover";
 
 const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun}) => {
+  const {serverUrl} = useContext(AppContext);
 
   const [playerWhite, setPlayerWhite] = useState([]);
   const [playerBlack, setPlayerBlack] = useState([]);
@@ -17,7 +19,7 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
     if(!loggedIn.email){
       return;
     }
-    axios.put(`http://localhost:8000/api/games/${gameId}/addPlayer${e.target.value}/${loggedIn._id}`, null, {withCredentials: true})
+    axios.put(`${serverUrl}/api/games/${gameId}/addPlayer${e.target.value}/${loggedIn._id}`, null, {withCredentials: true})
       .catch(err => console.error({errors: err}));
       
     let player = [{
@@ -38,7 +40,7 @@ const GamePlayerInfo = ({socket, gameId, loggedIn, origPlayers, beginGame, begun
   }
 
   const leaveGame = e => {
-    axios.put(`http://localhost:8000/api/games/${gameId}/removePlayer${e.target.value}/${loggedIn._id}`, null, {withCredentials: true})
+    axios.put(`${serverUrl}/api/games/${gameId}/removePlayer${e.target.value}/${loggedIn._id}`, null, {withCredentials: true})
       .catch(err => console.error({errors: err}));
 
     let socketInfo = {

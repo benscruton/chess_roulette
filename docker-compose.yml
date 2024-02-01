@@ -5,7 +5,7 @@ services:
     container_name: chess_roulette
     build: .
     ports:
-      - "8000:8000"
+      - "8021:8000"
     restart: unless-stopped
     env_file:
       - ./.env

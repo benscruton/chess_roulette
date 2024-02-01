@@ -1,9 +1,12 @@
-import Axios from "axios";
-import React, {useState, useEffect, useRef} from "react";
+import axios from "axios";
+import {useState, useEffect, useRef, useContext} from "react";
 import {Link} from "react-router-dom";
+import AppContext from "../../context/AppContext";
 import {separateCamelCase} from "../../utils";
 
 const GameLobby = ({loggedIn, socket}) => {
+  const {serverUrl} = useContext(AppContext);
+
   const [gameList, setGameList] = useState(false);
   const [filteredGameList, setFilteredGameList] = useState(false);
   const [filter, setFilter] = useState("unfinished");
@@ -18,7 +21,7 @@ const GameLobby = ({loggedIn, socket}) => {
   });
 
   useEffect( () => {
-    Axios.get(`http://localhost:8000/api/games`)
+    axios.get(`${serverUrl}/api/games`)
       .then(res => {
         setGameList(res.data.results);
         setFilteredGameList(res.data.results);

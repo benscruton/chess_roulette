@@ -1,10 +1,12 @@
 import UserForm from '../../components/User/UserForm';
 import ChangePassword from "../../components/User/ChangePassword";
-import {useState, useEffect} from 'react';
+import {useState, useEffect, useContext} from 'react';
 import {useHistory} from "react-router-dom";
-import Axios from 'axios';
+import axios from 'axios';
+import AppContext from '../../context/AppContext';
 
 const Edit = ({loggedIn, setLoggedIn}) => {
+  const {serverUrl} = useContext(AppContext);
   const history = useHistory();
   const navigate = path => history.push(path);
 
@@ -51,7 +53,7 @@ const Edit = ({loggedIn, setLoggedIn}) => {
       email: user.email,
       userId: loggedIn._id
     };
-    Axios.post("http://localhost:8000/api/checkifexists", dataToCheck)
+    axios.post(`${serverUrl}/api/checkifexists`, dataToCheck)
       .then( rsp => {
         console.log(rsp.data);
         if(rsp.data.unavailable.email){
@@ -59,7 +61,7 @@ const Edit = ({loggedIn, setLoggedIn}) => {
             email: {message: "This email address is already taken."}
           });
         } else {
-          Axios.put(`http://localhost:8000/api/users/${loggedIn._id}`, user, {withCredentials:true})
+          axios.put(`${serverUrl}/api/users/${loggedIn._id}`, user, {withCredentials:true})
           .then( () => {
             setLoggedIn({...loggedIn,
               firstName: user.firstName,
@@ -107,8 +109,8 @@ const Edit = ({loggedIn, setLoggedIn}) => {
       });
       return;
     }
-    // check oldpassword against bcrypt hash using Axios call
-    Axios.post('http://localhost:8000/api/checkpassword', {
+    // check oldpassword against bcrypt hash using axios call
+    axios.post(`${serverUrl}/api/checkpassword`, {
         _id: loggedIn._id,
         password: pwInputs.oldpw,
         newPassword: pwInputs.newpw,

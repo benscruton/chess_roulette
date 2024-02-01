@@ -1,12 +1,14 @@
 import {useParams, useHistory} from "react-router-dom";
 import axios from "axios";
-import React, {useState, useEffect} from "react";
+import {useState, useEffect, useContext} from "react";
+import AppContext from "../../context/AppContext";
 import GamePlayerInfo from "../../components/Game/GamePlayerInfo";
 import DrawOffer from "../../components/Game/DrawOffer";
 import GameBoard from "../../components/Game/GameBoard";
 import MoveLog from "../../components/Game/MoveLog";
 
 const GameRoom = ({loggedIn, socket}) => {
+  const {serverUrl} = useContext(AppContext);
   const {id} = useParams();
   const history = useHistory();
   const navigate = path => history.push(path);
@@ -16,7 +18,7 @@ const GameRoom = ({loggedIn, socket}) => {
   const [moveLog, setMoveLog] = useState(false);
   
   useEffect( () => {
-    axios.get(`http://localhost:8000/api/games/${id}`)
+    axios.get(`${serverUrl}/api/games/${id}`)
       .then(res => {
         setGame(res.data.results);
         setMoveLog(res.data.results.moveLog);
@@ -50,7 +52,7 @@ const GameRoom = ({loggedIn, socket}) => {
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const deleteGame = () => {
-    axios.delete(`http://localhost:8000/api/games/${id}`, {withCredentials: true})
+    axios.delete(`${serverUrl}/api/games/${id}`, {withCredentials: true})
       .then(() => {
         socket.emit("gameDeleted", id);
         navigate("/games");
@@ -59,7 +61,7 @@ const GameRoom = ({loggedIn, socket}) => {
   }
 
   const beginGame = () => {
-    axios.put(`http://localhost:8000/api/games/${id}/begin`, null, {withCredentials: true})
+    axios.put(`${serverUrl}/api/games/${id}/begin`, null, {withCredentials: true})
       .then(rsp => {
         if(rsp.data.incomplete){
           return;
@@ -72,7 +74,7 @@ const GameRoom = ({loggedIn, socket}) => {
   }
 
   const endGame = message => {
-    axios.put(`http://localhost:8000/api/games/${id}`, {finished: message}, {withCredentials: true})
+    axios.put(`${serverUrl}/api/games/${id}`, {finished: message}, {withCredentials: true})
       .then(rsp => {
         let finishedGame = rsp.data.results;
         setGame(finishedGame);
@@ -94,7 +96,7 @@ const GameRoom = ({loggedIn, socket}) => {
     } else {
       drawOfferedTo = game.playerWhite[0]._id;
     }
-    axios.put(`http://localhost:8000/api/games/${id}`, {drawOfferedTo}, {withCredentials: true})
+    axios.put(`${serverUrl}/api/games/${id}`, {drawOfferedTo}, {withCredentials: true})
       .then(rsp => {
         let gameWithDrawOffer = rsp.data.results;
         setGame(gameWithDrawOffer);
@@ -169,6 +171,9 @@ const GameRoom = ({loggedIn, socket}) => {
         </button>
         <button className="btn btn-info mx-2" onClick={() => setSpriteStyle("triangle")}>
           Triangle
+        </button>
+        <button className="btn btn-info mx-2" onClick={() => setSpriteStyle("crappy")}>
+          Crappy
         </button>
       </div>
 

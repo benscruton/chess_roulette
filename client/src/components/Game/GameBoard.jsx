@@ -1,12 +1,14 @@
-import {useState, useEffect} from "react";
-import Axios from "axios";
+import {useState, useEffect, useContext} from "react";
+import axios from "axios";
 import styles from "./GameBoard.module.css";
 import images from "./ImageSets/standardChess";
+import AppContext from "../../context/AppContext";
 import PiecePromotion from "./PiecePromotion";
 import ConfirmResign from "./ConfirmResign";
 import gameTypes from "./GameTypes";
 
 const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType, specialInfo, begun, endGame, finished, playerIds, spriteStyle, moveLog, setMoveLog, offerDraw, drawOfferPending}) => {
+  const {serverUrl} = useContext(AppContext);
   
   const [availableMoves, setAvailableMoves] = useState(false);
   const [boardStatus, setBoardStatus] = useState(origStatus);
@@ -21,7 +23,7 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
   const gameplayUtils = gameTypes[gameType];
 
   useEffect( () => {
-    Axios.get(`http://localhost:8000/api/games/${gameId}`)
+    axios.get(`${serverUrl}/api/games/${gameId}`)
       .then(res => {
         setWhiteToPlay(res.data.results.whiteToPlay);
       }).catch(err => console.error(err.errors));
@@ -212,7 +214,7 @@ const GameBoard = ({socket, loggedIn, origLastMove, origStatus, gameId, gameType
       moveLog: log,
       $set: dbSet
     };
-    Axios.put(`http://localhost:8000/api/games/${gameId}`, databaseInfo, {withCredentials: true})
+    axios.put(`${serverUrl}/api/games/${gameId}`, databaseInfo, {withCredentials: true})
       .catch(err => console.error({errors: err}));
 
     // send move to socket

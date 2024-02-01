@@ -1,9 +1,11 @@
-import { useHistory } from 'react-router-dom';
-import { useState } from 'react';
-import Axios from 'axios';
+import {useHistory} from 'react-router-dom';
+import {useState, useContext} from 'react';
+import axios from 'axios';
+import AppContext from '../../context/AppContext';
 import UserForm from "../../components/User/UserForm";
 
 const LogReg = ({setLoggedIn}) => {
+  const {serverUrl} = useContext(AppContext);
   const history = useHistory();
   const navigate = path => history.push(path);
   
@@ -45,7 +47,7 @@ const LogReg = ({setLoggedIn}) => {
       userName: reg.userName,
       userId: false,
     };
-    Axios.post("http://localhost:8000/api/checkifexists", dataToCheckForDuplicates)
+    axios.post(`${serverUrl}/api/checkifexists`, dataToCheckForDuplicates)
       .then(rsp => {
         let duplicateError = false;
         let updatedRegErrors = {...initialReg};
@@ -61,7 +63,7 @@ const LogReg = ({setLoggedIn}) => {
           setRegErrors(updatedRegErrors);
           return;
         }
-        Axios.post('http://localhost:8000/api/register', reg, {withCredentials:true})
+        axios.post(`${serverUrl}/api/register`, reg, {withCredentials:true})
           .then(rsp => {
             if (rsp.data.msg) {
               logUserIn(rsp.data.userLogged);
@@ -82,7 +84,7 @@ const LogReg = ({setLoggedIn}) => {
 
   const handleLogin = e => {
     e.preventDefault();
-    Axios.post('http://localhost:8000/api/login', log, {withCredentials:true})
+    axios.post(`${serverUrl}/api/login`, log, {withCredentials:true})
       .then(rsp => {
         if (rsp.data.msg) {
           logUserIn(rsp.data.userLogged);
@@ -98,7 +100,7 @@ const LogReg = ({setLoggedIn}) => {
 
   const demoLogin = e => {
     e.preventDefault();
-    Axios.post("http://localhost:8000/api/demoLogin", {userName: e.target.value}, {withCredentials:true})
+    axios.post(`${serverUrl}/api/demoLogin`, {userName: e.target.value}, {withCredentials:true})
       .then(rsp => {
         logUserIn(rsp.data.userLogged);
       });

@@ -1,11 +1,14 @@
-import React, {useEffect, useState} from "react";
+import {useEffect, useState, useContext} from "react";
 import {Link, useHistory} from "react-router-dom";
 import axios from "axios";
 import styles from "./Nav.module.css";
+import AppContext from "../../context/AppContext";
 import {List} from "react-bootstrap-icons";
 import MobileNavMenu from "./MobileNavMenu";
 
 const Nav = ({loggedIn, setLoggedIn, noUser}) => {
+  const {serverUrl} = useContext(AppContext);
+
   const history = useHistory();
   const navigate = path => history.push(path);
 
@@ -13,7 +16,7 @@ const Nav = ({loggedIn, setLoggedIn, noUser}) => {
     e.preventDefault();
     setLoggedIn(noUser);
     navigate("/");
-    axios.get(`http://localhost:8000/api/logout`, { withCredentials: true })
+    axios.get(`${serverUrl}/api/logout`, { withCredentials: true })
       .then( () => {
         localStorage.clear();
       })

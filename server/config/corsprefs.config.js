@@ -1,9 +1,9 @@
-const corsWhitelist = [
-  "http://localhost:3000",
-  "http://localhost:8000",
-  "chrome-extension://mpognobbkildjkofajifpdfhcoklimli",
-  undefined
-];
+// const corsWhitelist = [
+//   "http://localhost:3000",
+//   "http://localhost:8000",
+//   "chrome-extension://mpognobbkildjkofajifpdfhcoklimli",
+//   undefined
+// ];
 
 const corsPrefs = {
   credentials: true,
