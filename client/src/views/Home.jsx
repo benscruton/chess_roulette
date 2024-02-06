@@ -19,7 +19,7 @@ const Home = ({loggedIn}) => {
         {loggedIn.email ?
           <>Welcome back, <Link to="/profile">{loggedIn.userName}</Link>!</>
           :
-          <Link to="/">Click here to log in or register</Link>
+          <Link to="/login">Log in or register</Link>
         }
       </p>
 
