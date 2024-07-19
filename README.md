@@ -90,7 +90,7 @@ Users cannot move into check, and if they are in check they must block or move o
 
 After any new moves are made, or when a user enters a Game Room, the most recent move is highlighted in purple; this both helps users see when new moves come in, and helps users quickly see the most recent activity when entering a Game Room.
 
-<img alt="Last move is highlighted purple" src="/demoImages/latMove.png" />
+<img alt="Last move is highlighted purple" src="/demoImages/lastMove.png" />
 
 As mentioned in the last section, the Game Room is Socket.IO-enabled, so moves are shown in real time across browsers and devices. Below is a demonstration of a complete game, the "Fool's Mate," taking just two moves. The two side-by-side browsers represent two different users logged in.
 
